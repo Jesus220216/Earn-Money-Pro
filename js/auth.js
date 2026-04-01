@@ -1,32 +1,31 @@
-import { auth, db } from "./firebase.js";
+import { auth } from "./firebase.js";
 import {
 createUserWithEmailAndPassword,
 signInWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
-import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
 window.register = async () => {
-  const email = email.value;
-  const pass = pass.value;
+  const email = document.getElementById("email").value;
+  const pass = document.getElementById("password").value;
 
-  const res = await createUserWithEmailAndPassword(auth, email, pass);
-
-  await setDoc(doc(db, "users", res.user.uid), {
-    balance: 0,
-    videosToday: 0,
-    lastReset: new Date().toDateString(),
-    lastClaim: 0
-  });
-
-  alert("Cuenta creada");
+  try {
+    await createUserWithEmailAndPassword(auth, email, pass);
+    alert("Cuenta creada");
+    location.href = "dashboard.html";
+  } catch (e) {
+    alert(e.message);
+    console.error(e);
+  }
 };
 
 window.login = async () => {
-  const email = email.value;
-  const pass = pass.value;
+  const email = document.getElementById("email").value;
+  const pass = document.getElementById("password").value;
 
-  await signInWithEmailAndPassword(auth, email, pass);
-
-  window.location.href = "dashboard.html";
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    location.href = "dashboard.html";
+  } catch (e) {
+    alert(e.message);
+  }
 };
