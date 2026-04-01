@@ -3,6 +3,14 @@ const admin = require("firebase-admin");
 
 const app = express();
 
+const path = require("path");
+
+app.use(express.static(path.join(__dirname, "public")));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
 // 🔐 Firebase Admin
 const serviceAccount = JSON.parse(process.env.FIREBASE_KEY);
 
