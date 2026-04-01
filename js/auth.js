@@ -8,13 +8,17 @@ window.register = async () => {
   const email = document.getElementById("email").value;
   const pass = document.getElementById("password").value;
 
+  if(pass.length < 6){
+    alert("Mínimo 6 caracteres");
+    return;
+  }
+
   try {
     await createUserWithEmailAndPassword(auth, email, pass);
     alert("Cuenta creada");
     location.href = "dashboard.html";
   } catch (e) {
     alert(e.message);
-    console.error(e);
   }
 };
 
