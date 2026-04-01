@@ -1,22 +1,34 @@
 import { auth, db } from "./firebase.js";
+
+import {
+onAuthStateChanged,
+signOut
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+
 import {
 doc, getDoc, setDoc, updateDoc,
-addDoc, collection, increment
+increment, addDoc, collection
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 let user;
 
-// LOGIN
-auth.onAuthStateChanged(async (u)=>{
-  if(!u) return;
+// 🔐 LOGIN
+onAuthStateChanged(auth, async (u)=>{
+  if(!u){
+    location.href="index.html";
+    return;
+  }
+
   user = u;
 
+  document.getElementById("userEmail").innerText = user.email;
+
   await initUser();
-  await loadUser();
-  createRef();
+  loadUser();
+  loadOfferwalls();
 });
 
-// CREAR USUARIO
+// 👤 USER
 async function initUser(){
   const ref = doc(db,"users",user.uid);
   const snap = await getDoc(ref);
@@ -31,115 +43,95 @@ async function initUser(){
   }
 }
 
-// CARGAR
+// 📊 LOAD
 async function loadUser(){
   const snap = await getDoc(doc(db,"users",user.uid));
   const d = snap.data();
 
-  document.getElementById("balance").innerText = "$"+d.balance.toFixed(2);
-  document.getElementById("daily").innerText = "Videos: "+(d.videosToday||0)+"/10";
+  document.getElementById("balance").innerText =
+    "$"+d.balance.toFixed(2);
 }
 
-// REFERIDO
-function createRef(){
-  document.getElementById("refLink").value =
-    location.origin+"?ref="+user.uid;
-}
-
-// VIDEO
+// 🎥 VIDEO
 let watching=false, seconds=0, interval;
 
-window.startVideo = ()=>{
-  if(watching) return alert("Ya viendo");
+document.getElementById("videoBtn").onclick = ()=>{
+  if(watching) return;
 
-  watching = true;
-  seconds = 0;
+  watching=true;
+  seconds=0;
 
-  interval = setInterval(timer,1000);
+  interval=setInterval(()=>{
+    seconds++;
+    document.getElementById("timerText").innerText = seconds+"/20";
+
+    if(seconds>=20){
+      reward();
+    }
+  },1000);
 };
 
-function timer(){
-  seconds++;
-  document.getElementById("timerText").innerText = seconds+"/20";
-
-  if(seconds >= 20){
-    reward();
-  }
-}
-
-// BLOQUEO CAMBIO DE PESTAÑA
-document.addEventListener("visibilitychange",()=>{
-  if(document.hidden){
-    watching=false;
-    clearInterval(interval);
-    alert("No salir de la pestaña");
-  }
-});
-
-// RECOMPENSA
 async function reward(){
   clearInterval(interval);
 
-  const ref = doc(db,"users",user.uid);
-  const snap = await getDoc(ref);
-  const d = snap.data();
-
-  const today = new Date().toDateString();
-
-  if(d.lastReset !== today){
-    await updateDoc(ref,{
-      videosToday:0,
-      lastReset:today
-    });
-  }
-
-  if((d.videosToday||0) >= 10){
-    alert("Límite diario");
-    return;
-  }
-
-  if(Date.now() - (d.lastClaim||0) < 60000){
-    alert("Espera 60s");
-    return;
-  }
-
-  await updateDoc(ref,{
-    balance: increment(0.02),
-    videosToday: increment(1),
-    lastClaim: Date.now(),
-    lastReset: today
+  await updateDoc(doc(db,"users",user.uid),{
+    balance: increment(0.02)
   });
 
   alert("Ganaste $0.02");
   loadUser();
 }
 
-// RETIRO
-window.withdraw = async ()=>{
-  const amountValue = parseFloat(document.getElementById("amount").value);
-  const paypalValue = document.getElementById("email").value;
+// 🎮 GAME
+document.getElementById("gameBtn").onclick = async ()=>{
+  let r = Math.random();
+  let reward = r < 0.7 ? 0.01 : r < 0.9 ? 0.05 : 0.2;
 
-  if(!amountValue || amountValue < 5){
-    alert("Mínimo $5");
-    return;
-  }
+  await updateDoc(doc(db,"users",user.uid),{
+    balance: increment(reward)
+  });
 
-  const ref = doc(db,"users",user.uid);
-  const snap = await getDoc(ref);
+  alert("Ganaste $" + reward);
+  loadUser();
+};
+
+// 💸 RETIRO
+document.getElementById("withdrawBtn").onclick = async ()=>{
+  const email = document.getElementById("withdrawEmail").value;
+  const amount = parseFloat(document.getElementById("withdrawAmount").value);
+
+  const snap = await getDoc(doc(db,"users",user.uid));
   const balance = snap.data().balance;
 
-  if(amountValue > balance){
+  if(amount > balance){
     alert("Saldo insuficiente");
     return;
   }
 
   await addDoc(collection(db,"withdrawals"),{
     userId:user.uid,
-    amount:amountValue,
-    paypal:paypalValue,
-    status:"pending",
-    date:Date.now()
+    amount,
+    email,
+    status:"pending"
   });
 
   alert("Retiro enviado");
 };
+
+// 🚪 LOGOUT
+document.getElementById("logoutBtn").onclick = async ()=>{
+  await signOut(auth);
+  location.href="index.html";
+};
+
+// 🔥 OFFERWALLS REALES
+function loadOfferwalls(){
+
+  // 🔹 CPX Research (ENCUESTAS)
+  document.getElementById("cpxFrame").src =
+    "https://offers.cpx-research.com/index.php?app_id=TU_APP_ID&ext_user_id="+user.uid;
+
+  // 🔹 AdGate (TAREAS)
+  document.getElementById("offerFrame").src =
+    "https://wall.adgate.media/?id=TU_ID&userId="+user.uid;
+}
