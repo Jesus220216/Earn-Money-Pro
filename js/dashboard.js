@@ -1,8 +1,7 @@
 import { auth, db } from "./firebase.js";
 
 import {
-onAuthStateChanged,
-signOut
+onAuthStateChanged, signOut
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
 import {
@@ -21,30 +20,22 @@ onAuthStateChanged(auth, async (u)=>{
 
   user = u;
 
-  document.getElementById("userEmail").innerText = user.email;
-
   await initUser();
-  loadUser();
-  loadOfferwalls();
+  loadBalance();
 });
 
-// 👤 USER
+// 👤 CREAR USUARIO
 async function initUser(){
   const ref = doc(db,"users",user.uid);
   const snap = await getDoc(ref);
 
   if(!snap.exists()){
-    await setDoc(ref,{
-      balance:0,
-      videosToday:0,
-      lastClaim:0,
-      lastReset:new Date().toDateString()
-    });
+    await setDoc(ref,{ balance:0 });
   }
 }
 
-// 📊 LOAD
-async function loadUser(){
+// 💰 CARGAR BALANCE
+async function loadBalance(){
   const snap = await getDoc(doc(db,"users",user.uid));
   const d = snap.data();
 
@@ -53,52 +44,62 @@ async function loadUser(){
 }
 
 // 🎥 VIDEO
-let watching=false, seconds=0, interval;
+let t=0, interval;
 
-document.getElementById("videoBtn").onclick = ()=>{
-  if(watching) return;
+window.startVideo = ()=>{
+  t = 0;
 
-  watching=true;
-  seconds=0;
+  interval = setInterval(()=>{
+    t++;
+    document.getElementById("timerText").innerText = t+"/20";
 
-  interval=setInterval(()=>{
-    seconds++;
-    document.getElementById("timerText").innerText = seconds+"/20";
-
-    if(seconds>=20){
-      reward();
+    if(t >= 20){
+      clearInterval(interval);
+      addMoney(0.02);
+      alert("Ganaste $0.02");
     }
   },1000);
 };
 
-async function reward(){
-  clearInterval(interval);
-
-  await updateDoc(doc(db,"users",user.uid),{
-    balance: increment(0.02)
-  });
-
-  alert("Ganaste $0.02");
-  loadUser();
-}
-
-// 🎮 GAME
-document.getElementById("gameBtn").onclick = async ()=>{
-  let r = Math.random();
-  let reward = r < 0.7 ? 0.01 : r < 0.9 ? 0.05 : 0.2;
-
-  await updateDoc(doc(db,"users",user.uid),{
-    balance: increment(reward)
-  });
-
-  alert("Ganaste $" + reward);
-  loadUser();
+// 📋 ENCUESTA
+window.survey = ()=>{
+  addMoney(0.10);
+  alert("Ganaste $0.10");
 };
 
-// 💸 RETIRO
-document.getElementById("withdrawBtn").onclick = async ()=>{
-  const email = document.getElementById("withdrawEmail").value;
-  const amount = parseFloat(document.getElementById("withdrawAmount").value);
+// 🧩 TAREA
+window.task = ()=>{
+  addMoney(0.15);
+  alert("Ganaste $0.15");
+};
+
+// 🎮 JUEGO
+window.game = ()=>{
+  let r = Math.random();
+  let reward = r < 0.7 ? 0.01 : 0.05;
+
+  addMoney(reward);
+  alert("Ganaste $" + reward.toFixed(2));
+};
+
+// 💸 SUMAR DINERO
+async function addMoney(amount){
+  await updateDoc(doc(db,"users",user.uid),{
+    balance: increment(amount)
+  });
+
+  loadBalance();
+}
+
+// 💳 RETIRO
+window.withdraw = async ()=>{
+  const email = document.getElementById("email").value;
+  const amount = parseFloat(document.getElementById("amount").value);
+
+  if(!amount || amount <= 0){
+    alert("Monto inválido");
+    return;
+  }
 
   const snap = await getDoc(doc(db,"users",user.uid));
   const balance = snap.data().balance;
@@ -110,28 +111,17 @@ document.getElementById("withdrawBtn").onclick = async ()=>{
 
   await addDoc(collection(db,"withdrawals"),{
     userId:user.uid,
-    amount,
     email,
-    status:"pending"
+    amount,
+    status:"pending",
+    date:Date.now()
   });
 
   alert("Retiro enviado");
 };
 
 // 🚪 LOGOUT
-document.getElementById("logoutBtn").onclick = async ()=>{
+window.logout = async ()=>{
   await signOut(auth);
   location.href="index.html";
 };
-
-// 🔥 OFFERWALLS REALES
-function loadOfferwalls(){
-
-  // 🔹 CPX Research (ENCUESTAS)
-  document.getElementById("cpxFrame").src =
-    "https://offers.cpx-research.com/index.php?app_id=TU_APP_ID&ext_user_id="+user.uid;
-
-  // 🔹 AdGate (TAREAS)
-  document.getElementById("offerFrame").src =
-    "https://wall.adgate.media/?id=TU_ID&userId="+user.uid;
-}
