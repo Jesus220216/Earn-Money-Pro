@@ -2,27 +2,66 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Dashboard</title>
-<link rel="stylesheet" href="css/style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EarnPro</title>
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<h2>💰 Balance</h2>
-<p id="balance">$0</p>
+<div class="nav">
+  <div class="logo">💰 EarnPro</div>
+  <div>
+    <span id="userEmail"></span>
+    <button id="logoutBtn">Salir</button>
+  </div>
+</div>
 
-<p id="timerText">0/20</p>
-<p id="daily">Videos: 0/10</p>
+<div class="banner">
+🔥 Gana dinero real completando tareas 🔥
+</div>
 
-<button onclick="startVideo()">🎥 Ver video</button>
+<div class="main">
 
-<h3>👥 Referidos</h3>
-<input id="refLink" readonly>
+  <!-- IZQUIERDA -->
+  <div class="left">
 
-<h3>💸 Retiro</h3>
-<input id="email" placeholder="PayPal / Binance">
-<input id="amount" placeholder="Monto">
-<button onclick="withdraw()">Retirar</button>
+    <h3>🎥 Videos</h3>
+    <div class="btn" id="videoBtn">Ver video</div>
+    <p id="timerText">0/20</p>
+
+    <h3>📋 Encuestas</h3>
+    <iframe id="cpxFrame" width="100%" height="300"></iframe>
+
+    <h3>🧩 Tareas</h3>
+    <iframe id="offerFrame" width="100%" height="300"></iframe>
+
+    <h3>🎮 Mini Juego</h3>
+    <div class="btn" id="gameBtn">Jugar</div>
+
+    <h3>📢 Anuncios</h3>
+    <div id="ads"></div>
+
+  </div>
+
+  <!-- DERECHA -->
+  <div class="right">
+    <h3>💰 Balance</h3>
+    <p id="balance">$0.00</p>
+
+    <p id="daily"></p>
+
+    <hr>
+
+    <h3>💸 Retiro</h3>
+    <input id="withdrawEmail" placeholder="PayPal / Binance">
+    <input id="withdrawAmount" placeholder="Monto">
+    <div class="btn" id="withdrawBtn">Retirar</div>
+  </div>
+
+</div>
 
 <script type="module" src="js/dashboard.js"></script>
+
 </body>
 </html>
