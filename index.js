@@ -12,6 +12,11 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
+// 🟢 RUTA PRINCIPAL
+app.get("/", (req, res) => {
+  res.send("Servidor activo 💰");
+});
+
 // 💰 POSTBACK
 app.get("/postback", async (req, res) => {
   const userID = req.query.userID;
@@ -35,4 +40,9 @@ app.get("/postback", async (req, res) => {
   }
 });
 
-app.listen(3000, () => console.log("Servidor activo"));
+// 🚀 SERVER (IMPORTANTE PARA RENDER)
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log("Servidor activo en puerto " + PORT);
+});
