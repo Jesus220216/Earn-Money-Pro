@@ -3,7 +3,7 @@ const admin = require("firebase-admin");
 
 const app = express();
 
-// 🔥 CONFIG FIREBASE ADMIN
+// 🔐 Firebase Admin
 const serviceAccount = require("./serviceAccountKey.json");
 
 admin.initializeApp({
@@ -12,7 +12,7 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
-// 🚀 POSTBACK TIMEWALL
+// 💰 POSTBACK
 app.get("/postback", async (req, res) => {
   const userID = req.query.userID;
   const amount = parseFloat(req.query.amount);
@@ -26,7 +26,7 @@ app.get("/postback", async (req, res) => {
       balance: admin.firestore.FieldValue.increment(amount)
     });
 
-    console.log("Pago recibido:", userID, amount);
+    console.log("Pago:", userID, amount);
 
     res.send("ok");
   } catch (e) {
@@ -35,5 +35,4 @@ app.get("/postback", async (req, res) => {
   }
 });
 
-// SERVER
 app.listen(3000, () => console.log("Servidor activo"));
