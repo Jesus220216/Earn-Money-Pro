@@ -14,8 +14,10 @@
 <div class="nav">
   <div class="logo">💰 EarnPro</div>
   <div>
-    <button>Iniciar Sesión</button>
-    <button>Regístrate</button>
+    <input id="email" placeholder="Correo">
+    <input id="password" type="password" placeholder="Contraseña">
+    <button onclick="login()">Entrar</button>
+    <button onclick="register()">Regístrate</button>
   </div>
 </div>
 
@@ -40,7 +42,7 @@
     <h2>Gana dinero online en 2026</h2>
     <p>Completa tareas, encuestas y gana dinero desde tu celular.</p>
 
-    <div class="btn">🚀 Empezar ahora</div>
+    <div class="btn" onclick="register()">🚀 Empezar ahora</div>
 
     <h3>📊 Ofertas disponibles</h3>
 
@@ -59,12 +61,11 @@
     <h3>💰 Tu saldo</h3>
     <p id="saldo">$0</p>
 
-    <div class="btn" id="earnBtn">+1$</div>
   </div>
 
 </div>
 
-<script src="main.js"></script>
+<script type="module" src="js/auth.js"></script>
 
 </body>
 </html>
