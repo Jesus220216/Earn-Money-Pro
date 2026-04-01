@@ -27,10 +27,10 @@ app.get("/postback", async (req, res) => {
   }
 
   try {
-    await db.collection("users").doc(userID).update({
-      balance: admin.firestore.FieldValue.increment(amount)
-    });
-
+   await db.collection("users").doc(userID).set({
+  balance: admin.firestore.FieldValue.increment(amount)
+}, { merge: true });
+    
     console.log("Pago:", userID, amount);
 
     res.send("ok");
