@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EarnPro</title>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="nav">
+  <div class="logo">💰 EarnPro</div>
+  <div>
+    <input id="email" placeholder="Correo">
+    <input id="password" type="password" placeholder="Contraseña">
+    <button onclick="login()">Entrar</button>
+    <button onclick="register()">Regístrate</button>
+  </div>
+</div>
+
+<!-- BANNER -->
+<div class="banner">
+🔥 Gana dinero real completando tareas 🔥
+</div>
+
+<!-- CARDS -->
+<div class="cards">
+  <div class="card">PayPal <br><span>$25</span></div>
+  <div class="card">Amazon <br><span>$120</span></div>
+  <div class="card">Crypto <br><span>$80</span></div>
+  <div class="card">Visa <br><span>$60</span></div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- IZQUIERDA -->
+  <div class="left">
+    <h2>Gana dinero online en 2026</h2>
+    <p>Completa tareas, encuestas y gana dinero desde tu celular.</p>
+
+    <div class="btn" onclick="register()">🚀 Empezar ahora</div>
+
+    <h3>📊 Ofertas disponibles</h3>
+
+    <iframe src="https://example.com" width="100%" height="400"></iframe>
+  </div>
+
+  <!-- DERECHA -->
+  <div class="right">
+    <h3>🎯 Oferta destacada</h3>
+    <p>Gana hasta $87 en tu primera tarea</p>
+
+    <div class="btn">🎰 Girar ruleta</div>
+
+    <hr>
+
+    <h3>💰 Tu saldo</h3>
+    <p id="saldo">$0</p>
+
+  </div>
+
+</div>
+
+<script type="module" src="js/auth.js"></script>
+
+</body>
+</html>
