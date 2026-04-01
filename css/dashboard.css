@@ -1,0 +1,17 @@
+body { margin:0; font-family:Arial; background:#0f172a; color:white; }
+
+.dashboard { display:flex; }
+
+.sidebar { width:200px; background:#020617; padding:20px; }
+
+.sidebar button {
+  width:100%; margin-top:10px; padding:10px;
+  background:#1e293b; color:white; border:none;
+}
+
+.main { flex:1; padding:20px; }
+
+.page { display:none; }
+.page.active { display:block; }
+
+#balance { font-size:30px; color:#22c55e; }

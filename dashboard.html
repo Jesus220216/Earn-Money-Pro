@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<h2>💰 Balance</h2>
+<p id="balance">$0</p>
+
+<p id="timerText">0/20</p>
+<p id="daily">Videos: 0/10</p>
+
+<button onclick="startVideo()">🎥 Ver video</button>
+
+<h3>👥 Referidos</h3>
+<input id="refLink" readonly>
+
+<h3>💸 Retiro</h3>
+<input id="email" placeholder="PayPal / Binance">
+<input id="amount" placeholder="Monto">
+<button onclick="withdraw()">Retirar</button>
+
+<script type="module" src="js/dashboard.js"></script>
+</body>
+</html>
