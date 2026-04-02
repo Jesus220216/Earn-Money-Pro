@@ -13,10 +13,9 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
-// 📁 SERVIR FRONTEND
+// 📁 FRONTEND
 app.use(express.static(path.join(__dirname, "public")));
 
-// 🟢 INDEX (TU WEB)
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
@@ -24,22 +23,15 @@ app.get("/", (req, res) => {
 // 🔐 SECRET
 const SECRET = "EarnPro_SECURE_9xLk29@2026";
 
-// 💰 POSTBACK (TIMEWALL PRO)
+// 💰 POSTBACK SEGURO
 app.get("/postback", async (req, res) => {
   const { userID, amount, transactionID, revenue, secret } = req.query;
 
-  // 🔐 Validar secreto
-  if (secret !== SECRET) {
-    return res.send("denied");
-  }
+  if (secret !== SECRET) return res.send("denied");
+  if (!userID || !amount || !transactionID) return res.send("error");
 
-  // ❌ Validar datos obligatorios
-  if (!userID || !amount || !transactionID) {
-    return res.send("error");
-  }
-
-  // 💣 Validar amount (anti hack)
-  if (isNaN(amount) || amount <= 0 || amount > 5) {
+  const parsedAmount = parseFloat(amount);
+  if (isNaN(parsedAmount) || parsedAmount <= 0 || parsedAmount > 5) {
     return res.send("invalid amount");
   }
 
@@ -47,40 +39,57 @@ app.get("/postback", async (req, res) => {
     const txRef = db.collection("transactions").doc(transactionID);
     const txSnap = await txRef.get();
 
-    // 🚫 evitar duplicados
-    if (txSnap.exists) {
-      return res.send("duplicate");
+    if (txSnap.exists) return res.send("duplicate");
+
+    const userRef = db.collection("users").doc(userID);
+    const userSnap = await userRef.get();
+
+    if (!userSnap.exists) return res.send("no user");
+
+    const userData = userSnap.data();
+    const now = Date.now();
+
+    // 🚫 anti spam
+    if (userData.lastReward && now - userData.lastReward < 5000) {
+      return res.send("too fast");
+    }
+
+    // 🚫 anti fraude básico
+    if (userData.balance > 100 && userData.referrals === 0) {
+      await db.collection("fraud_logs").add({
+        userID,
+        reason: "balance sospechoso",
+        date: now
+      });
+      return res.send("blocked");
     }
 
     // 💰 sumar dinero
-    await db.collection("users").doc(userID).set({
-      balance: admin.firestore.FieldValue.increment(parseFloat(amount))
+    await userRef.set({
+      balance: admin.firestore.FieldValue.increment(parsedAmount),
+      lastReward: now
     }, { merge: true });
 
-  // 💸 REFERIDOS
-const userRef = await db.collection("users").doc(userID).get();
-const userData = userRef.data();
+    // 💸 referidos
+    if (userData.referrer) {
+      const commission = parsedAmount * 0.10;
 
-if (userData?.referrer) {
-  const commission = parseFloat(amount) * 0.10;
+      await db.collection("users").doc(userData.referrer).set({
+        balance: admin.firestore.FieldValue.increment(commission),
+        referralEarnings: admin.firestore.FieldValue.increment(commission)
+      }, { merge: true });
+    }
 
-  await db.collection("users").doc(userData.referrer).set({
-    balance: admin.firestore.FieldValue.increment(commission),
-    referralEarnings: admin.firestore.FieldValue.increment(commission)
-  }, { merge: true });
-
-  console.log("🎁 Comisión referida:", commission);
-}
-    
     // 💾 guardar transacción
     await txRef.set({
       userID,
-      amount: parseFloat(amount),
+      amount: parsedAmount,
       revenue: parseFloat(revenue || 0),
-      date: Date.now()
+      ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress,
+      date: now
     });
 
-    console.log("✅ Pago real:", userID, amount);
+    console.log("✅ Pago:", userID, parsedAmount);
 
     res.send("ok");
 
@@ -90,9 +99,55 @@ if (userData?.referrer) {
   }
 });
 
+// 👑 ADMIN USERS
+app.get("/admin/users", async (req, res) => {
+  if (req.query.secret !== SECRET) return res.send("denied");
+
+  const snap = await db.collection("users").get();
+  const users = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+  res.json(users);
+});
+
+// 💳 ADMIN WITHDRAWALS
+app.get("/admin/withdrawals", async (req, res) => {
+  if (req.query.secret !== SECRET) return res.send("denied");
+
+  const snap = await db.collection("withdrawals").get();
+  const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+  res.json(data);
+});
+
+// ✅ APROBAR
+app.get("/admin/approve", async (req, res) => {
+  if (req.query.secret !== SECRET) return res.send("denied");
+
+  const { id } = req.query;
+
+  await db.collection("withdrawals").doc(id).update({
+    status: "approved"
+  });
+
+  res.send("approved");
+});
+
+// ❌ RECHAZAR
+app.get("/admin/reject", async (req, res) => {
+  if (req.query.secret !== SECRET) return res.send("denied");
+
+  const { id } = req.query;
+
+  await db.collection("withdrawals").doc(id).update({
+    status: "rejected"
+  });
+
+  res.send("rejected");
+});
+
 // 🚀 SERVER
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log("Servidor activo en puerto " + PORT);
+  console.log("🔥 Server activo en puerto " + PORT);
 });
