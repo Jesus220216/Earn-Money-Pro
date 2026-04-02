@@ -31,6 +31,9 @@ onAuthStateChanged(auth, async (u) => {
   user = u;
 
   await initUser();
+
+  await checkSpinLimit(); // 👈 AQUÍ
+
   realtimeBalance();
   generateRefLink();
 });
@@ -205,17 +208,26 @@ window.daily = async () => {
   showToast("Ganaste $0.20 🎁");
 };
 
-window.spin = () => {
- let spinsToday = 0;
-
 window.spin = async () => {
 
-  if (spinsToday >= 10) {
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+  const data = snap.data() || {};
+
+  const today = new Date().toDateString();
+
+  if (data.spinDate !== today) {
+    await updateDoc(ref, { spinDate: today, spins: 0 });
+  }
+
+  if ((data.spins || 0) >= 10) {
     showToast("Límite diario alcanzado ❌");
     return;
   }
 
-  spinsToday++;
+  await updateDoc(ref, {
+    spins: increment(1)
+  });
 
   const wheel = document.getElementById("wheel");
 
@@ -306,4 +318,19 @@ function showToast(msg) {
   document.body.appendChild(toast);
 
   setTimeout(() => toast.remove(), 2500);
+}
+// 🧠 RESET LÍMITE DIARIO RULETA
+async function checkSpinLimit() {
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+
+  const data = snap.data() || {};
+  const today = new Date().toDateString();
+
+  if (data.spinDate !== today) {
+    await updateDoc(ref, {
+      spinDate: today,
+      spins: 0
+    });
+  }
 }
