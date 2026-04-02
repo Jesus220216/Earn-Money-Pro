@@ -3,18 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <title>EarnPro</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="dashboard.css">
 </head>
 
-<body>
+<body class="dashboard">
 
 <!-- NAV -->
 <div class="nav">
   <div class="logo">💰 EarnPro</div>
 
   <div class="nav-right">
-    <div class="balance-mini">$0.32</div>
-    <button class="logout">Salir</button>
+    <div class="balance-mini">$0.00</div>
+    <button class="logout" onclick="logout()">Salir</button>
   </div>
 </div>
 
@@ -28,28 +28,33 @@
 
     <div class="grid">
 
+      <!-- VIDEO -->
       <div class="card hover">
         <h3>🎥 Videos</h3>
         <p>Mira anuncios y gana dinero</p>
-        <button>Empezar</button>
+        <button onclick="startVideo()">Empezar</button>
+        <p id="timerText">0/20</p>
       </div>
 
+      <!-- ENCUESTA -->
       <div class="card hover">
         <h3>📋 Encuestas</h3>
         <p>Responde y gana $</p>
-        <button>Ganar</button>
+        <button onclick="survey()">Ganar</button>
       </div>
 
+      <!-- TAREA -->
       <div class="card hover">
         <h3>🧩 Tareas</h3>
         <p>Apps y registros</p>
-        <button>Completar</button>
+        <button onclick="task()">Completar</button>
       </div>
 
+      <!-- JUEGO -->
       <div class="card hover">
         <h3>🎮 Juegos</h3>
         <p>Juega y gana</p>
-        <button>Jugar</button>
+        <button onclick="game()">Jugar</button>
       </div>
 
     </div>
@@ -59,30 +64,47 @@
   <!-- RIGHT -->
   <div class="right">
 
+    <!-- BALANCE -->
     <div class="card glass">
       <h3>💰 Balance</h3>
-      <h1 id="balance">$0.32</h1>
+      <h1 id="balance">$0.00</h1>
       <p class="sub">Disponible para retirar</p>
     </div>
 
+    <!-- RETIRO -->
     <div class="card glass">
       <h3>💸 Retirar</h3>
 
-      <input placeholder="PayPal o Binance">
-      <input placeholder="Monto">
+      <input id="email" placeholder="PayPal o Binance">
+      <input id="amount" placeholder="Monto">
 
-      <button class="withdraw">Retirar dinero</button>
+      <button class="withdraw" onclick="withdraw()">Retirar dinero</button>
     </div>
 
+    <!-- REFERIDOS -->
     <div class="card glass">
       <h3>👥 Referidos</h3>
       <p>Gana 10% de tus amigos</p>
-      <input value="https://tuweb.com?ref=123" readonly>
+      <input id="refLink" readonly>
     </div>
 
   </div>
 
 </div>
+
+<script type="module" src="js/dashboard.js"></script>
+
+<script>
+/* 🔥 GENERAR LINK DE REFERIDO AUTOMÁTICO */
+setTimeout(() => {
+  const uid = localStorage.getItem("uid") || "user";
+  document.getElementById("refLink").value =
+    window.location.origin + "?ref=" + uid;
+}, 1000);
+</script>
+
+</body>
+</html>
 
 <script type="module" src="js/dashboard.js"></script>
 
