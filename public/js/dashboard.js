@@ -215,6 +215,13 @@ window.spin = () => {
 
 // 💰 SUMAR DINERO
 async function addMoney(amount) {
+
+  // 🧠 ANTIFRAUDE
+  if (amount > 0.5) {
+    console.warn("Intento sospechoso bloqueado");
+    return;
+  }
+
   await setDoc(doc(db, "users", user.uid), {
     balance: increment(amount)
   }, { merge: true });
