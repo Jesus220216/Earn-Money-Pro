@@ -6,8 +6,17 @@ import {
 
 import {
   doc, getDoc, setDoc, updateDoc,
-  increment, addDoc, collection, onSnapshot
+  increment, addDoc, collection,
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+// 🎯 DETECTAR REFERIDO (AL INICIO)
+const urlParams = new URLSearchParams(window.location.search);
+const ref = urlParams.get("ref");
+
+if (ref) {
+  localStorage.setItem("referrer", ref);
+}
 
 let user;
 let balance = 0;
@@ -22,30 +31,66 @@ onAuthStateChanged(auth, async (u) => {
   user = u;
 
   await initUser();
-  realtimeBalance(); // 🔥 tiempo real
+  realtimeBalance();
+  generateRefLink();
 });
 
-// 👤 CREAR USUARIO
+// 👤 CREAR USUARIO + REFERIDOS
 async function initUser() {
-  const ref = doc(db, "users", user.uid);
-  const snap = await getDoc(ref);
+  const referrer = localStorage.getItem("referrer");
+
+  const refDoc = doc(db, "users", user.uid);
+  const snap = await getDoc(refDoc);
 
   if (!snap.exists()) {
-    await setDoc(ref, { balance: 0 });
+    await setDoc(refDoc, {
+      balance: 0,
+      referrer: referrer || null,
+      referrals: 0,
+      referralEarnings: 0
+    });
+
+    // 🎯 sumar contador al referidor
+    if (referrer && referrer !== user.uid) {
+      await updateDoc(doc(db, "users", referrer), {
+        referrals: increment(1)
+      });
+    }
   }
 }
 
-// 💰 BALANCE EN TIEMPO REAL + ANIMADO
-function realtimeBalance() {
-  const ref = doc(db, "users", user.uid);
+// 🔗 GENERAR LINK REFERIDO
+function generateRefLink() {
+  const input = document.getElementById("refLink");
+  if (input) {
+    input.value = `${window.location.origin}?ref=${user.uid}`;
+  }
+}
 
-  onSnapshot(ref, (snap) => {
-    const newBalance = snap.data()?.balance || 0;
+// 💰 BALANCE EN TIEMPO REAL + DATOS
+function realtimeBalance() {
+  const refDoc = doc(db, "users", user.uid);
+
+  onSnapshot(refDoc, (snap) => {
+    const data = snap.data() || {};
+    const newBalance = data.balance || 0;
+
     animateBalance(newBalance);
+
+    // 📊 referidos
+    if (document.getElementById("refCount")) {
+      document.getElementById("refCount").innerText =
+        data.referrals || 0;
+    }
+
+    if (document.getElementById("refEarn")) {
+      document.getElementById("refEarn").innerText =
+        (data.referralEarnings || 0).toFixed(2);
+    }
   });
 }
 
-// 🎯 ANIMACIÓN PRO
+// 🎯 ANIMACIÓN PRO BALANCE
 function animateBalance(newValue) {
   let start = balance;
   let end = newValue;
@@ -88,27 +133,28 @@ window.startVideo = () => {
   }, 1000);
 };
 
-// 📋 TIMEWALL (ENCUESTAS)
+// 📋 TIMEWALL
 window.survey = () => {
-  const url = `https://timewall.io/wall?uid=${user.uid}`;
-  window.open(url, "_blank");
+  window.open(`https://timewall.io/wall?uid=${user.uid}`, "_blank");
 };
 
-// 🧩 CPX (TAREAS)
+// 🧩 CPX
 window.task = () => {
-  const url = `https://offers.cpx-research.com/index.php?app_id=TU_APP_ID&ext_user_id=${user.uid}`;
-  window.open(url, "_blank");
+  window.open(`https://offers.cpx-research.com/index.php?app_id=TU_APP_ID&ext_user_id=${user.uid}`, "_blank");
 };
 
-// 🎁 LOOTABLY (OFERTAS PRO)
+// 🎁 LOOTABLY
 window.lootably = () => {
-  const url = `https://wall.lootably.com/?placement=TU_PLACEMENT_ID&uid=${user.uid}`;
-  const win = window.open(url, "_blank");
+  const win = window.open(
+    `https://wall.lootably.com/?placement=TU_PLACEMENT_ID&uid=${user.uid}`,
+    "_blank"
+  );
 
   if (!win) {
-    alert("Activa las ventanas emergentes ⚠️");
+    showToast("Activa ventanas emergentes ⚠️");
   }
 };
+
 // 🎮 JUEGO
 window.game = () => {
   let reward = Math.random() < 0.7 ? 0.01 : 0.05;
@@ -117,21 +163,9 @@ window.game = () => {
   showToast("Ganaste $" + reward.toFixed(2) + " 🎮");
 };
 
-// 🎯 LOOTABLY OFFERWALL
-window.lootably = () => {
-  const url = `https://wall.lootably.com/?placement=TU_PLACEMENT_ID&uid=${user.uid}`;
-  const win = window.open(url, "_blank");
-
-  if (!win) {
-    alert("Activa las ventanas emergentes ⚠️");
-  }
-};
-
-// 💰 SUMAR DINERO (FIX PRO)
+// 💰 SUMAR DINERO
 async function addMoney(amount) {
-  const ref = doc(db, "users", user.uid);
-
-  await setDoc(ref, {
+  await setDoc(doc(db, "users", user.uid), {
     balance: increment(amount)
   }, { merge: true });
 }
@@ -148,6 +182,11 @@ window.withdraw = async () => {
 
   if (amount > balance) {
     showToast("Saldo insuficiente ❌");
+    return;
+  }
+
+  if (amount < 5) {
+    showToast("Mínimo retiro $5 ❌");
     return;
   }
 
@@ -168,12 +207,7 @@ window.logout = async () => {
   location.href = "index.html";
 };
 
-// 🔥 👇 PONLO AQUÍ AL FINAL
-window.addEventListener("focus", () => {
-  loadBalance();
-});
-
-// 🔔 TOAST PRO (sin alert)
+// 🔔 TOAST
 function showToast(msg) {
   const toast = document.createElement("div");
 
