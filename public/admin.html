@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #111;
+      color: white;
+      padding: 20px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: #1f1f1f;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+    }
+
+    button {
+      margin-left: 10px;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .ok { background: #22c55e; }
+    .no { background: #ef4444; }
+  </style>
+</head>
+<body>
+
+<h2>💳 Retiros</h2>
+<div id="list">Cargando...</div>
+
+<script>
+const SECRET = "123abc";
+
+async function loadWithdrawals() {
+  try {
+    const res = await fetch(`/admin/withdrawals?secret=${SECRET}`);
+    const data = await res.json();
+
+    const div = document.getElementById("list");
+    div.innerHTML = "";
+
+    if (!data.length) {
+      div.innerHTML = "No hay retiros";
+      return;
+    }
+
+    data.forEach(w => {
+      div.innerHTML += `
+        <div class="card">
+          👤 ${w.userId} <br>
+          💰 $${w.amount} <br>
+          📊 ${w.status || "pending"} <br>
+          <button class="ok" onclick="approve('${w.id}')">Aprobar</button>
+          <button class="no" onclick="reject('${w.id}')">Rechazar</button>
+        </div>
+      `;
+    });
+
+  } catch (e) {
+    document.getElementById("list").innerText = "Error cargando datos ❌";
+  }
+}
+
+function approve(id){
+  fetch(`/admin/approve?id=${id}&secret=${SECRET}`)
+  .then(() => location.reload());
+}
+
+function reject(id){
+  fetch(`/admin/reject?id=${id}&secret=${SECRET}`)
+  .then(() => location.reload());
+}
+
+loadWithdrawals();
+</script>
+
+</body>
+</html>
