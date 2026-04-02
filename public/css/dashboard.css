@@ -152,3 +152,10 @@ input {
   background: linear-gradient(90deg,#22c55e,#16a34a);
   transition: width 0.3s;
 }
+
+#videoProgress {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg,#22c55e,#16a34a);
+  transition: width 1s linear;
+}
