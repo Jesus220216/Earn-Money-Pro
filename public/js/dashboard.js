@@ -121,7 +121,7 @@ window.startVideo = () => {
     seconds++;
     document.getElementById("timerText").innerText = seconds + "/20";
 
-    if (seconds >= 20) {
+    if (seconds >= 10) {
       clearInterval(interval);
       video.pause();
 
