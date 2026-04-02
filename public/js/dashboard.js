@@ -128,36 +128,66 @@ function animateBalance(newValue) {
 // 🎥 VIDEO
 let videosLeft = 6;
 let watching = false;
+let seconds = 0;
+let interval;
 
 window.startVideo = () => {
+
   if (videosLeft <= 0) {
     showToast("No hay más videos hoy ❌");
     return;
   }
 
-  let time = 0;
+  const video = document.getElementById("videoPlayer");
+
+  seconds = 0;
   watching = true;
 
-  const interval = setInterval(() => {
+  video.currentTime = 0;
+  video.play();
+
+  interval = setInterval(() => {
+
     if (!watching) {
       clearInterval(interval);
+      video.pause();
       showToast("Cancelado ❌");
       return;
     }
 
-    time++;
-    document.getElementById("timerText").innerText = time + "/20";
+    seconds++;
+    document.getElementById("timerText").innerText =
+      seconds + "/20";
 
-    if (time >= 20) {
+    if (seconds >= 20) {
       clearInterval(interval);
+
       videosLeft--;
-      document.getElementById("videosLeft").innerText = "Restantes: " + videosLeft;
+      document.getElementById("videosLeft").innerText =
+        "Restantes: " + videosLeft;
+
+      video.pause();
 
       addMoney(0.09);
       showToast("Ganaste $0.09 🎥");
     }
+
   }, 1000);
 };
+
+// ⛔ detectar cambio de pestaña
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    watching = false;
+  }
+});
+
+// ⛔ detectar pausa manual
+document.getElementById("videoPlayer").addEventListener("pause", () => {
+  if (seconds < 20) {
+    watching = false;
+  }
+});
 
 // ❌ DETECTAR SI SALE
 document.addEventListener("visibilitychange", () => {
