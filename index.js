@@ -57,6 +57,21 @@ app.get("/postback", async (req, res) => {
       balance: admin.firestore.FieldValue.increment(parseFloat(amount))
     }, { merge: true });
 
+  // 💸 REFERIDOS
+const userRef = await db.collection("users").doc(userID).get();
+const userData = userRef.data();
+
+if (userData?.referrer) {
+  const commission = parseFloat(amount) * 0.10;
+
+  await db.collection("users").doc(userData.referrer).set({
+    balance: admin.firestore.FieldValue.increment(commission),
+    referralEarnings: admin.firestore.FieldValue.increment(commission)
+  }, { merge: true });
+
+  console.log("🎁 Comisión referida:", commission);
+}
+    
     // 💾 guardar transacción
     await txRef.set({
       userID,
