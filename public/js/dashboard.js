@@ -88,17 +88,13 @@ window.startVideo = () => {
   }, 1000);
 };
 
-// 📋 ENCUESTAS (TIMEWALL REAL)
-window.survey = () => {
-  const uid = user.uid;
-
-  const url = `https://timewall.io/wall?uid=${uid}`;
-
-  window.open(url, "_blank");
-};
-
 // 🎯 TIMEWALL (OFERTAS REALES)
 window.offerwall = () => {
+  if (!user) {
+    alert("Usuario no cargado");
+    return;
+  }
+
   const win = window.open(`https://timewall.io/wall?uid=${user.uid}`, "_blank");
 
   if (!win) {
@@ -160,6 +156,11 @@ window.logout = async () => {
   await signOut(auth);
   location.href = "index.html";
 };
+
+// 🔥 👇 PONLO AQUÍ AL FINAL
+window.addEventListener("focus", () => {
+  loadBalance();
+});
 
 // 🔔 TOAST PRO (sin alert)
 function showToast(msg) {
