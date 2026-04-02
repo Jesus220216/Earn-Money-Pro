@@ -1,127 +1,170 @@
 import { auth, db } from "./firebase.js";
 
 import {
-onAuthStateChanged, signOut
+  onAuthStateChanged, signOut
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
 import {
-doc, getDoc, setDoc, updateDoc,
-increment, addDoc, collection
+  doc, getDoc, setDoc, updateDoc,
+  increment, addDoc, collection, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 let user;
+let balance = 0;
 
 // 🔐 LOGIN
-onAuthStateChanged(auth, async (u)=>{
-  if(!u){
-    location.href="index.html";
+onAuthStateChanged(auth, async (u) => {
+  if (!u) {
+    location.href = "index.html";
     return;
   }
 
   user = u;
 
   await initUser();
-  loadBalance();
+  realtimeBalance(); // 🔥 tiempo real
 });
 
 // 👤 CREAR USUARIO
-async function initUser(){
-  const ref = doc(db,"users",user.uid);
+async function initUser() {
+  const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
 
-  if(!snap.exists()){
-    await setDoc(ref,{ balance:0 });
+  if (!snap.exists()) {
+    await setDoc(ref, { balance: 0 });
   }
 }
 
-// 💰 CARGAR BALANCE
-async function loadBalance(){
-  const snap = await getDoc(doc(db,"users",user.uid));
-  const d = snap.data();
+// 💰 BALANCE EN TIEMPO REAL + ANIMADO
+function realtimeBalance() {
+  const ref = doc(db, "users", user.uid);
 
-  document.getElementById("balance").innerText =
-    "$"+d.balance.toFixed(2);
+  onSnapshot(ref, (snap) => {
+    const newBalance = snap.data()?.balance || 0;
+    animateBalance(newBalance);
+  });
+}
+
+// 🎯 ANIMACIÓN PRO
+function animateBalance(newValue) {
+  let start = balance;
+  let end = newValue;
+  let step = (end - start) / 20;
+  let i = 0;
+
+  let interval = setInterval(() => {
+    start += step;
+
+    document.getElementById("balance").innerText =
+      "$" + start.toFixed(2);
+
+    document.querySelector(".balance-mini").innerText =
+      "$" + start.toFixed(2);
+
+    i++;
+    if (i >= 20) {
+      clearInterval(interval);
+      balance = end;
+    }
+  }, 25);
 }
 
 // 🎥 VIDEO
-let t=0, interval;
+let t = 0, interval;
 
-window.startVideo = ()=>{
+window.startVideo = () => {
   t = 0;
 
-  interval = setInterval(()=>{
+  interval = setInterval(() => {
     t++;
-    document.getElementById("timerText").innerText = t+"/20";
 
-    if(t >= 20){
+    document.getElementById("timerText").innerText = t + "/20";
+
+    if (t >= 20) {
       clearInterval(interval);
       addMoney(0.02);
-      alert("Ganaste $0.02");
+      showToast("Ganaste $0.02 💰");
     }
-  },1000);
+  }, 1000);
 };
 
 // 📋 ENCUESTA
-window.survey = ()=>{
+window.survey = () => {
   addMoney(0.10);
-  alert("Ganaste $0.10");
+  showToast("Ganaste $0.10 💰");
 };
 
 // 🧩 TAREA
-window.task = ()=>{
+window.task = () => {
   addMoney(0.15);
-  alert("Ganaste $0.15");
+  showToast("Ganaste $0.15 💰");
 };
 
 // 🎮 JUEGO
-window.game = ()=>{
-  let r = Math.random();
-  let reward = r < 0.7 ? 0.01 : 0.05;
+window.game = () => {
+  let reward = Math.random() < 0.7 ? 0.01 : 0.05;
 
   addMoney(reward);
-  alert("Ganaste $" + reward.toFixed(2));
+  showToast("Ganaste $" + reward.toFixed(2) + " 🎮");
 };
 
-// 💸 SUMAR DINERO
-async function addMoney(amount){
-  await updateDoc(doc(db,"users",user.uid),{
-    balance: increment(amount)
-  });
+// 💰 SUMAR DINERO (FIX PRO)
+async function addMoney(amount) {
+  const ref = doc(db, "users", user.uid);
 
-  loadBalance();
+  await setDoc(ref, {
+    balance: increment(amount)
+  }, { merge: true });
 }
 
 // 💳 RETIRO
-window.withdraw = async ()=>{
+window.withdraw = async () => {
   const email = document.getElementById("email").value;
   const amount = parseFloat(document.getElementById("amount").value);
 
-  if(!amount || amount <= 0){
-    alert("Monto inválido");
+  if (!amount || amount <= 0) {
+    showToast("Monto inválido ❌");
     return;
   }
 
-  const snap = await getDoc(doc(db,"users",user.uid));
-  const balance = snap.data().balance;
-
-  if(amount > balance){
-    alert("Saldo insuficiente");
+  if (amount > balance) {
+    showToast("Saldo insuficiente ❌");
     return;
   }
 
-  await addDoc(collection(db,"withdrawals"),{
-    userId:user.uid,
+  await addDoc(collection(db, "withdrawals"), {
+    userId: user.uid,
     email,
     amount,
-    status:"pending",
-    date:Date.now()
+    status: "pending",
+    date: Date.now()
   });
 
-  alert("Retiro enviado");
+  showToast("Retiro enviado 🚀");
 };
 
 // 🚪 LOGOUT
-window.logout = async ()=>{
+window.logout = async () => {
   await signOut(auth);
-  location.href="index.html";
+  location.href = "index.html";
 };
+
+// 🔔 TOAST PRO (sin alert)
+function showToast(msg) {
+  const toast = document.createElement("div");
+
+  toast.innerText = msg;
+  toast.style.position = "fixed";
+  toast.style.bottom = "20px";
+  toast.style.right = "20px";
+  toast.style.background = "#22c55e";
+  toast.style.padding = "12px 20px";
+  toast.style.borderRadius = "10px";
+  toast.style.color = "black";
+  toast.style.fontWeight = "bold";
+  toast.style.zIndex = "999";
+
+  document.body.appendChild(toast);
+
+  setTimeout(() => toast.remove(), 2500);
+}
