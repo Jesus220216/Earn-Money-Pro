@@ -17,6 +17,19 @@ if (ref) localStorage.setItem("referrer", ref);
 let user;
 let balance = 0;
 
+// 🎥 VIDEO GLOBAL
+const videos = [
+  "https://www.w3schools.com/html/mov_bbb.mp4",
+  "https://www.w3schools.com/html/movie.mp4"
+];
+
+let videoIndex = 0;
+let videosLeft = 0;
+let watching = false;
+let seconds = 0;
+let interval;
+let lastVideoTime = 0;
+
 // 🔐 LOGIN
 onAuthStateChanged(auth, async (u) => {
   if (!u) return location.href = "index.html";
@@ -25,7 +38,7 @@ onAuthStateChanged(auth, async (u) => {
 
   await initUser();
   await checkSpinLimit();
-  onAuthStateChanged(auth, async (u) => {
+  await checkVideoLimit();
 
   const snap = await getDoc(doc(db, "users", user.uid));
   updateSpinUI(snap.data()?.spins || 0);
@@ -44,12 +57,16 @@ async function initUser() {
       balance: 0,
       referrer: referrer || null,
       referrals: 0,
-      referralEarnings: 0
-    });
+      referralEarnings: 0,
 
-   videosLeft: 6,
-  videoDate: new Date().toDateString()
-});
+      // 🎥 VIDEO SYSTEM
+      videosLeft: 6,
+      videoDate: new Date().toDateString(),
+
+      // 🎰 RULETA
+      spins: 0,
+      spinDate: new Date().toDateString()
+    });
 
     if (referrer && referrer !== user.uid) {
       await updateDoc(doc(db, "users", referrer), {
@@ -66,29 +83,22 @@ function realtimeBalance() {
     animateBalance(data.balance || 0);
 
     document.getElementById("refCount").innerText = data.referrals || 0;
-    document.getElementById("refEarn").innerText = (data.referralEarnings || 0).toFixed(2);
+    document.getElementById("refEarn").innerText =
+      (data.referralEarnings || 0).toFixed(2);
   });
 }
 
 function animateBalance(newValue) {
   balance = newValue;
-  document.getElementById("balance").innerText = "$" + newValue.toFixed(2);
-  document.querySelector(".balance-mini").innerText = "$" + newValue.toFixed(2);
+
+  document.getElementById("balance").innerText =
+    "$" + newValue.toFixed(2);
+
+  document.querySelector(".balance-mini").innerText =
+    "$" + newValue.toFixed(2);
 }
 
 // 🎥 VIDEO
-const videos = [
-  "https://www.w3schools.com/html/mov_bbb.mp4",
-  "https://www.w3schools.com/html/movie.mp4"
-];
-
-let videoIndex = 0;
-let videosLeft = 6;
-let watching = false;
-let seconds = 0;
-let interval;
-let lastVideoTime = 0;
-
 window.startVideo = async () => {
 
   if (Date.now() - lastVideoTime < 10000) {
@@ -105,7 +115,6 @@ window.startVideo = async () => {
 
   const video = document.getElementById("videoPlayer");
 
-  // 🎥 cargar video
   video.src = videos[videoIndex];
   video.load();
   video.play().catch(() => {
@@ -132,20 +141,16 @@ window.startVideo = async () => {
       clearInterval(interval);
       video.pause();
 
-      // 💰 recompensa
       addMoney(0.09);
       showToast("Ganaste $0.09 🎥");
 
-      // 🔥 descontar video
       videosLeft--;
       videoIndex = (videoIndex + 1) % videos.length;
 
-      // 💾 guardar en Firebase
       await updateDoc(doc(db, "users", user.uid), {
         videosLeft: videosLeft
       });
 
-      // 🖥️ actualizar UI
       document.getElementById("videosLeft").innerText =
         "Restantes: " + videosLeft;
     }
@@ -200,11 +205,6 @@ window.spin = async () => {
 
   const wheel = document.getElementById("wheel");
 
-  if (!wheel) {
-    console.log("No existe wheel ❌");
-    return;
-  }
-
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
   const data = snap.data() || {};
@@ -216,7 +216,6 @@ window.spin = async () => {
 
   await updateDoc(ref, { spins: increment(1) });
 
-  // 🎯 ROTACIÓN
   const deg = Math.floor(3600 + Math.random() * 1000);
   wheel.style.transform = `rotate(${deg}deg)`;
 
@@ -243,7 +242,6 @@ window.withdraw = async () => {
   const amount = parseFloat(document.getElementById("amount").value);
 
   if (!amount || amount <= 0) return showToast("Monto inválido");
-
   if (amount > balance) return showToast("Saldo insuficiente");
 
   await addDoc(collection(db, "withdrawals"), {
@@ -267,7 +265,7 @@ function updateSpinUI(spins) {
     spins + " / 10 giros";
 }
 
-// 🔄 RESET
+// 🔄 RESET RULETA
 async function checkSpinLimit() {
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
@@ -278,6 +276,8 @@ async function checkSpinLimit() {
     await updateDoc(ref, { spinDate: today, spins: 0 });
   }
 }
+
+// 🎥 RESET VIDEO
 async function checkVideoLimit() {
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
@@ -296,10 +296,10 @@ async function checkVideoLimit() {
     videosLeft = data.videosLeft || 0;
   }
 
-  // 🔥 actualizar UI
   document.getElementById("videosLeft").innerText =
     "Restantes: " + videosLeft;
 }
+
 // 🔔 TOAST
 function showToast(msg) {
   const t = document.createElement("div");
@@ -309,6 +309,8 @@ function showToast(msg) {
   t.style.right = "20px";
   t.style.background = "#22c55e";
   t.style.padding = "10px";
+  t.style.borderRadius = "10px";
+  t.style.fontWeight = "bold";
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 2000);
 }
