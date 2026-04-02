@@ -88,10 +88,13 @@ window.startVideo = () => {
   }, 1000);
 };
 
-// 📋 ENCUESTA
+// 📋 ENCUESTAS (TIMEWALL REAL)
 window.survey = () => {
-  addMoney(0.10);
-  showToast("Ganaste $0.10 💰");
+  const uid = user.uid;
+
+  const url = `https://timewall.io/wall?uid=${uid}`;
+
+  window.open(url, "_blank");
 };
 
 // 🧩 TAREA
