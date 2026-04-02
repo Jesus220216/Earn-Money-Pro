@@ -206,11 +206,35 @@ window.daily = async () => {
 };
 
 window.spin = () => {
-  let rewards = [0.01, 0.02, 0.05, 0.1];
-  let reward = rewards[Math.floor(Math.random() * rewards.length)];
+ let spinsToday = 0;
 
-  addMoney(reward);
-  showToast("Ganaste $" + reward + " 🎰");
+window.spin = async () => {
+
+  if (spinsToday >= 10) {
+    showToast("Límite diario alcanzado ❌");
+    return;
+  }
+
+  spinsToday++;
+
+  const wheel = document.getElementById("wheel");
+
+  let deg = Math.floor(Math.random() * 360) + 720;
+  wheel.style.transform = `rotate(${deg}deg)`;
+
+  const rewards = [0.01, 0.02, 0.05, 0.1];
+  const reward = rewards[Math.floor(Math.random() * rewards.length)];
+
+  document.getElementById("spinStatus").innerText = "Girando...";
+
+  setTimeout(() => {
+    addMoney(reward);
+    document.getElementById("spinStatus").innerText =
+      "Ganaste $" + reward + " 🎉";
+
+    showToast("Ganaste $" + reward + " 🎰");
+
+  }, 2000);
 };
 
 // 💰 SUMAR DINERO
