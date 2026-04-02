@@ -26,17 +26,19 @@
 
 <!-- 🎥 VIDEO PRO -->
 <div class="card">
-  <h3>🎥 Videos</h3>
+  <h3>🎥 Videos Pro</h3>
 
-  <!-- VIDEO REAL -->
-  <video id="videoPlayer" width="100%" controls muted>
-    <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-  </video>
+  <video id="videoPlayer" width="100%" muted></video>
 
   <p id="timerText">0/20</p>
   <p id="videosLeft">Restantes: 6</p>
 
-  <button onclick="startVideo()">Ver video</button>
+  <!-- barra progreso -->
+  <div class="spin-bar">
+    <div id="videoProgress"></div>
+  </div>
+
+  <button onclick="startVideo()">Iniciar</button>
 </div>
 
 <!-- 🎰 RULETA -->
