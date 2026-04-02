@@ -3,6 +3,12 @@ const admin = require("firebase-admin");
 
 const app = express();
 
+const SECRET = "123abc";
+
+if(req.query.secret !== SECRET){
+  return res.send("denied");
+}
+
 const path = require("path");
 
 app.use(express.static("public"));
