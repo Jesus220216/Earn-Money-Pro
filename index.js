@@ -4,7 +4,7 @@ const path = require("path");
 
 const app = express();
 
-// 🔐 Firebase
+// 🔐 FIREBASE
 const serviceAccount = JSON.parse(process.env.FIREBASE_KEY);
 
 admin.initializeApp({
@@ -24,31 +24,53 @@ app.get("/", (req, res) => {
 // 🔐 SECRET
 const SECRET = "123abc";
 
-// 💰 POSTBACK (TimeWall)
+// 💰 POSTBACK (TIMEWALL PRO)
 app.get("/postback", async (req, res) => {
+  const { userID, amount, transactionID, revenue, secret } = req.query;
 
-  // ✅ VALIDACIÓN CORRECTA (AQUÍ VA)
-  if (req.query.secret !== SECRET) {
+  // 🔐 seguridad
+  if (secret !== SECRET) {
     return res.send("denied");
   }
 
-  const userID = req.query.userID;
-  const amount = parseFloat(req.query.amount);
-
-  if (!userID || !amount) {
+  // 🚫 validación
+  if (!userID || !amount || !transactionID) {
     return res.send("error");
   }
 
   try {
+    const txRef = db.collection("transactions").doc(transactionID);
+    const txSnap = await txRef.get();
+
+    // 🚫 evitar pagos duplicados
+    if (txSnap.exists) {
+      return res.send("duplicado");
+    }
+
+    // 💰 sumar dinero al usuario
     await db.collection("users").doc(userID).set({
-      balance: admin.firestore.FieldValue.increment(amount)
+      balance: admin.firestore.FieldValue.increment(parseFloat(amount))
     }, { merge: true });
 
-    console.log("Pago:", userID, amount);
+    // 💾 guardar transacción
+    await txRef.set({
+      userID,
+      amount: parseFloat(amount),
+      revenue: parseFloat(revenue || 0),
+      date: Date.now()
+    });
+
+    console.log("💰 Pago recibido:", {
+      userID,
+      amount,
+      revenue,
+      transactionID
+    });
 
     res.send("ok");
+
   } catch (e) {
-    console.error(e);
+    console.error("❌ Error en postback:", e);
     res.send("fail");
   }
 });
