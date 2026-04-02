@@ -179,6 +179,13 @@ window.daily = async () => {
 // 🎰 RULETA
 window.spin = async () => {
 
+  const wheel = document.getElementById("wheel");
+
+  if (!wheel) {
+    console.log("No existe wheel ❌");
+    return;
+  }
+
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
   const data = snap.data() || {};
@@ -190,13 +197,17 @@ window.spin = async () => {
 
   await updateDoc(ref, { spins: increment(1) });
 
-  const reward = [0.01,0.02,0.05][Math.floor(Math.random()*3)];
+  // 🎯 ROTACIÓN
+  const deg = Math.floor(3600 + Math.random() * 1000);
+  wheel.style.transform = `rotate(${deg}deg)`;
+
+  const reward = [0.01, 0.02, 0.05][Math.floor(Math.random() * 3)];
 
   setTimeout(() => {
     addMoney(reward);
-    showToast("+" + reward);
+    showToast("Ganaste $" + reward + " 🎰");
     updateSpinUI((data.spins || 0) + 1);
-  }, 1500);
+  }, 3000);
 };
 
 // 💰 ADD MONEY
