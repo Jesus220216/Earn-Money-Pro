@@ -37,10 +37,19 @@
 <div class="card">
   <h3>🎰 Ruleta</h3>
 
-  <div id="wheel">🎡</div>
+  <div class="wheel-container">
+    <div id="wheel">🎡</div>
+  </div>
+
+  <p id="spinStatus">Listo para girar</p>
+
+  <!-- 🔥 PROGRESO -->
+  <div class="spin-bar">
+    <div id="spinFill"></div>
+  </div>
+  <p id="spinCount">0 / 10 giros</p>
 
   <button onclick="spin()">Girar</button>
-  <p id="spinStatus"></p>
 </div>
 
 <!-- 🎁 DAILY -->
