@@ -132,8 +132,7 @@ input {
 }
 
 #wheel {
-  font-size: 60px;
-  transition: transform 2s cubic-bezier(.17,.67,.83,.67);
+  transition: transform 3s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 /* 🔥 barra */
