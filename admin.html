@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Panel</title>
+</head>
+<body>
+
+<h2>Retiros</h2>
+<div id="list"></div>
+
+<script>
+const SECRET = "123abc";
+
+fetch(`/admin/withdrawals?secret=${SECRET}`)
+.then(res => res.json())
+.then(data => {
+  const div = document.getElementById("list");
+
+  data.forEach(w => {
+    div.innerHTML += `
+      <p>
+        ${w.userId} - $${w.amount} - ${w.status}
+        <button onclick="approve('${w.id}')">✅</button>
+        <button onclick="reject('${w.id}')">❌</button>
+      </p>
+    `;
+  });
+});
+
+function approve(id){
+  fetch(`/admin/approve?id=${id}&secret=${SECRET}`)
+  .then(()=> location.reload());
+}
+
+function reject(id){
+  fetch(`/admin/reject?id=${id}&secret=${SECRET}`)
+  .then(()=> location.reload());
+}
+</script>
+
+</body>
+</html>
+
+</body>
+</html>
