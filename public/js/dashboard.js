@@ -115,23 +115,45 @@ function animateBalance(newValue) {
 }
 
 // 🎥 VIDEO
-let t = 0, interval;
+let videosLeft = 6;
+let watching = false;
 
 window.startVideo = () => {
-  t = 0;
+  if (videosLeft <= 0) {
+    showToast("No hay más videos hoy ❌");
+    return;
+  }
 
-  interval = setInterval(() => {
-    t++;
+  let time = 0;
+  watching = true;
 
-    document.getElementById("timerText").innerText = t + "/20";
-
-    if (t >= 20) {
+  const interval = setInterval(() => {
+    if (!watching) {
       clearInterval(interval);
-      addMoney(0.02);
-      showToast("Ganaste $0.02 💰");
+      showToast("Cancelado ❌");
+      return;
+    }
+
+    time++;
+    document.getElementById("timerText").innerText = time + "/20";
+
+    if (time >= 20) {
+      clearInterval(interval);
+      videosLeft--;
+      document.getElementById("videosLeft").innerText = "Restantes: " + videosLeft;
+
+      addMoney(0.09);
+      showToast("Ganaste $0.09 🎥");
     }
   }, 1000);
 };
+
+// ❌ DETECTAR SI SALE
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    watching = false;
+  }
+});
 
 // 📋 TIMEWALL
 window.survey = () => {
@@ -161,6 +183,14 @@ window.game = () => {
 
   addMoney(reward);
   showToast("Ganaste $" + reward.toFixed(2) + " 🎮");
+};
+
+window.spin = () => {
+  let rewards = [0.01, 0.02, 0.05, 0.1];
+  let reward = rewards[Math.floor(Math.random() * rewards.length)];
+
+  addMoney(reward);
+  showToast("Ganaste $" + reward + " 🎰");
 };
 
 // 💰 SUMAR DINERO
