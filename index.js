@@ -1,25 +1,10 @@
 const express = require("express");
 const admin = require("firebase-admin");
+const path = require("path");
 
 const app = express();
 
-const SECRET = "123abc";
-
-if(req.query.secret !== SECRET){
-  return res.send("denied");
-}
-
-const path = require("path");
-
-app.use(express.static("public"));
-
-app.use(express.static(path.join(__dirname, "public")));
-
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
-// 🔐 Firebase Admin
+// 🔐 Firebase
 const serviceAccount = JSON.parse(process.env.FIREBASE_KEY);
 
 admin.initializeApp({
@@ -28,13 +13,25 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
-// 🟢 RUTA PRINCIPAL
+// 📁 SERVIR FRONTEND
+app.use(express.static(path.join(__dirname, "public")));
+
+// 🟢 INDEX (TU WEB)
 app.get("/", (req, res) => {
-  res.send("Servidor activo 💰");
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// 💰 POSTBACK
+// 🔐 SECRET
+const SECRET = "123abc";
+
+// 💰 POSTBACK (TimeWall)
 app.get("/postback", async (req, res) => {
+
+  // ✅ VALIDACIÓN CORRECTA (AQUÍ VA)
+  if (req.query.secret !== SECRET) {
+    return res.send("denied");
+  }
+
   const userID = req.query.userID;
   const amount = parseFloat(req.query.amount);
 
@@ -43,10 +40,10 @@ app.get("/postback", async (req, res) => {
   }
 
   try {
-   await db.collection("users").doc(userID).set({
-  balance: admin.firestore.FieldValue.increment(amount)
-}, { merge: true });
-    
+    await db.collection("users").doc(userID).set({
+      balance: admin.firestore.FieldValue.increment(amount)
+    }, { merge: true });
+
     console.log("Pago:", userID, amount);
 
     res.send("ok");
@@ -56,7 +53,7 @@ app.get("/postback", async (req, res) => {
   }
 });
 
-// 🚀 SERVER (IMPORTANTE PARA RENDER)
+// 🚀 SERVER
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
