@@ -8,110 +8,89 @@
 
 <body class="dashboard">
 
-<!-- NAV -->
 <div class="nav">
   <div class="logo">💰 EarnPro</div>
-
   <div class="nav-right">
     <div class="balance-mini">$0.00</div>
-    <button class="logout" onclick="logout()">Salir</button>
+    <button onclick="logout()">Salir</button>
   </div>
 </div>
 
-<!-- MAIN -->
 <div class="container">
 
-  <!-- LEFT -->
-  <div class="left">
+<div class="left">
 
-    <h2 class="title">🔥 Gana dinero</h2>
+<h2>🔥 Gana dinero</h2>
 
-    <div class="grid">
+<div class="grid">
 
-      <!-- VIDEO -->
-      <div class="card hover">
-        <h3>🎥 Videos</h3>
-        <p>Mira anuncios y gana dinero</p>
-        <button onclick="startVideo()">Empezar</button>
-        <p id="timerText">0/20</p>
-      </div>
+<!-- 🎥 VIDEO PRO -->
+<div class="card">
+  <h3>🎥 Videos (6 disponibles)</h3>
+  <p>Gana $0.09 por video</p>
+  <button onclick="startVideo()">Ver video</button>
+  <p id="timerText">0/20</p>
+  <p id="videosLeft">Restantes: 6</p>
+</div>
 
-      <!-- ENCUESTA -->
-      <div class="card hover">
-        <h3>📋 Encuestas</h3>
-        <p>Responde y gana $</p>
-      <button onclick="survey()">Ganar</button>
-      </div>
+<!-- 🎰 RULETA -->
+<div class="card">
+  <h3>🎰 Ruleta</h3>
+  <p>Gira y gana dinero</p>
+  <button onclick="spin()">Girar</button>
+</div>
 
-      <!-- LOOTABLY -->
-<div class="card hover">
+<!-- 🎁 DAILY -->
+<div class="card">
+  <h3>🎁 Recompensa diaria</h3>
+  <button onclick="daily()">Reclamar</button>
+</div>
+
+<!-- 📋 ENCUESTA -->
+<div class="card">
+  <h3>📋 Encuestas</h3>
+  <button onclick="survey()">Abrir</button>
+</div>
+
+<!-- 🎁 LOOTABLY -->
+<div class="card">
   <h3>🎁 Ofertas PRO</h3>
-  <p>Gana dinero con ofertas premium</p>
   <button onclick="lootably()">Abrir</button>
 </div>
 
-      <!-- TAREA -->
-      <div class="card hover">
-        <h3>🧩 Tareas</h3>
-        <p>Apps y registros</p>
-        <button onclick="task()">Completar</button>
-      </div>
+<!-- 🎮 JUEGO -->
+<div class="card">
+  <h3>🎮 Juegos</h3>
+  <button onclick="game()">Jugar</button>
+</div>
 
-      <!-- JUEGO -->
-      <div class="card hover">
-        <h3>🎮 Juegos</h3>
-        <p>Juega y gana</p>
-        <button onclick="game()">Jugar</button>
-      </div>
+</div>
+</div>
 
-    </div>
+<div class="right">
 
-  </div>
+<div class="card">
+  <h3>💰 Balance</h3>
+  <h1 id="balance">$0.00</h1>
+</div>
 
-  <!-- RIGHT -->
-  <div class="right">
+<div class="card">
+  <h3>💸 Retirar</h3>
+  <input id="email" placeholder="PayPal">
+  <input id="amount" placeholder="Monto">
+  <button onclick="withdraw()">Retirar</button>
+</div>
 
-    <!-- BALANCE -->
-    <div class="card glass">
-      <h3>💰 Balance</h3>
-      <h1 id="balance">$0.00</h1>
-      <p class="sub">Disponible para retirar</p>
-    </div>
-
-    <!-- RETIRO -->
-    <div class="card glass">
-      <h3>💸 Retirar</h3>
-
-      <input id="email" placeholder="PayPal o Binance">
-      <input id="amount" placeholder="Monto">
-
-      <button class="withdraw" onclick="withdraw()">Retirar dinero</button>
-    </div>
-
-    <!-- REFERIDOS -->
-    <div class="card glass">
-  <h3>📊 Tus Referidos</h3>
+<div class="card">
+  <h3>📊 Referidos</h3>
   <p>Invitados: <span id="refCount">0</span></p>
   <p>Ganado: $<span id="refEarn">0.00</span></p>
 </div>
 
-  </div>
+</div>
 
 </div>
 
-<script type="module" src="js/dashboard.js"></script>
-
-<script>
-/* 🔥 GENERAR LINK DE REFERIDO AUTOMÁTICO */
-setTimeout(() => {
-  const uid = localStorage.getItem("uid") || "user";
-  document.getElementById("refLink").value =
-    window.location.origin + "?ref=" + uid;
-}, 1000);
-</script>
-
-</body>
-  
 <script type="module" src="js/dashboard.js"></script>
 </body>
 </html>
