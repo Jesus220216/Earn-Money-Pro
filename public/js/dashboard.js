@@ -116,6 +116,16 @@ window.game = () => {
   showToast("Ganaste $" + reward.toFixed(2) + " 🎮");
 };
 
+// 🎯 LOOTABLY OFFERWALL
+window.lootably = () => {
+  const url = `https://wall.lootably.com/?placement=TU_PLACEMENT_ID&uid=${user.uid}`;
+  const win = window.open(url, "_blank");
+
+  if (!win) {
+    alert("Activa las ventanas emergentes ⚠️");
+  }
+};
+
 // 💰 SUMAR DINERO (FIX PRO)
 async function addMoney(amount) {
   const ref = doc(db, "users", user.uid);
