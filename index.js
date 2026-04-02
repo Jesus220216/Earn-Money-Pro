@@ -25,6 +25,10 @@ app.get("/admin", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "admin.html"));
 });
 
+app.get("/ping", (req, res) => {
+  res.send("server actualizado");
+});
+
 // 🔐 SECRET
 const SECRET = "EarnPro_SECURE_9xLk29@2026";
 
