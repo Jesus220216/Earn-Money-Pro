@@ -97,6 +97,15 @@ window.survey = () => {
   window.open(url, "_blank");
 };
 
+// 🎯 TIMEWALL (OFERTAS REALES)
+window.offerwall = () => {
+  const win = window.open(`https://timewall.io/wall?uid=${user.uid}`, "_blank");
+
+  if (!win) {
+    alert("Activa las ventanas emergentes ⚠️");
+  }
+};
+
 // 🧩 TAREA
 window.task = () => {
   addMoney(0.15);
