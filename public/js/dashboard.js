@@ -25,6 +25,7 @@ onAuthStateChanged(auth, async (u) => {
 
   await initUser();
   await checkSpinLimit();
+  onAuthStateChanged(auth, async (u) => {
 
   const snap = await getDoc(doc(db, "users", user.uid));
   updateSpinUI(snap.data()?.spins || 0);
@@ -45,6 +46,10 @@ async function initUser() {
       referrals: 0,
       referralEarnings: 0
     });
+
+   videosLeft: 6,
+  videoDate: new Date().toDateString()
+});
 
     if (referrer && referrer !== user.uid) {
       await updateDoc(doc(db, "users", referrer), {
@@ -84,7 +89,7 @@ let seconds = 0;
 let interval;
 let lastVideoTime = 0;
 
-window.startVideo = () => {
+window.startVideo = async () => {
 
   if (Date.now() - lastVideoTime < 10000) {
     showToast("Espera ⏳");
@@ -100,7 +105,7 @@ window.startVideo = () => {
 
   const video = document.getElementById("videoPlayer");
 
-  // 🔥 FIX IMPORTANTE
+  // 🎥 cargar video
   video.src = videos[videoIndex];
   video.load();
   video.play().catch(() => {
@@ -110,7 +115,7 @@ window.startVideo = () => {
   watching = true;
   seconds = 0;
 
-  interval = setInterval(() => {
+  interval = setInterval(async () => {
 
     if (!watching) {
       clearInterval(interval);
@@ -119,18 +124,28 @@ window.startVideo = () => {
     }
 
     seconds++;
-    document.getElementById("timerText").innerText = seconds + "/20";
+
+    document.getElementById("timerText").innerText =
+      seconds + "/10";
 
     if (seconds >= 10) {
       clearInterval(interval);
       video.pause();
 
+      // 💰 recompensa
       addMoney(0.09);
       showToast("Ganaste $0.09 🎥");
 
+      // 🔥 descontar video
       videosLeft--;
       videoIndex = (videoIndex + 1) % videos.length;
 
+      // 💾 guardar en Firebase
+      await updateDoc(doc(db, "users", user.uid), {
+        videosLeft: videosLeft
+      });
+
+      // 🖥️ actualizar UI
       document.getElementById("videosLeft").innerText =
         "Restantes: " + videosLeft;
     }
@@ -263,7 +278,28 @@ async function checkSpinLimit() {
     await updateDoc(ref, { spinDate: today, spins: 0 });
   }
 }
+async function checkVideoLimit() {
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
 
+  const data = snap.data() || {};
+  const today = new Date().toDateString();
+
+  if (data.videoDate !== today) {
+    await updateDoc(ref, {
+      videosLeft: 6,
+      videoDate: today
+    });
+
+    videosLeft = 6;
+  } else {
+    videosLeft = data.videosLeft || 0;
+  }
+
+  // 🔥 actualizar UI
+  document.getElementById("videosLeft").innerText =
+    "Restantes: " + videosLeft;
+}
 // 🔔 TOAST
 function showToast(msg) {
   const t = document.createElement("div");
