@@ -88,26 +88,27 @@ window.startVideo = () => {
   }, 1000);
 };
 
-// 🎯 TIMEWALL (OFERTAS REALES)
-window.offerwall = () => {
-  if (!user) {
-    alert("Usuario no cargado");
-    return;
-  }
+// 📋 TIMEWALL (ENCUESTAS)
+window.survey = () => {
+  const url = `https://timewall.io/wall?uid=${user.uid}`;
+  window.open(url, "_blank");
+};
 
-  const win = window.open(`https://timewall.io/wall?uid=${user.uid}`, "_blank");
+// 🧩 CPX (TAREAS)
+window.task = () => {
+  const url = `https://offers.cpx-research.com/index.php?app_id=TU_APP_ID&ext_user_id=${user.uid}`;
+  window.open(url, "_blank");
+};
+
+// 🎁 LOOTABLY (OFERTAS PRO)
+window.lootably = () => {
+  const url = `https://wall.lootably.com/?placement=TU_PLACEMENT_ID&uid=${user.uid}`;
+  const win = window.open(url, "_blank");
 
   if (!win) {
     alert("Activa las ventanas emergentes ⚠️");
   }
 };
-
-// 🧩 TAREA
-window.task = () => {
-  addMoney(0.15);
-  showToast("Ganaste $0.15 💰");
-};
-
 // 🎮 JUEGO
 window.game = () => {
   let reward = Math.random() < 0.7 ? 0.01 : 0.05;
