@@ -184,6 +184,26 @@ window.game = () => {
   addMoney(reward);
   showToast("Ganaste $" + reward.toFixed(2) + " 🎮");
 };
+// 🎁 DAILY REWARD
+window.daily = async () => {
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+  const last = snap.data().lastDaily || 0;
+
+  const now = Date.now();
+
+  if (now - last < 86400000) {
+    showToast("Ya reclamaste hoy ❌");
+    return;
+  }
+
+  await updateDoc(ref, {
+    lastDaily: now,
+    balance: increment(0.20)
+  });
+
+  showToast("Ganaste $0.20 🎁");
+};
 
 window.spin = () => {
   let rewards = [0.01, 0.02, 0.05, 0.1];
