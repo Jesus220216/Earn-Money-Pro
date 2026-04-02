@@ -22,7 +22,7 @@ app.get("/", (req, res) => {
 });
 
 // 🔐 SECRET
-const SECRET = "123abc";
+const SECRET = "EarnPro_SECURE_9xLk29@2026";
 
 // 💰 POSTBACK (TIMEWALL PRO)
 app.get("/postback", async (req, res) => {
