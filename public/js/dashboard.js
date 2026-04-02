@@ -126,10 +126,23 @@ function animateBalance(newValue) {
 }
 
 // 🎥 VIDEO
+// 🎥 VIDEOS PRO MAX
+const videos = [
+  "https://www.w3schools.com/html/mov_bbb.mp4",
+  "https://www.w3schools.com/html/movie.mp4",
+  "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+  "https://www.w3schools.com/html/mov_bbb.mp4",
+  "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+  "https://www.w3schools.com/html/movie.mp4"
+];
+
+let videoIndex = 0;
 let videosLeft = 6;
 let watching = false;
 let seconds = 0;
 let interval;
+
+let lastVideoTime = 0;
 
 window.startVideo = () => {
 
@@ -140,11 +153,12 @@ window.startVideo = () => {
 
   const video = document.getElementById("videoPlayer");
 
-  seconds = 0;
-  watching = true;
-
-  video.currentTime = 0;
+  video.src = videos[videoIndex];
+  video.load();
   video.play();
+
+  watching = true;
+  seconds = 0;
 
   interval = setInterval(() => {
 
@@ -156,25 +170,49 @@ window.startVideo = () => {
     }
 
     seconds++;
+
     document.getElementById("timerText").innerText =
       seconds + "/20";
+
+    // barra progreso
+    document.getElementById("videoProgress").style.width =
+      (seconds / 20 * 100) + "%";
 
     if (seconds >= 20) {
       clearInterval(interval);
 
-      videosLeft--;
-      document.getElementById("videosLeft").innerText =
-        "Restantes: " + videosLeft;
-
       video.pause();
 
       addMoney(0.09);
+
       showToast("Ganaste $0.09 🎥");
+
+      videosLeft--;
+      videoIndex = (videoIndex + 1) % videos.length;
+
+      document.getElementById("videosLeft").innerText =
+        "Restantes: " + videosLeft;
+
+      // 🔄 autoplay siguiente
+      setTimeout(() => {
+        if (videosLeft > 0) {
+          startVideo();
+        }
+      }, 1500);
     }
 
   }, 1000);
 };
 
+window.startVideo = () => {
+
+  // 🧠 ANTI SPAM
+  if (Date.now() - lastVideoTime < 10000) {
+    showToast("Espera unos segundos ⏳");
+    return;
+  }
+
+  lastVideoTime = Date.now();
 // ⛔ detectar cambio de pestaña
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
@@ -394,3 +432,23 @@ async function checkSpinLimit() {
     });
   }
 }
+
+// ⛔ cambio de pestaña
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    watching = false;
+  }
+});
+
+// ⛔ pausa manual (cuando el DOM ya cargó)
+document.addEventListener("DOMContentLoaded", () => {
+  const video = document.getElementById("videoPlayer");
+
+  if (video) {
+    video.addEventListener("pause", () => {
+      if (seconds < 20) {
+        watching = false;
+      }
+    });
+  }
+});
