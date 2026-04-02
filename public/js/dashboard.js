@@ -100,8 +100,11 @@ window.startVideo = () => {
 
   const video = document.getElementById("videoPlayer");
 
-  video.src = videos[videoIndex];
-  video.play();
+ video.src = videos[videoIndex];
+video.load(); // 🔥 fuerza a cargar el video
+video.play().catch(() => {
+  showToast("Toca el video ▶️");
+});
 
   watching = true;
   seconds = 0;
