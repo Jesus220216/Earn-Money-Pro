@@ -32,7 +32,15 @@ onAuthStateChanged(auth, async (u) => {
 
   await initUser();
 
-  await checkSpinLimit(); // 👈 AQUÍ
+  await checkSpinLimit();
+
+  // 🔥 CARGAR DATOS DEL USUARIO
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+  const data = snap.data() || {};
+
+  // 🎰 ACTUALIZAR UI RULETA
+  updateSpinUI(data.spins || 0);
 
   realtimeBalance();
   generateRefLink();
@@ -220,7 +228,9 @@ window.spin = async () => {
     await updateDoc(ref, { spinDate: today, spins: 0 });
   }
 
-  if ((data.spins || 0) >= 10) {
+  const spins = data.spins || 0;
+
+  if (spins >= 10) {
     showToast("Límite diario alcanzado ❌");
     return;
   }
@@ -229,22 +239,30 @@ window.spin = async () => {
     spins: increment(1)
   });
 
+  // 🎡 ANIMACIÓN
   const wheel = document.getElementById("wheel");
-
-  let deg = Math.floor(Math.random() * 360) + 720;
+  const deg = Math.floor(Math.random() * 360) + 1080;
   wheel.style.transform = `rotate(${deg}deg)`;
-
-  const rewards = [0.01, 0.02, 0.05, 0.1];
-  const reward = rewards[Math.floor(Math.random() * rewards.length)];
 
   document.getElementById("spinStatus").innerText = "Girando...";
 
+  // 💰 PREMIOS (balanceados)
+  const rewards = [
+    0.01, 0.01, 0.02, 0.02,
+    0.05, 0.01, 0.10 // raro
+  ];
+
+  const reward = rewards[Math.floor(Math.random() * rewards.length)];
+
   setTimeout(() => {
     addMoney(reward);
-    document.getElementById("spinStatus").innerText =
-      "Ganaste $" + reward + " 🎉";
 
-    showToast("Ganaste $" + reward + " 🎰");
+    document.getElementById("spinStatus").innerText =
+      "Ganaste $" + reward.toFixed(2) + " 🎉";
+
+    showToast("+" + reward.toFixed(2) + " 💰");
+
+    updateSpinUI(spins + 1);
 
   }, 2000);
 };
@@ -318,6 +336,18 @@ function showToast(msg) {
   document.body.appendChild(toast);
 
   setTimeout(() => toast.remove(), 2500);
+}
+// 📊 UI RULETA PRO
+function updateSpinUI(spins) {
+  const max = 10;
+
+  document.getElementById("spinCount").innerText =
+    spins + " / " + max + " giros";
+
+  const percent = (spins / max) * 100;
+
+  document.getElementById("spinFill").style.width =
+    percent + "%";
 }
 // 🧠 RESET LÍMITE DIARIO RULETA
 async function checkSpinLimit() {
