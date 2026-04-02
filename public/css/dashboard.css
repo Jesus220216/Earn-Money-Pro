@@ -1,53 +1,17 @@
-body {
+* {
   margin: 0;
-  font-family: Arial;
-  background: #0f172a;
-  color: white;
-}
-
-.auth {
-  position: fixed;
-  top: 20%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #1e293b;
-  padding: 20px;
-  border-radius: 12px;
-}
-
-.nav {
-  display: flex;
-  justify-content: space-between;
-  padding: 15px;
-  background: #020617;
-}
-
-.logo {
-  color: #22c55e;
-  font-weight: bold;
-}
-
-.banner {
-  background: #22c55e;
-  text-align: center;
-  padding: 10px;
-  color: black;
-}
-
-.cards {
-  display: flex;
-  gap: 10px;
-  padding: 10px;
-}
-
-body {
-  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
   font-family: 'Segoe UI', sans-serif;
+}
+
+body.dashboard {
   background: #0f172a;
   color: white;
 }
 
-.nav {
+/* NAV */
+.dashboard .nav {
   display: flex;
   justify-content: space-between;
   padding: 15px 30px;
@@ -56,13 +20,13 @@ body {
   border-bottom: 1px solid #1e293b;
 }
 
-.logo {
+.dashboard .logo {
   color: #22c55e;
   font-weight: bold;
   font-size: 22px;
 }
 
-.nav button {
+.dashboard .nav button {
   background: #22c55e;
   border: none;
   padding: 10px 15px;
@@ -70,50 +34,16 @@ body {
   color: black;
   font-weight: bold;
   cursor: pointer;
-  margin-left: 10px;
   transition: 0.3s;
 }
 
-.nav button:hover {
+.dashboard .nav button:hover {
   transform: scale(1.05);
   box-shadow: 0 0 10px #22c55e;
 }
 
-.banner {
-  background: linear-gradient(90deg,#22c55e,#16a34a);
-  color: black;
-  text-align: center;
-  padding: 12px;
-  font-weight: bold;
-}
-
-.cards {
-  display: flex;
-  gap: 15px;
-  padding: 20px;
-  overflow-x: auto;
-}
-
-.card {
-  background: #1e293b;
-  padding: 15px;
-  border-radius: 12px;
-  min-width: 160px;
-  transition: 0.3s;
-  cursor: pointer;
-}
-
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 0 15px rgba(34,197,94,0.5);
-}
-
-.card span {
-  color: #22c55e;
-  font-weight: bold;
-}
-
-.main {
+/* LAYOUT */
+.container {
   display: flex;
   gap: 20px;
   padding: 20px;
@@ -121,31 +51,70 @@ body {
 
 .left {
   flex: 2;
-  background: #1e293b;
-  padding: 20px;
-  border-radius: 16px;
 }
 
 .right {
   flex: 1;
-  background: #1e293b;
-  padding: 20px;
-  border-radius: 16px;
 }
 
-.btn {
-  background: linear-gradient(90deg,#22c55e,#16a34a);
-  padding: 12px;
+/* GRID */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+/* CARDS */
+.card {
+  background: #1e293b;
+  padding: 15px;
+  border-radius: 12px;
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 15px rgba(34,197,94,0.5);
+}
+
+/* BOTONES */
+.card button {
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  border: none;
   border-radius: 10px;
-  text-align: center;
-  margin-top: 15px;
-  cursor: pointer;
+  background: linear-gradient(90deg,#22c55e,#16a34a);
   color: black;
   font-weight: bold;
+  cursor: pointer;
 }
 
-#saldo {
-  font-size: 28px;
+/* BALANCE */
+#balance {
+  font-size: 35px;
   color: #22c55e;
   font-weight: bold;
+}
+
+/* MINI BALANCE */
+.balance-mini {
+  background: #22c55e;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+/* INPUTS */
+input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: none;
+}
+
+/* RETIRO */
+.withdraw {
+  margin-top: 10px;
 }
