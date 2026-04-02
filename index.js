@@ -28,26 +28,31 @@ const SECRET = "123abc";
 app.get("/postback", async (req, res) => {
   const { userID, amount, transactionID, revenue, secret } = req.query;
 
-  // 🔐 seguridad
+  // 🔐 Validar secreto
   if (secret !== SECRET) {
     return res.send("denied");
   }
 
-  // 🚫 validación
+  // ❌ Validar datos obligatorios
   if (!userID || !amount || !transactionID) {
     return res.send("error");
+  }
+
+  // 💣 Validar amount (anti hack)
+  if (isNaN(amount) || amount <= 0 || amount > 5) {
+    return res.send("invalid amount");
   }
 
   try {
     const txRef = db.collection("transactions").doc(transactionID);
     const txSnap = await txRef.get();
 
-    // 🚫 evitar pagos duplicados
+    // 🚫 evitar duplicados
     if (txSnap.exists) {
-      return res.send("duplicado");
+      return res.send("duplicate");
     }
 
-    // 💰 sumar dinero al usuario
+    // 💰 sumar dinero
     await db.collection("users").doc(userID).set({
       balance: admin.firestore.FieldValue.increment(parseFloat(amount))
     }, { merge: true });
@@ -60,17 +65,12 @@ app.get("/postback", async (req, res) => {
       date: Date.now()
     });
 
-    console.log("💰 Pago recibido:", {
-      userID,
-      amount,
-      revenue,
-      transactionID
-    });
+    console.log("✅ Pago real:", userID, amount);
 
     res.send("ok");
 
   } catch (e) {
-    console.error("❌ Error en postback:", e);
+    console.error(e);
     res.send("fail");
   }
 });
