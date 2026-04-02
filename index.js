@@ -22,7 +22,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/admin", (req, res) => {
-  res.send("ADMIN FUNCIONA 🔥");
+  res.sendFile(path.join(__dirname, "public", "admin.html"));
 });
 
 app.get("/ping", (req, res) => {
