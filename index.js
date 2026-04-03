@@ -41,7 +41,7 @@ app.get("/admin", (req, res) => {
     <div id="list">Cargando...</div>
 
     <script>
-      const SECRET = "123abc";
+      const SECRET = "EarnPro_SECURE_9xLk29@2026";
 
       async function load() {
         const res = await fetch('/admin/withdrawals?secret=' + SECRET);
