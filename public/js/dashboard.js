@@ -227,6 +227,13 @@ async function addMoney(amount) {
 
 // 💳 RETIRO (ARREGLADO)
 window.withdraw = async () => {
+
+  // 🔥 ANTI SPAM (AQUÍ VA)
+  if (Date.now() - lastWithdraw < 10000) {
+    return showToast("Espera ⏳");
+  }
+  lastWithdraw = Date.now();
+
   const amount = parseFloat(document.getElementById("amount").value);
   const email = document.getElementById("email").value;
 
@@ -234,7 +241,6 @@ window.withdraw = async () => {
     return showToast("Monto inválido ❌");
   }
 
-  // 🔥 MÍNIMO RETIRO (AQUÍ VA)
   if (amount < 5) {
     return showToast("Mínimo $5 ❌");
   }
