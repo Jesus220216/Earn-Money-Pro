@@ -129,8 +129,8 @@ window.startVideo = async () => {
       clearInterval(interval);
       video.pause();
 
-      await addMoney(0.09);
-      showToast("Ganaste $0.09 🎥");
+      await addMoney(0.03);
+      showToast("Ganaste $0.03 🎥");
 
       videosLeft--;
       videoIndex = (videoIndex + 1) % videos.length;
@@ -230,8 +230,18 @@ window.withdraw = async () => {
   const amount = parseFloat(document.getElementById("amount").value);
   const email = document.getElementById("email").value;
 
-  if (!amount || amount <= 0) return showToast("Monto inválido ❌");
-  if (amount > balance) return showToast("Saldo insuficiente ❌");
+  if (!amount || amount <= 0) {
+    return showToast("Monto inválido ❌");
+  }
+
+  // 🔥 MÍNIMO RETIRO (AQUÍ VA)
+  if (amount < 5) {
+    return showToast("Mínimo $5 ❌");
+  }
+
+  if (amount > balance) {
+    return showToast("Saldo insuficiente ❌");
+  }
 
   try {
     await addDoc(collection(db, "withdrawals"), {
