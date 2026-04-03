@@ -15,23 +15,22 @@ const db = admin.firestore();
 
 // 📁 FRONTEND
 
-// 🔥 PRIMERO las rutas importantes
+// 🔥 ADMIN PRIMERO
 app.get("/admin", (req, res) => {
-  res.send(`
-    <h1>ADMIN FUNCIONA 🔥</h1>
-  `);
+  res.send("ADMIN OK 🔥");
 });
 
-// 👇 DESPUÉS el static
-app.use(express.static(path.join(__dirname, "public")));
-
-// 👇 luego home
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
+// 🔥 TEST
 app.get("/ping", (req, res) => {
   res.send("server actualizado");
+});
+
+// 🔥 STATIC DESPUÉS
+app.use(express.static(path.join(__dirname, "public")));
+
+// 🔥 HOME
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // 🔐 SECRET
