@@ -15,70 +15,19 @@ const db = admin.firestore();
 
 // 📁 FRONTEND
 
-app.use(express.static(path.join(__dirname, "public")));
-
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
+// 🔥 PRIMERO las rutas importantes
 app.get("/admin", (req, res) => {
   res.send(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Admin Panel</title>
-      <style>
-        body { font-family: Arial; background: #111; color: white; padding: 20px; }
-        .card { background: #1f1f1f; padding: 15px; margin: 10px 0; border-radius: 10px; }
-        button { margin: 5px; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; }
-        .ok { background: #22c55e; }
-        .no { background: #ef4444; }
-      </style>
-    </head>
-    <body>
-
-    <h2>💳 Retiros</h2>
-    <div id="list">Cargando...</div>
-
-    <script>
-      const SECRET = "EarnPro_SECURE_9xLk29@2026";
-
-      async function load() {
-        const res = await fetch('/admin/withdrawals?secret=' + SECRET);
-        const data = await res.json();
-
-        const div = document.getElementById("list");
-        div.innerHTML = "";
-
-        data.forEach(w => {
-          div.innerHTML += \`
-            <div class="card">
-              👤 \${w.userId}<br>
-              💰 $\${w.amount}<br>
-              📊 \${w.status || "pending"}<br>
-              <button class="ok" onclick="approve('\${w.id}')">Aprobar</button>
-              <button class="no" onclick="reject('\${w.id}')">Rechazar</button>
-            </div>
-          \`;
-        });
-      }
-
-      function approve(id){
-        fetch('/admin/approve?id=' + id + '&secret=' + SECRET)
-        .then(()=> location.reload());
-      }
-
-      function reject(id){
-        fetch('/admin/reject?id=' + id + '&secret=' + SECRET)
-        .then(()=> location.reload());
-      }
-
-      load();
-    </script>
-
-    </body>
-    </html>
+    <h1>ADMIN FUNCIONA 🔥</h1>
   `);
+});
+
+// 👇 DESPUÉS el static
+app.use(express.static(path.join(__dirname, "public")));
+
+// 👇 luego home
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 app.get("/ping", (req, res) => {
