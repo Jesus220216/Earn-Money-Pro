@@ -9,6 +9,10 @@ import {
   increment, addDoc, collection, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
+import {
+  collection, onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
 // 🔗 REFERIDO
 const urlParams = new URLSearchParams(window.location.search);
 const ref = urlParams.get("ref");
@@ -44,6 +48,8 @@ onAuthStateChanged(auth, async (u) => {
   updateSpinUI(snap.data()?.spins || 0);
 
   realtimeBalance();
+// 👇 AGREGA ESTA LÍNEA
+loadWithdrawals();
 });
 
 // 👤 USER
@@ -241,18 +247,48 @@ async function addMoney(amount) {
 window.withdraw = async () => {
   const amount = parseFloat(document.getElementById("amount").value);
 
-  if (!amount || amount <= 0) return showToast("Monto inválido");
-  if (amount > balance) return showToast("Saldo insuficiente");
+  if (!amount || amount <= 0) {
+    return showToast("Monto inválido ❌");
+  }
 
-  await addDoc(collection(db, "withdrawals"), {
-    userId: user.uid,
-    amount,
-    date: Date.now()
-  });
+  if (amount > balance) {
+    return showToast("Saldo insuficiente ❌");
+  }
 
-  showToast("Retiro enviado");
+  try {
+    // 🔥 1. crear retiro
+   window.withdraw = async () => {
+  const amount = parseFloat(document.getElementById("amount").value);
+
+  if (!amount || amount <= 0) {
+    return showToast("Monto inválido ❌");
+  }
+
+  if (amount > balance) {
+    return showToast("Saldo insuficiente ❌");
+  }
+
+  try {
+    // 🔥 1. crear retiro
+    await addDoc(collection(db, "withdrawals"), {
+      userId: user.uid,
+      amount,
+      status: "pending",
+      date: Date.now()
+    });
+
+    // 🔥 2. RESTAR saldo
+    await updateDoc(doc(db, "users", user.uid), {
+      balance: increment(-amount)
+    });
+
+    showToast("Retiro enviado 🚀");
+
+  } catch (e) {
+    console.error(e);
+    showToast("Error ❌");
+  }
 };
-
 // 🚪 LOGOUT
 window.logout = async () => {
   await signOut(auth);
@@ -313,4 +349,29 @@ function showToast(msg) {
   t.style.fontWeight = "bold";
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 2000);
+}
+function loadWithdrawals() {
+  const q = collection(db, "withdrawals");
+
+  onSnapshot(q, (snap) => {
+    const div = document.getElementById("withdrawList");
+    div.innerHTML = "";
+
+    snap.forEach(docu => {
+      const w = docu.data();
+
+      if (w.userId !== user.uid) return;
+
+      let color = "gray";
+      if (w.status === "approved") color = "green";
+      if (w.status === "rejected") color = "red";
+
+      div.innerHTML += `
+        <div style="margin:10px;padding:10px;background:#1f1f1f;border-radius:10px;">
+          💰 $${w.amount} <br>
+          📊 <span style="color:${color}">${w.status}</span>
+        </div>
+      `;
+    });
+  });
 }
