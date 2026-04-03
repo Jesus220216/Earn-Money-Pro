@@ -9,10 +9,6 @@ import {
   increment, addDoc, collection, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-import {
-  collection, onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
 // 🔗 REFERIDO
 const urlParams = new URLSearchParams(window.location.search);
 const ref = urlParams.get("ref");
@@ -21,7 +17,7 @@ if (ref) localStorage.setItem("referrer", ref);
 let user;
 let balance = 0;
 
-// 🎥 VIDEO GLOBAL
+// 🎥 VIDEO
 const videos = [
   "https://www.w3schools.com/html/mov_bbb.mp4",
   "https://www.w3schools.com/html/movie.mp4"
@@ -48,8 +44,7 @@ onAuthStateChanged(auth, async (u) => {
   updateSpinUI(snap.data()?.spins || 0);
 
   realtimeBalance();
-// 👇 AGREGA ESTA LÍNEA
-loadWithdrawals();
+  loadWithdrawals();
 });
 
 // 👤 USER
@@ -64,12 +59,8 @@ async function initUser() {
       referrer: referrer || null,
       referrals: 0,
       referralEarnings: 0,
-
-      // 🎥 VIDEO SYSTEM
       videosLeft: 6,
       videoDate: new Date().toDateString(),
-
-      // 🎰 RULETA
       spins: 0,
       spinDate: new Date().toDateString()
     });
@@ -86,22 +77,15 @@ async function initUser() {
 function realtimeBalance() {
   onSnapshot(doc(db, "users", user.uid), (snap) => {
     const data = snap.data() || {};
-    animateBalance(data.balance || 0);
+    balance = data.balance || 0;
+
+    document.getElementById("balance").innerText = "$" + balance.toFixed(2);
+    document.querySelector(".balance-mini").innerText = "$" + balance.toFixed(2);
 
     document.getElementById("refCount").innerText = data.referrals || 0;
     document.getElementById("refEarn").innerText =
       (data.referralEarnings || 0).toFixed(2);
   });
-}
-
-function animateBalance(newValue) {
-  balance = newValue;
-
-  document.getElementById("balance").innerText =
-    "$" + newValue.toFixed(2);
-
-  document.querySelector(".balance-mini").innerText =
-    "$" + newValue.toFixed(2);
 }
 
 // 🎥 VIDEO
@@ -139,15 +123,13 @@ window.startVideo = async () => {
     }
 
     seconds++;
-
-    document.getElementById("timerText").innerText =
-      seconds + "/10";
+    document.getElementById("timerText").innerText = seconds + "/10";
 
     if (seconds >= 10) {
       clearInterval(interval);
       video.pause();
 
-      addMoney(0.09);
+      await addMoney(0.09);
       showToast("Ganaste $0.09 🎥");
 
       videosLeft--;
@@ -168,16 +150,6 @@ window.startVideo = async () => {
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) watching = false;
 });
-
-// 📋 ENCUESTAS
-window.survey = () => {
-  window.open(`https://timewall.io/wall?uid=${user.uid}`, "_blank");
-};
-
-// 🎁 LOOTABLY
-window.lootably = () => {
-  window.open(`https://wall.lootably.com/?placement=TU_ID&uid=${user.uid}`, "_blank");
-};
 
 // 🎮 JUEGO
 window.game = () => {
@@ -243,41 +215,23 @@ async function addMoney(amount) {
   }, { merge: true });
 }
 
-// 💳 RETIRO
+// 💳 RETIRO (ARREGLADO)
 window.withdraw = async () => {
   const amount = parseFloat(document.getElementById("amount").value);
+  const email = document.getElementById("email").value;
 
-  if (!amount || amount <= 0) {
-    return showToast("Monto inválido ❌");
-  }
-
-  if (amount > balance) {
-    return showToast("Saldo insuficiente ❌");
-  }
+  if (!amount || amount <= 0) return showToast("Monto inválido ❌");
+  if (amount > balance) return showToast("Saldo insuficiente ❌");
 
   try {
-    // 🔥 1. crear retiro
-   window.withdraw = async () => {
-  const amount = parseFloat(document.getElementById("amount").value);
-
-  if (!amount || amount <= 0) {
-    return showToast("Monto inválido ❌");
-  }
-
-  if (amount > balance) {
-    return showToast("Saldo insuficiente ❌");
-  }
-
-  try {
-    // 🔥 1. crear retiro
     await addDoc(collection(db, "withdrawals"), {
       userId: user.uid,
       amount,
+      email,
       status: "pending",
       date: Date.now()
     });
 
-    // 🔥 2. RESTAR saldo
     await updateDoc(doc(db, "users", user.uid), {
       balance: increment(-amount)
     });
@@ -289,6 +243,7 @@ window.withdraw = async () => {
     showToast("Error ❌");
   }
 };
+
 // 🚪 LOGOUT
 window.logout = async () => {
   await signOut(auth);
@@ -336,6 +291,33 @@ async function checkVideoLimit() {
     "Restantes: " + videosLeft;
 }
 
+// 📜 HISTORIAL
+function loadWithdrawals() {
+  const q = collection(db, "withdrawals");
+
+  onSnapshot(q, (snap) => {
+    const div = document.getElementById("withdrawList");
+    div.innerHTML = "";
+
+    snap.forEach(docu => {
+      const w = docu.data();
+      if (w.userId !== user.uid) return;
+
+      let color = "orange";
+      if (w.status === "approved") color = "#22c55e";
+      if (w.status === "rejected") color = "#ef4444";
+
+      div.innerHTML += `
+        <div style="margin:10px;padding:10px;background:#1f1f1f;border-radius:10px;">
+          💰 $${w.amount} <br>
+          📧 ${w.email || "-"} <br>
+          📊 <span style="color:${color}">${w.status}</span>
+        </div>
+      `;
+    });
+  });
+}
+
 // 🔔 TOAST
 function showToast(msg) {
   const t = document.createElement("div");
@@ -349,29 +331,4 @@ function showToast(msg) {
   t.style.fontWeight = "bold";
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 2000);
-}
-function loadWithdrawals() {
-  const q = collection(db, "withdrawals");
-
-  onSnapshot(q, (snap) => {
-    const div = document.getElementById("withdrawList");
-    div.innerHTML = "";
-
-    snap.forEach(docu => {
-      const w = docu.data();
-
-      if (w.userId !== user.uid) return;
-
-      let color = "gray";
-      if (w.status === "approved") color = "green";
-      if (w.status === "rejected") color = "red";
-
-      div.innerHTML += `
-        <div style="margin:10px;padding:10px;background:#1f1f1f;border-radius:10px;">
-          💰 $${w.amount} <br>
-          📊 <span style="color:${color}">${w.status}</span>
-        </div>
-      `;
-    });
-  });
 }
