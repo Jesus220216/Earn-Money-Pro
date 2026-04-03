@@ -151,6 +151,16 @@ document.addEventListener("visibilitychange", () => {
   if (document.hidden) watching = false;
 });
 
+// 📋 ENCUESTAS
+window.survey = () => {
+  window.open(`https://timewall.io/wall?uid=${user.uid}`, "_blank");
+};
+
+// 🎁 LOOTABLY
+window.lootably = () => {
+  window.open(`https://wall.lootably.com/?placement=TU_ID&uid=${user.uid}`, "_blank");
+};
+
 // 🎮 JUEGO
 window.game = () => {
   const reward = Math.random() < 0.7 ? 0.01 : 0.05;
