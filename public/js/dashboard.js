@@ -17,6 +17,17 @@ if (ref) localStorage.setItem("referrer", ref);
 let user;
 let balance = 0;
 
+// 💰 MONETAG
+let lastAdTime = 0;
+function openAdSafe() {
+  if (Date.now() - lastAdTime < 30000) return;
+  lastAdTime = Date.now();
+  window.open("https://omg10.com/4/10828691", "_blank");
+}
+
+// 🔐 ANTI SPAM RETIRO
+let lastWithdraw = 0;
+
 // 🎥 VIDEO
 const videos = [
   "https://www.w3schools.com/html/mov_bbb.mp4",
@@ -92,13 +103,11 @@ function realtimeBalance() {
 window.startVideo = async () => {
 
   if (Date.now() - lastVideoTime < 10000) {
-    showToast("Espera ⏳");
-    return;
+    return showToast("Espera ⏳");
   }
 
   if (videosLeft <= 0) {
-    showToast("No hay más videos ❌");
-    return;
+    return showToast("No hay más videos ❌");
   }
 
   lastVideoTime = Date.now();
@@ -129,6 +138,8 @@ window.startVideo = async () => {
       clearInterval(interval);
       video.pause();
 
+      openAdSafe(); // 💰 ANUNCIO SOLO CUANDO TERMINA (MEJOR CONVERSIÓN)
+
       await addMoney(0.03);
       showToast("Ganaste $0.03 🎥");
 
@@ -151,45 +162,18 @@ document.addEventListener("visibilitychange", () => {
   if (document.hidden) watching = false;
 });
 
-// 📋 ENCUESTAS
-window.survey = () => {
-  window.open(`https://timewall.io/wall?uid=${user.uid}`, "_blank");
-};
-
-// 🎁 LOOTABLY
-window.lootably = () => {
-  window.open(`https://wall.lootably.com/?placement=TU_ID&uid=${user.uid}`, "_blank");
-};
-
 // 🎮 JUEGO
 window.game = () => {
+  openAdSafe();
   const reward = Math.random() < 0.7 ? 0.01 : 0.05;
   addMoney(reward);
   showToast("Ganaste $" + reward.toFixed(2));
 };
 
-// 🎁 DAILY
-window.daily = async () => {
-  const ref = doc(db, "users", user.uid);
-  const snap = await getDoc(ref);
-
-  const last = snap.data().lastDaily || 0;
-
-  if (Date.now() - last < 86400000) {
-    showToast("Ya reclamaste ❌");
-    return;
-  }
-
-  await updateDoc(ref, {
-    lastDaily: Date.now(),
-    balance: increment(0.20)
-  });
-
-  showToast("Ganaste $0.20 🎁");
-};
-
 // 🎰 RULETA
 window.spin = async () => {
+
+  openAdSafe();
 
   const wheel = document.getElementById("wheel");
 
@@ -198,8 +182,7 @@ window.spin = async () => {
   const data = snap.data() || {};
 
   if ((data.spins || 0) >= 10) {
-    showToast("Límite alcanzado ❌");
-    return;
+    return showToast("Límite alcanzado ❌");
   }
 
   await updateDoc(ref, { spins: increment(1) });
@@ -225,10 +208,9 @@ async function addMoney(amount) {
   }, { merge: true });
 }
 
-// 💳 RETIRO (ARREGLADO)
+// 💳 RETIRO
 window.withdraw = async () => {
 
-  // 🔥 ANTI SPAM (AQUÍ VA)
   if (Date.now() - lastWithdraw < 10000) {
     return showToast("Espera ⏳");
   }
@@ -237,17 +219,9 @@ window.withdraw = async () => {
   const amount = parseFloat(document.getElementById("amount").value);
   const email = document.getElementById("email").value;
 
-  if (!amount || amount <= 0) {
-    return showToast("Monto inválido ❌");
-  }
-
-  if (amount < 5) {
-    return showToast("Mínimo $5 ❌");
-  }
-
-  if (amount > balance) {
-    return showToast("Saldo insuficiente ❌");
-  }
+  if (!amount || amount <= 0) return showToast("Monto inválido ❌");
+  if (amount < 5) return showToast("Mínimo $5 ❌");
+  if (amount > balance) return showToast("Saldo insuficiente ❌");
 
   try {
     await addDoc(collection(db, "withdrawals"), {
@@ -269,53 +243,6 @@ window.withdraw = async () => {
     showToast("Error ❌");
   }
 };
-
-// 🚪 LOGOUT
-window.logout = async () => {
-  await signOut(auth);
-  location.href = "index.html";
-};
-
-// 🎰 UI
-function updateSpinUI(spins) {
-  document.getElementById("spinCount").innerText =
-    spins + " / 10 giros";
-}
-
-// 🔄 RESET RULETA
-async function checkSpinLimit() {
-  const ref = doc(db, "users", user.uid);
-  const snap = await getDoc(ref);
-
-  const today = new Date().toDateString();
-
-  if (snap.data()?.spinDate !== today) {
-    await updateDoc(ref, { spinDate: today, spins: 0 });
-  }
-}
-
-// 🎥 RESET VIDEO
-async function checkVideoLimit() {
-  const ref = doc(db, "users", user.uid);
-  const snap = await getDoc(ref);
-
-  const data = snap.data() || {};
-  const today = new Date().toDateString();
-
-  if (data.videoDate !== today) {
-    await updateDoc(ref, {
-      videosLeft: 6,
-      videoDate: today
-    });
-
-    videosLeft = 6;
-  } else {
-    videosLeft = data.videosLeft || 0;
-  }
-
-  document.getElementById("videosLeft").innerText =
-    "Restantes: " + videosLeft;
-}
 
 // 📜 HISTORIAL
 function loadWithdrawals() {
@@ -354,7 +281,6 @@ function showToast(msg) {
   t.style.background = "#22c55e";
   t.style.padding = "10px";
   t.style.borderRadius = "10px";
-  t.style.fontWeight = "bold";
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 2000);
 }
