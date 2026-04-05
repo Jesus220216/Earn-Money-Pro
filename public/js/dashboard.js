@@ -54,8 +54,6 @@ async function initUser() {
   const snap = await getDoc(refDoc);
 
   if (!snap.exists()) {
-
-    // crear usuario
     await setDoc(refDoc, {
       balance: 0,
       referrer: referrer || null,
@@ -67,25 +65,6 @@ async function initUser() {
       spinDate: new Date().toDateString()
     });
 
-    // 🔥 SISTEMA REFERIDO SEGURO
-    if (referrer && referrer !== user.uid) {
-      try {
-        const refUser = doc(db, "users", referrer);
-
-        await setDoc(refUser, {
-          referrals: increment(1),
-          referralEarnings: increment(0.10),
-          balance: increment(0.05)
-        }, { merge: true });
-
-        console.log("✅ Referido sumado");
-
-      } catch (e) {
-        console.error("❌ Error referido:", e);
-      }
-    }
-
-    // limpiar SIEMPRE
     sessionStorage.removeItem("referrer");
   }
 }
@@ -199,36 +178,49 @@ async function addMoney(amount) {
 
     let finalAmount = amount;
 
-    // 🧠 BONUS NUEVO USUARIO
+    // BONUS nuevo usuario
     if ((data.balance || 0) < 1) {
       finalAmount *= 1.5;
     }
 
-    // 💎 VIP (seguro)
+    // VIP
     if (data.vip === true) {
       finalAmount *= 2;
     }
 
-    // 🚫 límite diario
+    // límite diario
     if (userEarnings > 2) {
       return showToast("Límite diario alcanzado 💸");
     }
 
     userEarnings += finalAmount;
 
-    // 🔥 SIEMPRE FUNCIONA
+    // 💰 pagar usuario
     await setDoc(ref, {
       balance: increment(finalAmount)
     }, { merge: true });
 
-    console.log("💰 SUMADO:", finalAmount);
+    // 💎 PAGAR REFERIDOR (AQUÍ ESTÁ LA MAGIA)
+    if (data.referrer) {
+      const refUser = doc(db, "users", data.referrer);
+
+      const commission = finalAmount * 0.10;
+
+      await setDoc(refUser, {
+        balance: increment(commission),
+        referralEarnings: increment(commission)
+      }, { merge: true });
+
+      console.log("💎 Comisión referida:", commission);
+    }
+
+    console.log("💰 Usuario ganó:", finalAmount);
 
   } catch (e) {
     console.error("❌ ERROR addMoney:", e);
-    showToast("Error al sumar dinero ❌");
+    showToast("Error ❌");
   }
 }
-
 // 🎁 DAILY
 window.daily = async () => {
   const ref = doc(db, "users", user.uid);
