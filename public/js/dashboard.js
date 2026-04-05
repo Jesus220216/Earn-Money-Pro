@@ -236,12 +236,22 @@ window.spin = async () => {
 
 // 💰 ADD MONEY (ARREGLADO)
 async function addMoney(amount) {
+  if (!user) return;
+
   try {
-    await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(amount)
-    });
+    const ref = doc(db, "users", user.uid);
+    const snap = await getDoc(ref);
+
+    if (!snap.exists()) {
+      await setDoc(ref, { balance: amount }, { merge: true });
+    } else {
+      await updateDoc(ref, {
+        balance: increment(amount)
+      });
+    }
+
   } catch (e) {
-    console.error("Error sumando dinero:", e);
+    console.error("ERROR DINERO:", e);
   }
 }
 
