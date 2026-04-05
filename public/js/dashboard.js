@@ -133,6 +133,17 @@ window.startVideo = async () => {
   }, 1000);
 };
 
+// ENCUESTA
+window.survey = () => {
+  window.open(`https://timewall.io/wall?uid=${user.uid}`, "_blank");
+};
+
+// OFERTAS
+window.lootably = () => {
+  window.open(`https://wall.lootably.com/?placement=TU_ID&uid=${user.uid}`, "_blank");
+};
+
+
 // 🎰 RULETA (ANIMACIÓN REAL)
 window.spin = async () => {
 
