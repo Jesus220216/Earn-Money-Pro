@@ -49,6 +49,7 @@ onAuthStateChanged(auth, async (u) => {
 // INIT USER + REFERIDOS
 async function initUser() {
   const referrer = localStorage.getItem("referrer");
+
   const refDoc = doc(db, "users", user.uid);
   const snap = await getDoc(refDoc);
 
@@ -64,15 +65,22 @@ async function initUser() {
       spinDate: new Date().toDateString()
     });
 
+    // 🔥 IMPORTANTE
     if (referrer && referrer !== user.uid) {
-      await updateDoc(doc(db, "users", referrer), {
+
+      const refUser = doc(db, "users", referrer);
+
+      await updateDoc(refUser, {
         referrals: increment(1),
+        referralEarnings: increment(0.10),
         balance: increment(0.10)
       });
+
+      // limpiar para no duplicar
+      localStorage.removeItem("referrer");
     }
   }
 }
-
 // BALANCE
 function realtimeBalance() {
   onSnapshot(doc(db, "users", user.uid), (snap) => {
