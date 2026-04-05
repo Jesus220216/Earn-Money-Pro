@@ -137,7 +137,7 @@ window.startVideo = async () => {
 window.spin = async () => {
 
   const wheel = document.getElementById("wheel");
-
+window.open("https://omg10.com/4/10828691", "_blank");
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
   const data = snap.data() || {};
@@ -173,7 +173,7 @@ async function addMoney(amount) {
 window.daily = async () => {
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
-
+window.open("https://omg10.com/4/10828691", "_blank");
   const last = snap.data()?.lastDaily || 0;
 
   if (Date.now() - last < 86400000)
@@ -192,7 +192,7 @@ window.withdraw = async () => {
 
   if (Date.now() - lastWithdraw < 10000)
     return showToast("Espera ⏳");
-
+window.open("https://omg10.com/4/10828691", "_blank");
   lastWithdraw = Date.now();
 
   const amount = parseFloat(document.getElementById("amount").value);
