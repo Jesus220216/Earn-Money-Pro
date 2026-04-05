@@ -23,6 +23,9 @@ let videoIndex = 0;
 let videosLeft = 0;
 let seconds = 0;
 let interval;
+let earningsToday = 0;
+let userEarnings = 0;
+
 
 // LOGIN
 onAuthStateChanged(auth, async (u) => {
@@ -54,7 +57,7 @@ async function initUser() {
       balance: 0,
       referrer: referrer || null,
       referrals: 0,
-      referralEarnings: 0,
+      referralEarnings: 0.05,
       videosLeft: 6,
       videoDate: new Date().toDateString(),
       spins: 0,
@@ -64,11 +67,11 @@ async function initUser() {
     // 🔥 REFERIDO REAL
     if (referrer && referrer !== user.uid) {
       const refUser = doc(db, "users", referrer);
-
+if (referrer === user.uid) return;
       await updateDoc(refUser, {
         referrals: increment(1),
         referralEarnings: increment(0.10),
-        balance: increment(0.10)
+        balance: increment(0.05)
       });
 
       localStorage.removeItem("referrer");
@@ -99,7 +102,10 @@ window.startVideo = async () => {
  window.open("https://omg10.com/4/10828691", "_blank");
   if (videosLeft <= 0)
     return showToast("No hay más videos ❌");
-
+if (document.hidden) {
+  return showToast("No hagas trampa ❌");
+}
+  
   lastVideoTime = Date.now();
 
   const video = document.getElementById("videoPlayer");
@@ -118,7 +124,7 @@ window.startVideo = async () => {
       clearInterval(interval);
       video.pause();
 
-      await addMoney(0.03);
+      await addMoney(0.01);
       showToast("Ganaste $0.03 🎥");
 
       videosLeft--;
@@ -136,11 +142,13 @@ window.startVideo = async () => {
 // ENCUESTA
 window.survey = () => {
   window.open(`https://timewall.io/wall?uid=${user.uid}`, "_blank");
+   window.open("https://omg10.com/4/10828691", "_blank");
 };
 
 // OFERTAS
 window.lootably = () => {
   window.open(`https://wall.lootably.com/?placement=TU_ID&uid=${user.uid}`, "_blank");
+   window.open("https://omg10.com/4/10828691", "_blank");
 };
 
 
@@ -158,7 +166,7 @@ window.open("https://omg10.com/4/10828691", "_blank");
 
   await updateDoc(ref, { spins: increment(1) });
 
-  const reward = [0.01, 0.02, 0.05][Math.floor(Math.random() * 3)];
+  const reward = [0.05, 0.01, 0.02][Math.floor(Math.random() * 3)];
 
   const spinDeg = 1080 + Math.random() * 360;
   currentRotation += spinDeg;
@@ -175,6 +183,28 @@ window.open("https://omg10.com/4/10828691", "_blank");
 
 // 💰 DINERO
 async function addMoney(amount) {
+
+  // 💣 CONTROL GLOBAL
+  if (balance > 20) {
+    amount = amount * 0.3; // paga menos a usuarios ricos
+  }
+
+  // 🧠 NUEVOS USUARIOS GANAN MÁS
+  if (balance < 1) {
+    amount = amount * 1.5;
+  }
+  
+  if (data.vip) {
+  amount *= 2;
+}
+
+  // 🚫 LIMITE DIARIO
+  if (userEarnings > 2) {
+    return showToast("Límite diario alcanzado 💸");
+  }
+
+  userEarnings += amount;
+
   await updateDoc(doc(db, "users", user.uid), {
     balance: increment(amount)
   });
@@ -192,7 +222,7 @@ window.open("https://omg10.com/4/10828691", "_blank");
 
   await updateDoc(ref, {
     lastDaily: Date.now(),
-    balance: increment(0.20)
+    balance: increment(0.05)
   });
 
   showToast("Ganaste $0.20 🎁");
