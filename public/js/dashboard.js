@@ -5,7 +5,9 @@ import { doc, getDoc, setDoc, updateDoc, increment, addDoc, collection, onSnapsh
 // REFERIDO
 const urlParams = new URLSearchParams(window.location.search);
 const ref = urlParams.get("ref");
-if (ref) localStorage.setItem("referrer", ref);
+if (ref) {
+  sessionStorage.setItem("referrer", ref);
+}
 
 let user;
 let balance = 0;
@@ -45,40 +47,48 @@ onAuthStateChanged(auth, async (u) => {
   generateRefLink();
 });
 
-// INIT USER + REFERIDOS
 async function initUser() {
-  const referrer = localStorage.getItem("referrer");
+  const referrer = sessionStorage.getItem("referrer");
 
   const refDoc = doc(db, "users", user.uid);
   const snap = await getDoc(refDoc);
 
   if (!snap.exists()) {
+
+    // crear usuario
     await setDoc(refDoc, {
       balance: 0,
       referrer: referrer || null,
       referrals: 0,
-      referralEarnings: 0.05,
+      referralEarnings: 0,
       videosLeft: 6,
       videoDate: new Date().toDateString(),
       spins: 0,
       spinDate: new Date().toDateString()
     });
 
-    // 🔥 REFERIDO REAL
+    // 🔥 SISTEMA REFERIDO SEGURO
     if (referrer && referrer !== user.uid) {
-      const refUser = doc(db, "users", referrer);
-if (referrer === user.uid) return;
-      await updateDoc(refUser, {
-        referrals: increment(1),
-        referralEarnings: increment(0.10),
-        balance: increment(0.05)
-      });
+      try {
+        const refUser = doc(db, "users", referrer);
 
-      localStorage.removeItem("referrer");
+        await setDoc(refUser, {
+          referrals: increment(1),
+          referralEarnings: increment(0.10),
+          balance: increment(0.05)
+        }, { merge: true });
+
+        console.log("✅ Referido sumado");
+
+      } catch (e) {
+        console.error("❌ Error referido:", e);
+      }
     }
+
+    // limpiar SIEMPRE
+    sessionStorage.removeItem("referrer");
   }
 }
-
 // BALANCE
 function realtimeBalance() {
   onSnapshot(doc(db, "users", user.uid), (snap) => {
