@@ -9,7 +9,7 @@ import {
   increment, addDoc, collection, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-// 🔗 REFERIDO
+// REFERIDO
 const urlParams = new URLSearchParams(window.location.search);
 const ref = urlParams.get("ref");
 if (ref) localStorage.setItem("referrer", ref);
@@ -17,25 +17,23 @@ if (ref) localStorage.setItem("referrer", ref);
 let user;
 let balance = 0;
 
-// 💰 MONETAG
+// MONETAG
 let lastAdTime = 0;
 function openAdSafe() {
   if (Date.now() - lastAdTime < 30000) return;
-
   lastAdTime = Date.now();
 
   const a = document.createElement("a");
   a.href = "https://omg10.com/4/10828691";
   a.target = "_blank";
-  a.rel = "noopener noreferrer";
   a.click();
 }
 
-// 🔐 CONTROL
+// CONTROL
 let lastWithdraw = 0;
 let lastVideoTime = 0;
 
-// 🎥 VIDEOS (FUNCIONALES)
+// VIDEOS
 const videos = [
   "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
   "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/beer.mp4"
@@ -47,7 +45,7 @@ let watching = false;
 let seconds = 0;
 let interval;
 
-// 🔐 LOGIN
+// LOGIN
 onAuthStateChanged(auth, async (u) => {
   if (!u) return location.href = "index.html";
 
@@ -64,7 +62,7 @@ onAuthStateChanged(auth, async (u) => {
   loadWithdrawals();
 });
 
-// 👤 USER
+// USER INIT
 async function initUser() {
   const referrer = localStorage.getItem("referrer");
   const refDoc = doc(db, "users", user.uid);
@@ -90,7 +88,7 @@ async function initUser() {
   }
 }
 
-// 💰 BALANCE
+// BALANCE
 function realtimeBalance() {
   onSnapshot(doc(db, "users", user.uid), (snap) => {
     const data = snap.data() || {};
@@ -105,7 +103,7 @@ function realtimeBalance() {
   });
 }
 
-// 🎥 VIDEO
+// VIDEO
 window.startVideo = async () => {
 
   if (Date.now() - lastVideoTime < 10000)
@@ -119,8 +117,7 @@ window.startVideo = async () => {
   const video = document.getElementById("videoPlayer");
 
   video.src = videos[videoIndex];
-  video.load();
-  video.play().catch(() => showToast("Toca el video ▶️"));
+  video.play().catch(() => showToast("Toca ▶️"));
 
   watching = true;
   seconds = 0;
@@ -129,7 +126,6 @@ window.startVideo = async () => {
 
     if (!watching) {
       clearInterval(interval);
-      video.pause();
       return;
     }
 
@@ -138,18 +134,17 @@ window.startVideo = async () => {
 
     if (seconds >= 10) {
       clearInterval(interval);
-      video.pause();
 
-      openAdSafe(); // 💰 monetización
-
+      openAdSafe();
       await addMoney(0.03);
+
       showToast("Ganaste $0.03 🎥");
 
       videosLeft--;
       videoIndex = (videoIndex + 1) % videos.length;
 
       await updateDoc(doc(db, "users", user.uid), {
-        videosLeft: videosLeft
+        videosLeft
       });
 
       document.getElementById("videosLeft").innerText =
@@ -159,59 +154,50 @@ window.startVideo = async () => {
   }, 1000);
 };
 
-// ⛔ seguridad video
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) watching = false;
 });
 
-// 📋 ENCUESTAS
+// ENCUESTA
 window.survey = () => {
-  window.open(`https://timewall.io/wall?uid=${user.uid}`, "_blank", "noopener,noreferrer");
+  window.open(`https://timewall.io/wall?uid=${user.uid}`, "_blank");
 };
 
-// 🎁 OFERTAS
+// OFERTAS
 window.lootably = () => {
-  window.open(`https://wall.lootably.com/?placement=TU_ID&uid=${user.uid}`, "_blank", "noopener,noreferrer");
+  window.open(`https://wall.lootably.com/?placement=TU_ID&uid=${user.uid}`, "_blank");
 };
 
-// 🎮 JUEGO
-window.game = () => {
+// JUEGO
+window.game = async () => {
   openAdSafe();
   const reward = Math.random() < 0.7 ? 0.01 : 0.05;
-  addMoney(reward);
+  await addMoney(reward);
   showToast("Ganaste $" + reward.toFixed(2));
 };
 
-// 🎁 DAILY
+// DAILY
 window.daily = async () => {
-  try {
-    const ref = doc(db, "users", user.uid);
-    const snap = await getDoc(ref);
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
 
-    const last = snap.data()?.lastDaily || 0;
+  const last = snap.data()?.lastDaily || 0;
 
-    if (Date.now() - last < 86400000)
-      return showToast("Ya reclamaste ❌");
+  if (Date.now() - last < 86400000)
+    return showToast("Ya reclamaste ❌");
 
-    await updateDoc(ref, {
-      lastDaily: Date.now(),
-      balance: increment(0.20)
-    });
+  await updateDoc(ref, {
+    lastDaily: Date.now(),
+    balance: increment(0.20)
+  });
 
-    showToast("Ganaste $0.20 🎁");
-
-  } catch (e) {
-    console.error(e);
-    showToast("Error daily ❌");
-  }
+  showToast("Ganaste $0.20 🎁");
 };
 
-// 🎰 RULETA
+// RULETA
 window.spin = async () => {
 
   openAdSafe();
-
-  const wheel = document.getElementById("wheel");
 
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
@@ -222,40 +208,30 @@ window.spin = async () => {
 
   await updateDoc(ref, { spins: increment(1) });
 
-  const deg = Math.floor(3600 + Math.random() * 1000);
-  wheel.style.transform = `rotate(${deg}deg)`;
-
   const reward = [0.01, 0.02, 0.05][Math.floor(Math.random() * 3)];
 
-  setTimeout(() => {
-    addMoney(reward);
+  setTimeout(async () => {
+    await addMoney(reward);
     showToast("Ganaste $" + reward + " 🎰");
     updateSpinUI((data.spins || 0) + 1);
   }, 3000);
 };
 
-// 💰 ADD MONEY (ARREGLADO)
+// SUMAR DINERO
 async function addMoney(amount) {
-  if (!user) return;
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
 
-  try {
-    const ref = doc(db, "users", user.uid);
-    const snap = await getDoc(ref);
-
-    if (!snap.exists()) {
-      await setDoc(ref, { balance: amount }, { merge: true });
-    } else {
-      await updateDoc(ref, {
-        balance: increment(amount)
-      });
-    }
-
-  } catch (e) {
-    console.error("ERROR DINERO:", e);
+  if (!snap.exists()) {
+    await setDoc(ref, { balance: amount }, { merge: true });
+  } else {
+    await updateDoc(ref, {
+      balance: increment(amount)
+    });
   }
 }
 
-// 💳 RETIRO
+// RETIRO
 window.withdraw = async () => {
 
   if (Date.now() - lastWithdraw < 10000)
@@ -270,28 +246,22 @@ window.withdraw = async () => {
   if (amount < 5) return showToast("Mínimo $5 ❌");
   if (amount > balance) return showToast("Saldo insuficiente ❌");
 
-  try {
-    await addDoc(collection(db, "withdrawals"), {
-      userId: user.uid,
-      amount,
-      email,
-      status: "pending",
-      date: Date.now()
-    });
+  await addDoc(collection(db, "withdrawals"), {
+    userId: user.uid,
+    amount,
+    email,
+    status: "pending",
+    date: Date.now()
+  });
 
-    await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(-amount)
-    });
+  await updateDoc(doc(db, "users", user.uid), {
+    balance: increment(-amount)
+  });
 
-    showToast("Retiro enviado 🚀");
-
-  } catch (e) {
-    console.error(e);
-    showToast("Error ❌");
-  }
+  showToast("Retiro enviado 🚀");
 };
 
-// 📜 HISTORIAL
+// HISTORIAL
 function loadWithdrawals() {
   const q = collection(db, "withdrawals");
 
@@ -299,26 +269,66 @@ function loadWithdrawals() {
     const div = document.getElementById("withdrawList");
     div.innerHTML = "";
 
+    if (!snap.size) {
+      div.innerHTML = "No hay retiros aún";
+      return;
+    }
+
     snap.forEach(docu => {
       const w = docu.data();
       if (w.userId !== user.uid) return;
 
-      let color = "orange";
-      if (w.status === "approved") color = "#22c55e";
-      if (w.status === "rejected") color = "#ef4444";
-
       div.innerHTML += `
         <div style="margin:10px;padding:10px;background:#1f1f1f;border-radius:10px;">
           💰 $${w.amount} <br>
-          📧 ${w.email || "-"} <br>
-          📊 <span style="color:${color}">${w.status}</span>
+          📊 ${w.status}
         </div>
       `;
     });
   });
 }
 
-// 🔔 TOAST
+// UI
+function updateSpinUI(spins) {
+  document.getElementById("spinCount").innerText =
+    spins + " / 10 giros";
+}
+
+// VIDEO RESET
+async function checkVideoLimit() {
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+
+  const data = snap.data() || {};
+  const today = new Date().toDateString();
+
+  if (data.videoDate !== today) {
+    await updateDoc(ref, {
+      videosLeft: 6,
+      videoDate: today
+    });
+    videosLeft = 6;
+  } else {
+    videosLeft = data.videosLeft || 0;
+  }
+
+  document.getElementById("videosLeft").innerText =
+    "Restantes: " + videosLeft;
+}
+
+// RULETA RESET
+async function checkSpinLimit() {
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+
+  const today = new Date().toDateString();
+
+  if (snap.data()?.spinDate !== today) {
+    await updateDoc(ref, { spinDate: today, spins: 0 });
+  }
+}
+
+// TOAST
 function showToast(msg) {
   const t = document.createElement("div");
   t.innerText = msg;
@@ -331,3 +341,9 @@ function showToast(msg) {
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 2000);
 }
+
+// LOGOUT
+window.logout = async () => {
+  await signOut(auth);
+  location.href = "index.html";
+};
