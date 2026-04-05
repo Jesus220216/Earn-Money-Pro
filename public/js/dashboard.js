@@ -60,6 +60,7 @@ onAuthStateChanged(auth, async (u) => {
 
   realtimeBalance();
   loadWithdrawals();
+  generateRefLink();
 });
 
 // USER INIT
@@ -347,3 +348,8 @@ window.logout = async () => {
   await signOut(auth);
   location.href = "index.html";
 };
+
+function generateRefLink() {
+  const link = `${window.location.origin}?ref=${user.uid}`;
+  document.getElementById("refLink").value = link;
+}
