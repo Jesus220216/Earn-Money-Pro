@@ -1,13 +1,6 @@
 import { auth, db } from "./firebase.js";
-
-import {
-  onAuthStateChanged, signOut
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-
-import {
-  doc, getDoc, setDoc, updateDoc,
-  increment, addDoc, collection, onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+import { doc, getDoc, setDoc, updateDoc, increment, addDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 // REFERIDO
 const urlParams = new URLSearchParams(window.location.search);
@@ -16,33 +9,23 @@ if (ref) localStorage.setItem("referrer", ref);
 
 let user;
 let balance = 0;
-
-// MONETAG
-let lastAdTime = 0;
-function openAdSafe() {
-  if (Date.now() - lastAdTime < 30000) return;
-  lastAdTime = Date.now();
-
-  const a = document.createElement("a");
-  a.href = "https://omg10.com/4/10828691";
-  a.target = "_blank";
-  a.click();
-}
-
-// CONTROL
 let lastWithdraw = 0;
 let lastVideoTime = 0;
+let currentRotation = 0;
 
-// VIDEOS
+// VIDEOS (6)
 const videos = [
   "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/beer.mp4"
+  "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/beer.mp4",
+  "https://www.w3schools.com/html/mov_bbb.mp4",
+  "https://www.w3schools.com/html/movie.mp4",
+  "https://media.w3.org/2010/05/sintel/trailer.mp4",
+  "https://media.w3.org/2010/05/bunny/movie.mp4"
 ];
 
 let videoIndex = 0;
 let videosLeft = 0;
 let watching = false;
-let seconds = 0;
 let interval;
 
 // LOGIN
@@ -63,7 +46,7 @@ onAuthStateChanged(auth, async (u) => {
   generateRefLink();
 });
 
-// USER INIT
+// INIT USER + REFERIDOS
 async function initUser() {
   const referrer = localStorage.getItem("referrer");
   const refDoc = doc(db, "users", user.uid);
@@ -83,7 +66,8 @@ async function initUser() {
 
     if (referrer && referrer !== user.uid) {
       await updateDoc(doc(db, "users", referrer), {
-        referrals: increment(1)
+        referrals: increment(1),
+        balance: increment(0.10)
       });
     }
   }
@@ -104,7 +88,7 @@ function realtimeBalance() {
   });
 }
 
-// VIDEO
+// VIDEO 10s REAL
 window.startVideo = async () => {
 
   if (Date.now() - lastVideoTime < 10000)
@@ -118,35 +102,28 @@ window.startVideo = async () => {
   const video = document.getElementById("videoPlayer");
 
   video.src = videos[videoIndex];
-  video.play().catch(() => showToast("Toca ▶️"));
+  video.currentTime = 0;
+  video.play();
 
   watching = true;
-  seconds = 0;
 
   interval = setInterval(async () => {
 
-    if (!watching) {
-      clearInterval(interval);
-      return;
-    }
+    const seconds = Math.floor(video.currentTime);
 
-    seconds++;
     document.getElementById("timerText").innerText = seconds + "/10";
 
     if (seconds >= 10) {
       clearInterval(interval);
+      video.pause();
 
-      openAdSafe();
       await addMoney(0.03);
-
       showToast("Ganaste $0.03 🎥");
 
       videosLeft--;
       videoIndex = (videoIndex + 1) % videos.length;
 
-      await updateDoc(doc(db, "users", user.uid), {
-        videosLeft
-      });
+      await updateDoc(doc(db, "users", user.uid), { videosLeft });
 
       document.getElementById("videosLeft").innerText =
         "Restantes: " + videosLeft;
@@ -155,27 +132,41 @@ window.startVideo = async () => {
   }, 1000);
 };
 
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) watching = false;
-});
+// RULETA
+window.spin = async () => {
 
-// ENCUESTA
-window.survey = () => {
-  window.open(`https://timewall.io/wall?uid=${user.uid}`, "_blank");
+  const wheel = document.getElementById("wheel");
+
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+  const data = snap.data() || {};
+
+  if ((data.spins || 0) >= 10)
+    return showToast("Límite alcanzado ❌");
+
+  await updateDoc(ref, { spins: increment(1) });
+
+  const reward = [0.01, 0.02, 0.05][Math.floor(Math.random() * 3)];
+
+  const spinDeg = 720 + Math.random() * 360;
+  currentRotation += spinDeg;
+
+  wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+  setTimeout(async () => {
+    await addMoney(reward);
+    showToast("Ganaste $" + reward + " 🎰");
+    updateSpinUI((data.spins || 0) + 1);
+  }, 3000);
 };
 
-// OFERTAS
-window.lootably = () => {
-  window.open(`https://wall.lootably.com/?placement=TU_ID&uid=${user.uid}`, "_blank");
-};
-
-// JUEGO
-window.game = async () => {
-  openAdSafe();
-  const reward = Math.random() < 0.7 ? 0.01 : 0.05;
-  await addMoney(reward);
-  showToast("Ganaste $" + reward.toFixed(2));
-};
+// MONEY
+async function addMoney(amount) {
+  const ref = doc(db, "users", user.uid);
+  await updateDoc(ref, {
+    balance: increment(amount)
+  });
+}
 
 // DAILY
 window.daily = async () => {
@@ -194,50 +185,6 @@ window.daily = async () => {
 
   showToast("Ganaste $0.20 🎁");
 };
-
-// RULETA
-window.spin = async () => {
-
-  openAdSafe();
-
-  const ref = doc(db, "users", user.uid);
-  const snap = await getDoc(ref);
-  const data = snap.data() || {};
-
-  if ((data.spins || 0) >= 10)
-    return showToast("Límite alcanzado ❌");
-
-  await updateDoc(ref, { spins: increment(1) });
-
-  const reward = [0.01, 0.02, 0.05][Math.floor(Math.random() * 3)];
-
-  setTimeout(async () => {
-    await addMoney(reward);
-    showToast("Ganaste $" + reward + " 🎰");
-    updateSpinUI((data.spins || 0) + 1);
-  }, 3000);
-};
-
-window.copyRef = () => {
-  const input = document.getElementById("refLink");
-  input.select();
-  document.execCommand("copy");
-  showToast("Link copiado 🔗");
-};
-
-// SUMAR DINERO
-async function addMoney(amount) {
-  const ref = doc(db, "users", user.uid);
-  const snap = await getDoc(ref);
-
-  if (!snap.exists()) {
-    await setDoc(ref, { balance: amount }, { merge: true });
-  } else {
-    await updateDoc(ref, {
-      balance: increment(amount)
-    });
-  }
-}
 
 // RETIRO
 window.withdraw = async () => {
@@ -271,9 +218,7 @@ window.withdraw = async () => {
 
 // HISTORIAL
 function loadWithdrawals() {
-  const q = collection(db, "withdrawals");
-
-  onSnapshot(q, (snap) => {
+  onSnapshot(collection(db, "withdrawals"), (snap) => {
     const div = document.getElementById("withdrawList");
     div.innerHTML = "";
 
@@ -296,25 +241,43 @@ function loadWithdrawals() {
   });
 }
 
+// REFERIDO LINK
+function generateRefLink() {
+  document.getElementById("refLink").value =
+    `${window.location.origin}?ref=${user.uid}`;
+}
+
+window.copyRef = () => {
+  const input = document.getElementById("refLink");
+  input.select();
+  document.execCommand("copy");
+  showToast("Link copiado 🔗");
+};
+
 // UI
 function updateSpinUI(spins) {
   document.getElementById("spinCount").innerText =
     spins + " / 10 giros";
 }
 
-// VIDEO RESET
+// RESET
+async function checkSpinLimit() {
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+  const today = new Date().toDateString();
+
+  if (snap.data()?.spinDate !== today)
+    await updateDoc(ref, { spinDate: today, spins: 0 });
+}
+
 async function checkVideoLimit() {
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
-
   const data = snap.data() || {};
   const today = new Date().toDateString();
 
   if (data.videoDate !== today) {
-    await updateDoc(ref, {
-      videosLeft: 6,
-      videoDate: today
-    });
+    await updateDoc(ref, { videosLeft: 6, videoDate: today });
     videosLeft = 6;
   } else {
     videosLeft = data.videosLeft || 0;
@@ -322,18 +285,6 @@ async function checkVideoLimit() {
 
   document.getElementById("videosLeft").innerText =
     "Restantes: " + videosLeft;
-}
-
-// RULETA RESET
-async function checkSpinLimit() {
-  const ref = doc(db, "users", user.uid);
-  const snap = await getDoc(ref);
-
-  const today = new Date().toDateString();
-
-  if (snap.data()?.spinDate !== today) {
-    await updateDoc(ref, { spinDate: today, spins: 0 });
-  }
 }
 
 // TOAST
@@ -355,8 +306,3 @@ window.logout = async () => {
   await signOut(auth);
   location.href = "index.html";
 };
-
-function generateRefLink() {
-  const link = `${window.location.origin}?ref=${user.uid}`;
-  document.getElementById("refLink").value = link;
-}
