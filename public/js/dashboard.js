@@ -99,7 +99,6 @@ window.startVideo = async () => {
 
   if (Date.now() - lastVideoTime < 10000)
     return showToast("Espera ⏳");
- window.open("https://omg10.com/4/10828691", "_blank");
   if (videosLeft <= 0)
     return showToast("No hay más videos ❌");
 if (document.hidden) {
