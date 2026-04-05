@@ -123,7 +123,7 @@ if (document.hidden) {
       clearInterval(interval);
       video.pause();
 
-      await addMoney(0.01);
+      await addMoney(0.03);
       showToast("Ganaste $0.03 🎥");
 
       videosLeft--;
@@ -182,31 +182,41 @@ window.open("https://omg10.com/4/10828691", "_blank");
 
 // 💰 DINERO
 async function addMoney(amount) {
+  try {
+    const ref = doc(db, "users", user.uid);
+    const snap = await getDoc(ref);
+    const data = snap.data() || {};
 
-  // 💣 CONTROL GLOBAL
-  if (balance > 20) {
-    amount = amount * 0.3; // paga menos a usuarios ricos
+    let finalAmount = amount;
+
+    // 🧠 BONUS NUEVO USUARIO
+    if ((data.balance || 0) < 1) {
+      finalAmount *= 1.5;
+    }
+
+    // 💎 VIP (seguro)
+    if (data.vip === true) {
+      finalAmount *= 2;
+    }
+
+    // 🚫 límite diario
+    if (userEarnings > 2) {
+      return showToast("Límite diario alcanzado 💸");
+    }
+
+    userEarnings += finalAmount;
+
+    // 🔥 SIEMPRE FUNCIONA
+    await setDoc(ref, {
+      balance: increment(finalAmount)
+    }, { merge: true });
+
+    console.log("💰 SUMADO:", finalAmount);
+
+  } catch (e) {
+    console.error("❌ ERROR addMoney:", e);
+    showToast("Error al sumar dinero ❌");
   }
-
-  // 🧠 NUEVOS USUARIOS GANAN MÁS
-  if (balance < 1) {
-    amount = amount * 1.5;
-  }
-  
-  if (data.vip) {
-  amount *= 2;
-}
-
-  // 🚫 LIMITE DIARIO
-  if (userEarnings > 2) {
-    return showToast("Límite diario alcanzado 💸");
-  }
-
-  userEarnings += amount;
-
-  await updateDoc(doc(db, "users", user.uid), {
-    balance: increment(amount)
-  });
 }
 
 // 🎁 DAILY
@@ -336,6 +346,8 @@ function showToast(msg) {
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 2000);
 }
+
+window.testMoney = () => addMoney(0.5);
 
 // LOGOUT
 window.logout = async () => {
