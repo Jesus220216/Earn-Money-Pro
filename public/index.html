@@ -55,5 +55,15 @@
 <!-- 💰 MONETAG -->
 <script src="//omg10.com/4/10828691"></script>
 
+  <script>
+const params = new URLSearchParams(window.location.search);
+const ref = params.get("ref");
+
+if (ref) {
+  sessionStorage.setItem("referrer", ref);
+  console.log("REF GUARDADO:", ref);
+}
+</script>
+
 </body>
 </html>
