@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <title>EarnPro</title>
 <link rel="stylesheet" href="/css/dashboard.css">
+
+<style>
+#wheel {
+  font-size: 50px;
+  transition: transform 3s ease-out;
+}
+</style>
+
 </head>
 
 <body class="dashboard">
@@ -28,7 +36,7 @@
 <div class="card hover">
   <h3>🎥 Videos Pro</h3>
 
-  <video id="videoPlayer" width="100%" height="150" controls muted style="border-radius:10px;"></video>
+  <video id="videoPlayer" width="100%" height="150" controls muted></video>
 
   <p id="timerText">0/10</p>
   <p id="videosLeft">Restantes: 6</p>
@@ -99,7 +107,7 @@
   <p>Ganado: $<span id="refEarn">0.00</span></p>
 </div>
 
-  <div class="card">
+<div class="card">
   <h3>🔗 Tu link de referido</h3>
   <input id="refLink" readonly style="width:100%;padding:8px;">
   <button onclick="copyRef()">Copiar</button>
