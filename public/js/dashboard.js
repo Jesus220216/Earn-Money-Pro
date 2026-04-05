@@ -21,17 +21,24 @@ let balance = 0;
 let lastAdTime = 0;
 function openAdSafe() {
   if (Date.now() - lastAdTime < 30000) return;
+
   lastAdTime = Date.now();
-  window.open("https://omg10.com/4/10828691", "_blank");
+
+  const a = document.createElement("a");
+  a.href = "https://omg10.com/4/10828691";
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  a.click();
 }
 
-// 🔐 ANTI SPAM RETIRO
+// 🔐 CONTROL
 let lastWithdraw = 0;
+let lastVideoTime = 0;
 
-// 🎥 VIDEO
+// 🎥 VIDEOS (FUNCIONALES)
 const videos = [
-  "https://www.w3schools.com/html/mov_bbb.mp4",
-  "https://www.w3schools.com/html/movie.mp4"
+  "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+  "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/beer.mp4"
 ];
 
 let videoIndex = 0;
@@ -39,7 +46,6 @@ let videosLeft = 0;
 let watching = false;
 let seconds = 0;
 let interval;
-let lastVideoTime = 0;
 
 // 🔐 LOGIN
 onAuthStateChanged(auth, async (u) => {
@@ -102,13 +108,11 @@ function realtimeBalance() {
 // 🎥 VIDEO
 window.startVideo = async () => {
 
-  if (Date.now() - lastVideoTime < 10000) {
+  if (Date.now() - lastVideoTime < 10000)
     return showToast("Espera ⏳");
-  }
 
-  if (videosLeft <= 0) {
+  if (videosLeft <= 0)
     return showToast("No hay más videos ❌");
-  }
 
   lastVideoTime = Date.now();
 
@@ -116,9 +120,7 @@ window.startVideo = async () => {
 
   video.src = videos[videoIndex];
   video.load();
-  video.play().catch(() => {
-    showToast("Toca el video ▶️");
-  });
+  video.play().catch(() => showToast("Toca el video ▶️"));
 
   watching = true;
   seconds = 0;
@@ -138,7 +140,7 @@ window.startVideo = async () => {
       clearInterval(interval);
       video.pause();
 
-      openAdSafe(); // 💰 ANUNCIO SOLO CUANDO TERMINA (MEJOR CONVERSIÓN)
+      openAdSafe(); // 💰 monetización
 
       await addMoney(0.03);
       showToast("Ganaste $0.03 🎥");
@@ -162,12 +164,46 @@ document.addEventListener("visibilitychange", () => {
   if (document.hidden) watching = false;
 });
 
+// 📋 ENCUESTAS
+window.survey = () => {
+  window.open(`https://timewall.io/wall?uid=${user.uid}`, "_blank", "noopener,noreferrer");
+};
+
+// 🎁 OFERTAS
+window.lootably = () => {
+  window.open(`https://wall.lootably.com/?placement=TU_ID&uid=${user.uid}`, "_blank", "noopener,noreferrer");
+};
+
 // 🎮 JUEGO
 window.game = () => {
   openAdSafe();
   const reward = Math.random() < 0.7 ? 0.01 : 0.05;
   addMoney(reward);
   showToast("Ganaste $" + reward.toFixed(2));
+};
+
+// 🎁 DAILY
+window.daily = async () => {
+  try {
+    const ref = doc(db, "users", user.uid);
+    const snap = await getDoc(ref);
+
+    const last = snap.data()?.lastDaily || 0;
+
+    if (Date.now() - last < 86400000)
+      return showToast("Ya reclamaste ❌");
+
+    await updateDoc(ref, {
+      lastDaily: Date.now(),
+      balance: increment(0.20)
+    });
+
+    showToast("Ganaste $0.20 🎁");
+
+  } catch (e) {
+    console.error(e);
+    showToast("Error daily ❌");
+  }
 };
 
 // 🎰 RULETA
@@ -181,9 +217,8 @@ window.spin = async () => {
   const snap = await getDoc(ref);
   const data = snap.data() || {};
 
-  if ((data.spins || 0) >= 10) {
+  if ((data.spins || 0) >= 10)
     return showToast("Límite alcanzado ❌");
-  }
 
   await updateDoc(ref, { spins: increment(1) });
 
@@ -199,21 +234,23 @@ window.spin = async () => {
   }, 3000);
 };
 
-// 💰 ADD MONEY
+// 💰 ADD MONEY (ARREGLADO)
 async function addMoney(amount) {
-  if (amount > 0.5) return;
-
-  await setDoc(doc(db, "users", user.uid), {
-    balance: increment(amount)
-  }, { merge: true });
+  try {
+    await updateDoc(doc(db, "users", user.uid), {
+      balance: increment(amount)
+    });
+  } catch (e) {
+    console.error("Error sumando dinero:", e);
+  }
 }
 
 // 💳 RETIRO
 window.withdraw = async () => {
 
-  if (Date.now() - lastWithdraw < 10000) {
+  if (Date.now() - lastWithdraw < 10000)
     return showToast("Espera ⏳");
-  }
+
   lastWithdraw = Date.now();
 
   const amount = parseFloat(document.getElementById("amount").value);
