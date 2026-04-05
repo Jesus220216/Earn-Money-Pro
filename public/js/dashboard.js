@@ -231,11 +231,6 @@ window.open("https://omg10.com/4/10828691", "_blank");
   if (Date.now() - last < 86400000)
     return showToast("Ya reclamaste ❌");
 
- await setDoc(refUser, {
-  referrals: increment(1),
-  referralEarnings: increment(0.10),
-  balance: increment(0.05)
-}, { merge: true });
 
   showToast("Ganaste $0.20 🎁");
 };
