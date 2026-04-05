@@ -218,6 +218,13 @@ window.spin = async () => {
   }, 3000);
 };
 
+window.copyRef = () => {
+  const input = document.getElementById("refLink");
+  input.select();
+  document.execCommand("copy");
+  showToast("Link copiado 🔗");
+};
+
 // SUMAR DINERO
 async function addMoney(amount) {
   const ref = doc(db, "users", user.uid);
