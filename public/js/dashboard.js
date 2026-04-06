@@ -60,6 +60,12 @@ function realtimeBalance() {
     const data = snap.data() || {};
     balance = data.balance || 0;
 
+    const spins = data.spins || 0;
+const left = 10 - spins;
+
+document.getElementById("spinCount").innerText =
+  `${spins}/10 giros (te quedan ${left})`;
+
     document.getElementById("balance").innerText = "$" + balance.toFixed(2);
     document.querySelector(".balance-mini").innerText = "$" + balance.toFixed(2);
 
@@ -135,23 +141,50 @@ window.spin = async () => {
   const snap = await getDoc(ref);
   const data = snap.data() || {};
 
-  if ((data.spins || 0) >= 10)
+  let spins = data.spins || 0;
+
+  if (spins >= 10)
     return showToast("Límite alcanzado ❌");
 
-  await updateDoc(ref, { spins: increment(1) });
+  spins++;
 
+  await updateDoc(ref, { spins });
+
+  // 🎯 PREMIOS
+  const rewards = [0.01, 0.02, 0.05, 0.10, 0.50, 0];
+  const index = Math.floor(Math.random() * rewards.length);
+  const reward = rewards[index];
+
+  // 🎡 ROTACIÓN REAL
+  const degPerSegment = 360 / rewards.length;
+  const finalDeg = (360 * 5) + (index * degPerSegment);
+
+  wheel.style.transform = `rotate(${finalDeg}deg)`;
+
+  // 💸 abrir anuncio
   window.open(LINK, "_blank");
 
-  const reward = [0.05, 0.01, 0.02][Math.floor(Math.random() * 3)];
-  const spinDeg = 1080 + Math.random() * 360;
-  currentRotation += spinDeg;
-
-  wheel.style.transform = `rotate(${currentRotation}deg)`;
-
   setTimeout(async () => {
-    await addMoney(reward);
-    showToast("Ganaste $" + reward + " 🎰");
-  }, 3000);
+    if (reward > 0) {
+      await updateDoc(ref, {
+        balance: increment(reward)
+      });
+
+      showToast(`Ganaste $${reward} 🎰`);
+    } else {
+      showToast("Sigue intentando 😅");
+    }
+
+    // 💎 BONUS AL LLEGAR A 10
+    if (spins === 10) {
+      await updateDoc(ref, {
+        balance: increment(1)
+      });
+
+      showToast("🎁 BONUS $1 por completar 10 giros 🔥");
+    }
+
+  }, 4000);
 };
 
 // 🎁 DAILY
