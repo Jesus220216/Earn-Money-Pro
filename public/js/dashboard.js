@@ -106,6 +106,23 @@ window.startVideo = async () => {
   }, 1000);
 };
 
+window.openGame = async () => {
+  if (!user) return;
+
+  // abre juego real
+ window.open("https://omg10.com/4/10751693", "_blank");
+
+  showToast("Juega 20 segundos ⏳");
+
+  setTimeout(async () => {
+    await updateDoc(doc(db, "users", user.uid), {
+      balance: increment(0.30)
+    });
+
+    showToast("Ganaste $0.30 🎮💰");
+  }, 20000);
+};
+
 // 🎰 RULETA
 window.spin = async () => {
   const wheel = document.getElementById("wheel");
