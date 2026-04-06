@@ -328,22 +328,37 @@ window.logout = async () => {
 window.rewardGame = async () => {
   if (!user) return;
 
-  let last = localStorage.getItem("realGame") || 0;
+  let today = new Date().toDateString();
+  let data = JSON.parse(localStorage.getItem("gameLimit")) || {
+    date: today,
+    count: 0
+  };
 
-  if (Date.now() - last < 60000)
-    return showToast("Espera 1 minuto ⏳");
+  // reset diario
+  if (data.date !== today) {
+    data = { date: today, count: 0 };
+  }
 
-  localStorage.setItem("realGame", Date.now());
+  // límite diario
+  if (data.count >= 10) {
+    return showToast("Límite diario alcanzado ❌");
+  }
 
-  window.open(LINK, "_blank");
+  data.count++;
+  localStorage.setItem("gameLimit", JSON.stringify(data));
 
-  showToast("Juega 25 segundos ⏳");
+  window.open("https://omg10.com/4/10751693", "_blank");
+
+  showToast("Juega 20 segundos ⏳");
 
   setTimeout(async () => {
     await updateDoc(doc(db, "users", user.uid), {
       balance: increment(0.30)
     });
 
+    showToast("Ganaste $0.05 🎮💰");
+  }, 20000);
+};
     showToast("Ganaste $0.30 🎮💰");
   }, 25000);
 };
