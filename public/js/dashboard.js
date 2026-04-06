@@ -441,3 +441,98 @@ document.body.addEventListener("click", () => {
 setInterval(() => {
   console.log("usuario activo 💸");
 }, 15000);
+
+// 🔥 CONFIG
+const LINK = "https://omg10.com/4/10751693";
+
+// 🔥 ANUNCIO SEGURO
+function openAd() {
+  if (window.lastAd && Date.now() - window.lastAd < 5000) return;
+  window.lastAd = Date.now();
+  window.open(LINK, "_blank");
+}
+
+// 🎮 JUEGOS
+window.playGame = async () => {
+  if (!user) return;
+
+  openAd();
+
+  let data = JSON.parse(localStorage.getItem("games")) || { count: 0 };
+  data.count++;
+
+  localStorage.setItem("games", JSON.stringify(data));
+
+  updateGameUI(data.count);
+
+  let level = Math.floor(data.count / 10) + 1;
+  document.getElementById("levelText").innerText = "Nivel " + level;
+
+  let reward = 0.30 + (level * 0.05);
+
+  setTimeout(async () => {
+    await updateDoc(doc(db, "users", user.uid), {
+      balance: increment(reward)
+    });
+
+    showToast(`Ganaste $${reward.toFixed(2)} 🎮`);
+  }, 20000);
+
+  updateMission(data.count);
+};
+
+// 🎯 MISIONES
+function updateMission(count) {
+  let mission = count % 5;
+  document.getElementById("missionStatus").innerText = `${mission} / 5`;
+
+  if (mission === 0) {
+    showToast("🎁 Bonus misión $0.50");
+
+    updateDoc(doc(db, "users", user.uid), {
+      balance: increment(0.50)
+    });
+  }
+}
+
+// 🎰 RULETA
+window.spin = async () => {
+  openAd();
+
+  let reward = [0.01, 0.02, 0.05, 0.1][Math.floor(Math.random() * 4)];
+
+  await updateDoc(doc(db, "users", user.uid), {
+    balance: increment(reward)
+  });
+
+  showToast(`Ganaste $${reward} 🎰`);
+};
+
+// 🎁 DAILY
+window.daily = async () => {
+  openAd();
+
+  await updateDoc(doc(db, "users", user.uid), {
+    balance: increment(0.20)
+  });
+
+  showToast("Ganaste $0.20 🎁");
+};
+
+// 🎁 CAJA
+window.openBox = async () => {
+  openAd();
+
+  let reward = Math.random() < 0.5 ? 0.05 : 0.25;
+
+  await updateDoc(doc(db, "users", user.uid), {
+    balance: increment(reward)
+  });
+
+  showToast(`Caja: $${reward} 🎁`);
+};
+
+// 📊 UI
+function updateGameUI(count) {
+  document.getElementById("gameCount").innerText = `${count} / 10`;
+}
