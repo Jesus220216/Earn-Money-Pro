@@ -62,30 +62,29 @@ iframe {
   <button onclick="offer()">Completar oferta</button>
 </div>
 
-<!-- 🎮 JUEGOS REALES -->
 <div class="card">
-  <h3>🎮 Juegos reales</h3>
+  <h3>🎮 Juegos</h3>
 
-  <iframe src="https://html5.gamedistribution.com/rvvASMiM/6d5e0f9d4f9c4f3a9c9b9a0e3f/index.html"></iframe>
+  <!-- 🎮 JUEGO ACTIVO -->
+  <iframe id="gameFrame"
+    src="https://games.cdn.famobi.com/html5games/f/fruit-ninja/v090/?fg_domain=play.famobi.com">
+  </iframe>
 
-  <button onclick="rewardGame()">💰 Reclamar</button>
-</div>
+  <!-- 🎯 SELECTOR TIPO NETFLIX -->
+  <div class="game-row">
 
-<!-- 🎮 MÁS JUEGOS -->
-<div class="card">
-  <h3>🎮 Más juegos</h3>
+    <img src="https://img.cdn.famobi.com/portal/html5games/images/tmp/fruit-ninja-teaser.jpg"
+      onclick="changeGame('https://games.cdn.famobi.com/html5games/f/fruit-ninja/v090/?fg_domain=play.famobi.com')">
 
-  <iframe src="https://www.crazygames.com/embed"></iframe>
+    <img src="https://img.cdn.famobi.com/portal/html5games/images/tmp/8-ball-billiards-classic-teaser.jpg"
+      onclick="changeGame('https://games.cdn.famobi.com/html5games/f/8-ball-billiards-classic/v060/?fg_domain=play.famobi.com')">
 
-  <button onclick="game()">💰 Jugar y ganar</button>
-</div>
+    <img src="https://img.cdn.famobi.com/portal/html5games/images/tmp/stack-smash-teaser.jpg"
+      onclick="changeGame('https://games.cdn.famobi.com/html5games/f/stack-smash/v010/?fg_domain=play.famobi.com')">
 
-  <div class="card">
-  <h3>🎮 Juegos reales</h3>
-  <button onclick="openGame()">Jugar ahora</button>
-</div>
+  </div>
 
-</div>
+  <button onclick="rewardGame()">💰 Reclamar recompensa</button>
 </div>
 
 <!-- 💰 PANEL DERECHO -->
