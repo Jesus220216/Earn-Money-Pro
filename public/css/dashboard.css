@@ -158,3 +158,22 @@ input {
   background: linear-gradient(90deg,#22c55e,#16a34a);
   transition: width 1s linear;
 }
+
+.game-row {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  margin-top: 10px;
+}
+
+.game-row img {
+  width: 120px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.game-row img:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 10px #22c55e;
+}
