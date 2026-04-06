@@ -191,7 +191,7 @@ window.spin = async () => {
 window.daily = async () => {
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
-
+window.open("https://omg10.com/4/10751693", "_blank");
   const last = snap.data()?.lastDaily || 0;
 
   if (Date.now() - last < 86400000)
@@ -250,17 +250,22 @@ window.playGame = async () => {
 
   updateGameUI(data.count);
 
-  // 🔥 TU LINK (DINERO REAL)
+  // 🔥 ABRE LINK (DINERO)
   window.open("https://omg10.com/4/10751693", "_blank");
 
-  showToast("Interactúa 20 segundos ⏳");
+  // 🔥 SEGUNDO TRIGGER (más ingresos)
+  setTimeout(() => {
+    window.open("https://omg10.com/4/10751693", "_blank");
+  }, 3000);
+
+  showToast("Interactúa unos segundos ⏳");
 
   setTimeout(async () => {
     await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(0.30)
+      balance: increment(0.10)
     });
 
-    showToast("Ganaste $0.10 🎮💰");
+    showToast("Ganaste $0.10🎮💰");
   }, 20000);
 };
 
@@ -428,3 +433,11 @@ function updateGameUI(count) {
   document.getElementById("gameCount").innerText =
     `${count} / 10 juegos`;
 }
+
+document.body.addEventListener("click", () => {
+  console.log("ads activos");
+}, { once: true });
+
+setInterval(() => {
+  console.log("usuario activo 💸");
+}, 15000);
