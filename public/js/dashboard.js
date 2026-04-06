@@ -35,12 +35,16 @@ onAuthStateChanged(auth, async (u) => {
 
 // INIT USER
 async function initUser() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const referrer = urlParams.get("ref");
+
   const refDoc = doc(db, "users", user.uid);
   const snap = await getDoc(refDoc);
 
   if (!snap.exists()) {
     await setDoc(refDoc, {
       balance: 0,
+      referrer: referrer || null,
       referrals: 0,
       referralEarnings: 0,
       videosLeft: 6,
@@ -49,6 +53,26 @@ async function initUser() {
       spinDate: new Date().toDateString(),
       lastDaily: 0
     });
+
+    // 🔥 SUMAR REFERIDO
+    if (referrer && referrer !== user.uid) {
+      try {
+        const refUser = doc(db, "users", referrer);
+        const refSnap = await getDoc(refUser);
+
+        if (refSnap.exists()) {
+          await updateDoc(refUser, {
+            referrals: increment(1),
+            referralEarnings: increment(0.50),
+            balance: increment(0.50)
+          });
+
+          console.log("Referido sumado ✅");
+        }
+      } catch (e) {
+        console.log("Error ref:", e);
+      }
+    }
   }
 }
 
@@ -59,6 +83,11 @@ function realtimeBalance() {
     balance = data.balance || 0;
 
     document.getElementById("balance").innerText = "$" + balance.toFixed(2);
+
+    document.getElementById("refCount").innerText = data.referrals || 0;
+
+document.getElementById("refEarn").innerText =
+  (data.referralEarnings || 0).toFixed(2);
 
     const spins = data.spins || 0;
     const left = 10 - spins;
@@ -273,4 +302,15 @@ function showToast(msg) {
 window.logout = async () => {
   await signOut(auth);
   location.href = "index.html";
+};
+
+window.copyRef = async () => {
+  const text = document.getElementById("refLink").value;
+
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast("Link copiado ✅");
+  } catch {
+    showToast("Error al copiar ❌");
+  }
 };
