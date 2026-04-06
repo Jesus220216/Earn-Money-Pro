@@ -334,12 +334,10 @@ window.rewardGame = async () => {
     count: 0
   };
 
-  // reset diario
   if (data.date !== today) {
     data = { date: today, count: 0 };
   }
 
-  // límite diario
   if (data.count >= 10) {
     return showToast("Límite diario alcanzado ❌");
   }
@@ -356,9 +354,6 @@ window.rewardGame = async () => {
       balance: increment(0.30)
     });
 
-    showToast("Ganaste $0.05 🎮💰");
-  }, 20000);
-};
     showToast("Ganaste $0.30 🎮💰");
-  }, 25000);
+  }, 20000);
 };
