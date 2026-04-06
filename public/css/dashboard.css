@@ -182,3 +182,23 @@ iframe {
   background: #000;
   min-height: 250px;
 }
+
+#wheel {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  transform: rotate(0deg);
+  transition: transform 4s cubic-bezier(0.25, 1, 0.5, 1);
+  overflow: hidden;
+}
+
+.segment {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  background: #22c55e;
+  border: 1px solid #000;
+}
