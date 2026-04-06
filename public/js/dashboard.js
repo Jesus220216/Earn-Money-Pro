@@ -260,7 +260,7 @@ window.playGame = async () => {
       balance: increment(0.30)
     });
 
-    showToast("Ganaste $0.30 🎮💰");
+    showToast("Ganaste $0.10 🎮💰");
   }, 20000);
 };
 
