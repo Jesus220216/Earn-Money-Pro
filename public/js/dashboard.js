@@ -178,47 +178,59 @@ async function addMoney(amount) {
 
     let finalAmount = amount;
 
-    // BONUS nuevo usuario
+    // 🔥 balance inteligente
     if ((data.balance || 0) < 1) {
-      finalAmount *= 1.5;
+      finalAmount *= 1.3;
     }
 
-    // VIP
     if (data.vip === true) {
       finalAmount *= 2;
     }
 
-    // límite diario
     if (userEarnings > 2) {
       return showToast("Límite diario alcanzado 💸");
     }
 
     userEarnings += finalAmount;
 
-    // 💰 pagar usuario
+    // 💰 usuario gana MÁS que el referido
     await setDoc(ref, {
       balance: increment(finalAmount)
     }, { merge: true });
 
-    // 💎 PAGAR REFERIDOR (AQUÍ ESTÁ LA MAGIA)
+    console.log("💰 Usuario ganó:", finalAmount);
+
+    // 💎 REFERIDO (MENOS GANANCIA)
     if (data.referrer) {
+
       const refUser = doc(db, "users", data.referrer);
 
-      const commission = finalAmount * 0.10;
+      const commission = finalAmount * 0.05; // 🔥 SOLO 5%
 
       await setDoc(refUser, {
         balance: increment(commission),
         referralEarnings: increment(commission)
       }, { merge: true });
 
-      console.log("💎 Comisión referida:", commission);
+      console.log("💎 Comisión:", commission);
     }
 
-    console.log("💰 Usuario ganó:", finalAmount);
+    // 👇 contar invitado SOLO UNA VEZ
+    if (data.referrer && !data.refCounted) {
+
+      const refUser = doc(db, "users", data.referrer);
+
+      await setDoc(refUser, {
+        referrals: increment(1)
+      }, { merge: true });
+
+      await updateDoc(ref, {
+        refCounted: true
+      });
+    }
 
   } catch (e) {
-    console.error("❌ ERROR addMoney:", e);
-    showToast("Error ❌");
+    console.error("❌ ERROR:", e);
   }
 }
 // 🎁 DAILY
