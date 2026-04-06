@@ -301,3 +301,27 @@ window.logout = async () => {
   await signOut(auth);
   location.href = "index.html";
 };
+
+// 🎮 JUEGO REAL
+window.rewardGame = async () => {
+  if (!user) return;
+
+  let last = localStorage.getItem("realGame") || 0;
+
+  if (Date.now() - last < 60000)
+    return showToast("Espera 1 minuto ⏳");
+
+  localStorage.setItem("realGame", Date.now());
+
+  window.open(LINK, "_blank");
+
+  showToast("Juega 25 segundos ⏳");
+
+  setTimeout(async () => {
+    await updateDoc(doc(db, "users", user.uid), {
+      balance: increment(0.30)
+    });
+
+    showToast("Ganaste $0.30 🎮💰");
+  }, 25000);
+};
