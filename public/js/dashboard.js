@@ -2,32 +2,21 @@ import { auth, db } from "./firebase.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, increment, addDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-// REFERIDO
+// REF
 const urlParams = new URLSearchParams(window.location.search);
-const ref = urlParams.get("ref");
-if (ref) {
-  sessionStorage.setItem("referrer", ref);
-}
+const refParam = urlParams.get("ref");
+if (refParam) sessionStorage.setItem("referrer", refParam);
 
 let user;
 let balance = 0;
 let lastWithdraw = 0;
 let lastVideoTime = 0;
 let currentRotation = 0;
-
-// 🎥 VIDEOS (NO DEPENDEN DEL TIEMPO REAL)
-const videos = [
-  "https://www.w3schools.com/html/mov_bbb.mp4",
-  "https://www.w3schools.com/html/movie.mp4"
-];
-
-let videoIndex = 0;
 let videosLeft = 0;
-let seconds = 0;
-let interval;
-let earningsToday = 0;
 let userEarnings = 0;
 
+// 🔗 TU LINK (EDITA SI QUIERES)
+const LINK = "https://omg10.com/4/10751693";
 
 // LOGIN
 onAuthStateChanged(auth, async (u) => {
@@ -39,17 +28,14 @@ onAuthStateChanged(auth, async (u) => {
   await checkSpinLimit();
   await checkVideoLimit();
 
-  const snap = await getDoc(doc(db, "users", user.uid));
-  updateSpinUI(snap.data()?.spins || 0);
-
   realtimeBalance();
   loadWithdrawals();
   generateRefLink();
 });
 
+// INIT USER
 async function initUser() {
   const referrer = sessionStorage.getItem("referrer");
-
   const refDoc = doc(db, "users", user.uid);
   const snap = await getDoc(refDoc);
 
@@ -62,13 +48,13 @@ async function initUser() {
       videosLeft: 6,
       videoDate: new Date().toDateString(),
       spins: 0,
-      spinDate: new Date().toDateString()
+      spinDate: new Date().toDateString(),
+      lastDaily: 0
     });
-
-    sessionStorage.removeItem("referrer");
   }
 }
-// BALANCE
+
+// BALANCE REALTIME
 function realtimeBalance() {
   onSnapshot(doc(db, "users", user.uid), (snap) => {
     const data = snap.data() || {};
@@ -83,28 +69,23 @@ function realtimeBalance() {
   });
 }
 
-// 🎥 VIDEO REAL (FORZADO A 10 SEG)
+// 🎥 VIDEO
 window.startVideo = async () => {
-
   if (Date.now() - lastVideoTime < 10000)
     return showToast("Espera ⏳");
+
   if (videosLeft <= 0)
     return showToast("No hay más videos ❌");
-if (document.hidden) {
-  return showToast("No hagas trampa ❌");
-}
-  
+
   lastVideoTime = Date.now();
 
   const video = document.getElementById("videoPlayer");
-
-  video.src = videos[videoIndex];
+  video.src = "https://www.w3schools.com/html/mov_bbb.mp4";
   video.play();
 
-  seconds = 0;
+  let seconds = 0;
 
-  interval = setInterval(async () => {
-
+  const interval = setInterval(async () => {
     seconds++;
     document.getElementById("timerText").innerText = seconds + "/10";
 
@@ -116,36 +97,18 @@ if (document.hidden) {
       showToast("Ganaste $0.03 🎥");
 
       videosLeft--;
-      videoIndex = (videoIndex + 1) % videos.length;
 
       await updateDoc(doc(db, "users", user.uid), { videosLeft });
 
       document.getElementById("videosLeft").innerText =
         "Restantes: " + videosLeft;
     }
-
   }, 1000);
 };
 
-
-// ENCUESTA
-window.survey = () => {
-  window.open(`https://timewall.io/wall?uid=${user.uid}`, "_blank");
-   window.open("https://omg10.com/4/10828691", "_blank");
-};
-
-// OFERTAS
-window.lootably = () => {
-  window.open(`https://wall.lootably.com/?placement=TU_ID&uid=${user.uid}`, "_blank");
-   window.open("https://omg10.com/4/10828691", "_blank");
-};
-
-
-// 🎰 RULETA (ANIMACIÓN REAL)
+// 🎰 RULETA
 window.spin = async () => {
-
   const wheel = document.getElementById("wheel");
-window.open("https://omg10.com/4/10828691", "_blank");
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
   const data = snap.data() || {};
@@ -155,131 +118,101 @@ window.open("https://omg10.com/4/10828691", "_blank");
 
   await updateDoc(ref, { spins: increment(1) });
 
-  const reward = [0.05, 0.01, 0.02][Math.floor(Math.random() * 3)];
+  window.open(LINK, "_blank");
 
+  const reward = [0.05, 0.01, 0.02][Math.floor(Math.random() * 3)];
   const spinDeg = 1080 + Math.random() * 360;
   currentRotation += spinDeg;
 
-  wheel.style.transition = "transform 3s ease-out";
   wheel.style.transform = `rotate(${currentRotation}deg)`;
 
   setTimeout(async () => {
     await addMoney(reward);
     showToast("Ganaste $" + reward + " 🎰");
-    updateSpinUI((data.spins || 0) + 1);
   }, 3000);
 };
 
-// 💰 DINERO
-async function addMoney(amount) {
-  try {
-    const ref = doc(db, "users", user.uid);
-    const snap = await getDoc(ref);
-    const data = snap.data() || {};
-
-    let finalAmount = amount;
-
-    // 🔥 balance inteligente
-    if ((data.balance || 0) < 1) {
-      finalAmount *= 1.3;
-    }
-
-    if (data.vip === true) {
-      finalAmount *= 2;
-    }
-
-    if (userEarnings > 2) {
-      return showToast("Límite diario alcanzado 💸");
-    }
-
-    userEarnings += finalAmount;
-
-    // 💰 usuario gana MÁS que el referido
-    await setDoc(ref, {
-      balance: increment(finalAmount)
-    }, { merge: true });
-
-    console.log("💰 Usuario ganó:", finalAmount);
-
-    // 💎 REFERIDO (MENOS GANANCIA)
-    if (data.referrer) {
-
-      const refUser = doc(db, "users", data.referrer);
-
-      const commission = finalAmount * 0.05; // 🔥 SOLO 5%
-
-      await setDoc(refUser, {
-        balance: increment(commission),
-        referralEarnings: increment(commission)
-      }, { merge: true });
-
-      console.log("💎 Comisión:", commission);
-    }
-
-    // 👇 contar invitado SOLO UNA VEZ
-    if (data.referrer && !data.refCounted) {
-
-      const refUser = doc(db, "users", data.referrer);
-
-      await setDoc(refUser, {
-        referrals: increment(1)
-      }, { merge: true });
-
-      await updateDoc(ref, {
-        refCounted: true
-      });
-    }
-
-  } catch (e) {
-    console.error("❌ ERROR:", e);
-  }
-}
 // 🎁 DAILY
 window.daily = async () => {
-  if (!user) return showToast("Inicia sesión");
-
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
 
-  if (!snap.exists()) {
-    showToast("Usuario no existe ❌");
-    return;
-  }
+  const last = snap.data()?.lastDaily || 0;
 
-  const data = snap.data();
-  const last = data?.lastDaily || 0;
-
-  // abrir anuncio
-  window.open("https://omg10.com/4/10828691", "_blank");
-
-  // validar tiempo (24h)
-  if (Date.now() - last < 86400000) {
+  if (Date.now() - last < 86400000)
     return showToast("Ya reclamaste ❌");
-  }
 
-  // 🔥 ACTUALIZAR FIREBASE
-  await updateDoc(ref, {
-    balance: increment(0.20), // suma automática
-    lastDaily: Date.now()
-  });
+  window.open(LINK, "_blank");
 
-  showToast("Ganaste $0.20 🎁");
+  showToast("Espera 15s ⏳");
+
+  setTimeout(async () => {
+    await updateDoc(ref, {
+      balance: increment(0.20),
+      lastDaily: Date.now()
+    });
+
+    showToast("Ganaste $0.20 🎁");
+  }, 15000);
 };
+
+// 🎮 JUEGOS
+window.game = async () => {
+  let last = localStorage.getItem("lastGame") || 0;
+
+  if (Date.now() - last < 60000)
+    return showToast("Espera 1 minuto ⏳");
+
+  localStorage.setItem("lastGame", Date.now());
+
+  window.open(LINK, "_blank");
+
+  setTimeout(async () => {
+    await updateDoc(doc(db, "users", user.uid), {
+      balance: increment(0.25)
+    });
+
+    showToast("Ganaste $0.25 🎮");
+  }, 20000);
+};
+
+// 💸 OFERTAS
+window.offer = async () => {
+  window.open(LINK, "_blank");
+
+  setTimeout(async () => {
+    await updateDoc(doc(db, "users", user.uid), {
+      balance: increment(0.30)
+    });
+
+    showToast("Ganaste $0.30 💸");
+  }, 20000);
+};
+
+// 💰 SUMAR DINERO
+async function addMoney(amount) {
+  const ref = doc(db, "users", user.uid);
+
+  await setDoc(ref, {
+    balance: increment(amount)
+  }, { merge: true });
+}
 
 // 💳 RETIRO
 window.withdraw = async () => {
-
   if (Date.now() - lastWithdraw < 10000)
     return showToast("Espera ⏳");
-window.open("https://omg10.com/4/10828691", "_blank");
+
   lastWithdraw = Date.now();
 
   const amount = parseFloat(document.getElementById("amount").value);
   const email = document.getElementById("email").value;
 
-  if (!amount || amount <= 0) return showToast("Monto inválido ❌");
-  if (amount < 5) return showToast("Mínimo $5 ❌");
-  if (amount > balance) return showToast("Saldo insuficiente ❌");
+  if (!amount || amount < 5)
+    return showToast("Mínimo $5 ❌");
+
+  if (amount > balance)
+    return showToast("Saldo insuficiente ❌");
 
   await addDoc(collection(db, "withdrawals"), {
     userId: user.uid,
@@ -316,23 +249,10 @@ function loadWithdrawals() {
   });
 }
 
-// 🔗 LINK REFERIDO
+// 🔗 REF
 function generateRefLink() {
   document.getElementById("refLink").value =
     `${window.location.origin}?ref=${user.uid}`;
-}
-
-window.copyRef = () => {
-  const input = document.getElementById("refLink");
-  input.select();
-  document.execCommand("copy");
-  showToast("Link copiado 🔗");
-};
-
-// UI
-function updateSpinUI(spins) {
-  document.getElementById("spinCount").innerText =
-    spins + " / 10 giros";
 }
 
 // RESET
@@ -375,8 +295,6 @@ function showToast(msg) {
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 2000);
 }
-
-window.testMoney = () => addMoney(0.5);
 
 // LOGOUT
 window.logout = async () => {
