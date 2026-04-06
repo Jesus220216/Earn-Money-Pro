@@ -6,9 +6,11 @@
 <link rel="stylesheet" href="/css/dashboard.css">
 
 <style>
-#wheel {
-  font-size: 50px;
-  transition: transform 3s ease-out;
+iframe {
+  width: 100%;
+  height: 250px;
+  border: none;
+  border-radius: 10px;
 }
 </style>
 </head>
@@ -31,52 +33,57 @@
 
 <div class="grid">
 
-<div class="card hover">
-  <h3>🎥 Videos Pro</h3>
+<!-- 🎥 VIDEO -->
+<div class="card">
+  <h3>🎥 Videos</h3>
   <video id="videoPlayer" width="100%" height="150" controls muted></video>
   <p id="timerText">0/10</p>
   <p id="videosLeft">Restantes: 6</p>
-  <button onclick="showAd(); startVideo()">Iniciar</button>
+  <button onclick="startVideo()">Ver y ganar</button>
 </div>
 
-  <div class="card">
-  <h3>🎮 Juegos reales</h3>
-
-  <iframe src="https://html5.gamedistribution.com/rvvASMiM/6d5e0f9d4f9c4f3a9c9b9a0e3f/index.html"></iframe>
-
-  <button onclick="rewardGame()">💰 Reclamar recompensa</button>
-</div>
-
+<!-- 🎰 RULETA -->
 <div class="card">
   <h3>🎰 Ruleta</h3>
   <div id="wheel">🎡</div>
   <p id="spinCount">0 / 10 giros</p>
-  <button onclick="showAd(); spin()">Girar</button>
+  <button onclick="spin()">Girar</button>
 </div>
 
+<!-- 🎁 DAILY -->
 <div class="card">
   <h3>🎁 Recompensa diaria</h3>
-  <button onclick="showAd(); daily()">Reclamar</button>
+  <button onclick="daily()">Reclamar</button>
 </div>
 
+<!-- 💸 OFERTAS -->
 <div class="card">
-  <h3>📋 Encuestas</h3>
-  <button onclick="showAd(); survey()">Abrir</button>
+  <h3>💸 Ofertas</h3>
+  <button onclick="offer()">Completar oferta</button>
 </div>
 
+<!-- 🎮 JUEGOS REALES -->
 <div class="card">
-  <h3>🎁 Ofertas PRO</h3>
-  <button onclick="showAd(); offer()">Abrir</button>
+  <h3>🎮 Juegos reales</h3>
+
+  <iframe src="https://html5.gamedistribution.com/rvvASMiM/6d5e0f9d4f9c4f3a9c9b9a0e3f/index.html"></iframe>
+
+  <button onclick="rewardGame()">💰 Reclamar</button>
 </div>
 
+<!-- 🎮 MÁS JUEGOS -->
 <div class="card">
-  <h3>🎮 Juegos</h3>
-  <button onclick="showAd(); game()">Jugar</button>
+  <h3>🎮 Más juegos</h3>
+
+  <iframe src="https://www.crazygames.com/embed"></iframe>
+
+  <button onclick="game()">💰 Jugar y ganar</button>
 </div>
 
 </div>
 </div>
 
+<!-- 💰 PANEL DERECHO -->
 <div class="right">
 
 <div class="card">
@@ -91,7 +98,7 @@
   <button onclick="withdraw()">Retirar</button>
 </div>
 
-<h3>📜 Historial de retiros</h3>
+<h3>📜 Historial</h3>
 <div id="withdrawList"></div>
 
 <div class="card">
@@ -101,8 +108,8 @@
 </div>
 
 <div class="card">
-  <h3>🔗 Tu link de referido</h3>
-  <input id="refLink" readonly style="width:100%;padding:8px;">
+  <h3>🔗 Tu link</h3>
+  <input id="refLink" readonly>
   <button onclick="copyRef()">Copiar</button>
 </div>
 
@@ -111,15 +118,6 @@
 </div>
 
 <script type="module" src="/js/dashboard.js"></script>
-
-<!-- 💰 MONETAG (1 SOLO SISTEMA LIMPIO) -->
-<script src="//omg10.com/4/10828691"></script>
-
-<script>
-function showAd() {
-  window.open("https://omg10.com/4/10828691", "_blank");
-}
-</script>
 
 </body>
 </html>
