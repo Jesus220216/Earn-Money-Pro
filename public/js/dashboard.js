@@ -2,21 +2,21 @@ import { auth, db } from "./firebase.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, increment, addDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-// REF
-const urlParams = new URLSearchParams(window.location.search);
-const refParam = urlParams.get("ref");
-if (refParam) sessionStorage.setItem("referrer", refParam);
+// 🔗 LINK MONETIZACIÓN
+const LINK = "https://omg10.com/4/10751693";
 
 let user;
 let balance = 0;
 let lastWithdraw = 0;
 let lastVideoTime = 0;
-let currentRotation = 0;
 let videosLeft = 0;
-let userEarnings = 0;
 
-// 🔗 TU LINK (EDITA SI QUIERES)
-const LINK = "https://omg10.com/4/10751693";
+// 🔥 ANUNCIO SEGURO
+function openAd() {
+  if (window.lastAd && Date.now() - window.lastAd < 5000) return;
+  window.lastAd = Date.now();
+  window.open(LINK, "_blank");
+}
 
 // LOGIN
 onAuthStateChanged(auth, async (u) => {
@@ -35,14 +35,12 @@ onAuthStateChanged(auth, async (u) => {
 
 // INIT USER
 async function initUser() {
-  const referrer = sessionStorage.getItem("referrer");
   const refDoc = doc(db, "users", user.uid);
   const snap = await getDoc(refDoc);
 
   if (!snap.exists()) {
     await setDoc(refDoc, {
       balance: 0,
-      referrer: referrer || null,
       referrals: 0,
       referralEarnings: 0,
       videosLeft: 6,
@@ -54,115 +52,67 @@ async function initUser() {
   }
 }
 
-// BALANCE REALTIME
+// BALANCE
 function realtimeBalance() {
   onSnapshot(doc(db, "users", user.uid), (snap) => {
     const data = snap.data() || {};
     balance = data.balance || 0;
 
-    const spins = data.spins || 0;
-const left = 10 - spins;
-
-document.getElementById("spinCount").innerText =
-  `${spins}/10 giros (te quedan ${left})`;
-
     document.getElementById("balance").innerText = "$" + balance.toFixed(2);
-    document.querySelector(".balance-mini").innerText = "$" + balance.toFixed(2);
 
-    document.getElementById("refCount").innerText = data.referrals || 0;
-    document.getElementById("refEarn").innerText =
-      (data.referralEarnings || 0).toFixed(2);
+    const spins = data.spins || 0;
+    const left = 10 - spins;
+
+    document.getElementById("spinCount").innerText =
+      `${spins}/10 (te quedan ${left})`;
   });
 }
 
-// 🎥 VIDEO
-window.startVideo = async () => {
-  if (Date.now() - lastVideoTime < 10000)
-    return showToast("Espera ⏳");
-
-  if (videosLeft <= 0)
-    return showToast("No hay más videos ❌");
-
-  lastVideoTime = Date.now();
-
-  const video = document.getElementById("videoPlayer");
-  video.src = "https://www.w3schools.com/html/mov_bbb.mp4";
-  video.play();
-
-  let seconds = 0;
-
-  const interval = setInterval(async () => {
-    seconds++;
-    document.getElementById("timerText").innerText = seconds + "/10";
-
-    if (seconds >= 10) {
-      clearInterval(interval);
-      video.pause();
-
-      await addMoney(0.03);
-      showToast("Ganaste $0.03 🎥");
-
-      videosLeft--;
-
-      await updateDoc(doc(db, "users", user.uid), { videosLeft });
-
-      document.getElementById("videosLeft").innerText =
-        "Restantes: " + videosLeft;
-    }
-  }, 1000);
-};
-
-window.openGame = async () => {
+// 🎮 JUEGOS
+window.playGame = async () => {
   if (!user) return;
 
-  // abre juego real
- window.open("https://omg10.com/4/10751693", "_blank");
+  openAd();
 
-  showToast("Juega 20 segundos ⏳");
+  let today = new Date().toDateString();
+  let data = JSON.parse(localStorage.getItem("games")) || { date: today, count: 0 };
+
+  if (data.date !== today) data = { date: today, count: 0 };
+
+  if (data.count >= 10)
+    return showToast("Límite diario alcanzado ❌");
+
+  data.count++;
+  localStorage.setItem("games", JSON.stringify(data));
+
+  document.getElementById("gameCount").innerText =
+    `${data.count} / 10`;
 
   setTimeout(async () => {
     await updateDoc(doc(db, "users", user.uid), {
       balance: increment(0.10)
     });
 
-    showToast("Ganaste $0.10 🎮💰");
+    showToast("Ganaste $0.10 🎮");
   }, 20000);
-};
-
-// cambiar juego
-window.changeGame = (url) => {
-  document.getElementById("gameFrame").src = url;
 };
 
 // 🎰 RULETA
 window.spin = async () => {
-  const wheel = document.getElementById("wheel");
+  openAd();
+
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
-  const data = snap.data() || {};
-
-  let spins = data.spins || 0;
+  let spins = snap.data()?.spins || 0;
 
   if (spins >= 10)
     return showToast("Límite alcanzado ❌");
 
   spins++;
-
   await updateDoc(ref, { spins });
 
-  // 🎯 PREMIOS
-  const rewards = [0.01, 0.02, 0.05, 0.10, 0.50, 0];
-  const index = Math.floor(Math.random() * rewards.length);
-  const reward = rewards[index];
-
-  // 🎡 ROTACIÓN REAL
-  const degPerSegment = 360 / rewards.length;
-  const finalDeg = (360 * 5) + (index * degPerSegment);
-
-  wheel.style.transform = `rotate(${finalDeg}deg)`;
-
-  // 💸 abrir anuncio
-  window.open(LINK, "_blank");
+  const rewards = [0.01, 0.02, 0.05, 0.10, 0];
+  const reward = rewards[Math.floor(Math.random() * rewards.length)];
 
   setTimeout(async () => {
     if (reward > 0) {
@@ -175,31 +125,27 @@ window.spin = async () => {
       showToast("Sigue intentando 😅");
     }
 
-    // 💎 BONUS AL LLEGAR A 10
     if (spins === 10) {
       await updateDoc(ref, {
         balance: increment(1)
       });
 
-      showToast("🎁 BONUS $1 por completar 10 giros 🔥");
+      showToast("🎁 BONUS $1 🔥");
     }
 
-  }, 4000);
+  }, 3000);
 };
 
 // 🎁 DAILY
 window.daily = async () => {
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
-window.open("https://omg10.com/4/10751693", "_blank");
   const last = snap.data()?.lastDaily || 0;
 
   if (Date.now() - last < 86400000)
-    return showToast("Ya reclamaste ❌");
+    return showToast("Ya reclamaste hoy ❌");
 
-  window.open(LINK, "_blank");
-
-  showToast("Espera 15s ⏳");
+  openAd();
 
   setTimeout(async () => {
     await updateDoc(ref, {
@@ -211,101 +157,35 @@ window.open("https://omg10.com/4/10751693", "_blank");
   }, 15000);
 };
 
-// 🎮 JUEGOS
-window.game = async () => {
-  let last = localStorage.getItem("lastGame") || 0;
+// 🎥 VIDEO
+window.startVideo = async () => {
+  if (videosLeft <= 0)
+    return showToast("No hay más videos ❌");
 
-  if (Date.now() - last < 60000)
-    return showToast("Espera 1 minuto ⏳");
-
-  localStorage.setItem("lastGame", Date.now());
-
-  window.open(LINK, "_blank");
+  openAd();
 
   setTimeout(async () => {
     await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(0.10)
+      balance: increment(0.03),
+      videosLeft: increment(-1)
     });
 
-    showToast("Ganaste $0.10 🎮");
-  }, 20000);
+    videosLeft--;
+
+    document.getElementById("videosLeft").innerText =
+      "Restantes: " + videosLeft;
+
+    showToast("Ganaste $0.03 🎥");
+  }, 10000);
 };
-
-window.playGame = async () => {
-  if (!user) return;
-
-  const today = new Date().toDateString();
-  let data = JSON.parse(localStorage.getItem("games")) || {
-    date: today,
-    count: 0
-  };
-
-  if (data.date !== today) data = { date: today, count: 0 };
-
-  if (data.count >= 10)
-    return showToast("Límite diario alcanzado ❌");
-
-  data.count++;
-  localStorage.setItem("games", JSON.stringify(data));
-
-  updateGameUI(data.count);
-
-  // 🔥 ABRE LINK (DINERO)
-  window.open("https://omg10.com/4/10751693", "_blank");
-
-  // 🔥 SEGUNDO TRIGGER (más ingresos)
-  setTimeout(() => {
-    window.open("https://omg10.com/4/10751693", "_blank");
-  }, 3000);
-
-  showToast("Interactúa unos segundos ⏳");
-
-  setTimeout(async () => {
-    await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(0.10)
-    });
-
-    showToast("Ganaste $0.10🎮💰");
-  }, 20000);
-};
-
-// 💸 OFERTAS
-window.offer = async () => {
-  window.open(LINK, "_blank");
-
-  setTimeout(async () => {
-    await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(0.10)
-    });
-
-    showToast("Ganaste $0.10 💸");
-  }, 20000);
-};
-
-// 💰 SUMAR DINERO
-async function addMoney(amount) {
-  const ref = doc(db, "users", user.uid);
-
-  await setDoc(ref, {
-    balance: increment(amount)
-  }, { merge: true });
-}
 
 // 💳 RETIRO
 window.withdraw = async () => {
-  if (Date.now() - lastWithdraw < 10000)
-    return showToast("Espera ⏳");
-
-  lastWithdraw = Date.now();
-
   const amount = parseFloat(document.getElementById("amount").value);
   const email = document.getElementById("email").value;
 
-  if (!amount || amount < 5)
-    return showToast("Mínimo $5 ❌");
-
-  if (amount > balance)
-    return showToast("Saldo insuficiente ❌");
+  if (amount < 5) return showToast("Mínimo $5 ❌");
+  if (amount > balance) return showToast("Saldo insuficiente ❌");
 
   await addDoc(collection(db, "withdrawals"), {
     userId: user.uid,
@@ -322,7 +202,7 @@ window.withdraw = async () => {
   showToast("Retiro enviado 🚀");
 };
 
-// 📜 HISTORIAL
+// HISTORIAL
 function loadWithdrawals() {
   onSnapshot(collection(db, "withdrawals"), (snap) => {
     const div = document.getElementById("withdrawList");
@@ -340,12 +220,6 @@ function loadWithdrawals() {
       `;
     });
   });
-}
-
-// 🔗 REF
-function generateRefLink() {
-  document.getElementById("refLink").value =
-    `${window.location.origin}?ref=${user.uid}`;
 }
 
 // RESET
@@ -375,6 +249,12 @@ async function checkVideoLimit() {
     "Restantes: " + videosLeft;
 }
 
+// REF LINK
+function generateRefLink() {
+  document.getElementById("refLink").value =
+    `${window.location.origin}?ref=${user.uid}`;
+}
+
 // TOAST
 function showToast(msg) {
   const t = document.createElement("div");
@@ -394,145 +274,3 @@ window.logout = async () => {
   await signOut(auth);
   location.href = "index.html";
 };
-
-// 🎮 JUEGO REAL
-window.rewardGame = async () => {
-  if (!user) return;
-
-  let today = new Date().toDateString();
-  let data = JSON.parse(localStorage.getItem("gameLimit")) || {
-    date: today,
-    count: 0
-  };
-
-  if (data.date !== today) {
-    data = { date: today, count: 0 };
-  }
-
-  if (data.count >= 10) {
-    return showToast("Límite diario alcanzado ❌");
-  }
-
-  data.count++;
-  localStorage.setItem("gameLimit", JSON.stringify(data));
-
-  window.open("https://omg10.com/4/10751693", "_blank");
-
-  showToast("Juega 20 segundos ⏳");
-
-  setTimeout(async () => {
-    await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(0.30)
-    });
-
-    showToast("Ganaste $0.10🎮💰");
-  }, 20000);
-};
-
-function updateGameUI(count) {
-  document.getElementById("gameCount").innerText =
-    `${count} / 10 juegos`;
-}
-
-document.body.addEventListener("click", () => {
-  console.log("ads activos");
-}, { once: true });
-
-setInterval(() => {
-  console.log("usuario activo 💸");
-}, 15000);
-
-// 🔥 CONFIG
-const LINK = "https://omg10.com/4/10751693";
-
-// 🔥 ANUNCIO SEGURO
-function openAd() {
-  if (window.lastAd && Date.now() - window.lastAd < 5000) return;
-  window.lastAd = Date.now();
-  window.open(LINK, "_blank");
-}
-
-// 🎮 JUEGOS
-window.playGame = async () => {
-  if (!user) return;
-
-  openAd();
-
-  let data = JSON.parse(localStorage.getItem("games")) || { count: 0 };
-  data.count++;
-
-  localStorage.setItem("games", JSON.stringify(data));
-
-  updateGameUI(data.count);
-
-  let level = Math.floor(data.count / 10) + 1;
-  document.getElementById("levelText").innerText = "Nivel " + level;
-
-  let reward = 0.30 + (level * 0.05);
-
-  setTimeout(async () => {
-    await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(reward)
-    });
-
-    showToast(`Ganaste $${reward.toFixed(2)} 🎮`);
-  }, 20000);
-
-  updateMission(data.count);
-};
-
-// 🎯 MISIONES
-function updateMission(count) {
-  let mission = count % 5;
-  document.getElementById("missionStatus").innerText = `${mission} / 5`;
-
-  if (mission === 0) {
-    showToast("🎁 Bonus misión $0.50");
-
-    updateDoc(doc(db, "users", user.uid), {
-      balance: increment(0.50)
-    });
-  }
-}
-
-// 🎰 RULETA
-window.spin = async () => {
-  openAd();
-
-  let reward = [0.01, 0.02, 0.05, 0.1][Math.floor(Math.random() * 4)];
-
-  await updateDoc(doc(db, "users", user.uid), {
-    balance: increment(reward)
-  });
-
-  showToast(`Ganaste $${reward} 🎰`);
-};
-
-// 🎁 DAILY
-window.daily = async () => {
-  openAd();
-
-  await updateDoc(doc(db, "users", user.uid), {
-    balance: increment(0.20)
-  });
-
-  showToast("Ganaste $0.20 🎁");
-};
-
-// 🎁 CAJA
-window.openBox = async () => {
-  openAd();
-
-  let reward = Math.random() < 0.5 ? 0.05 : 0.25;
-
-  await updateDoc(doc(db, "users", user.uid), {
-    balance: increment(reward)
-  });
-
-  showToast(`Caja: $${reward} 🎁`);
-};
-
-// 📊 UI
-function updateGameUI(count) {
-  document.getElementById("gameCount").innerText = `${count} / 10`;
-}
