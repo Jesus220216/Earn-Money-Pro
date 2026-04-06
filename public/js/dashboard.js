@@ -123,6 +123,11 @@ window.openGame = async () => {
   }, 20000);
 };
 
+// cambiar juego
+window.changeGame = (url) => {
+  document.getElementById("gameFrame").src = url;
+};
+
 // 🎰 RULETA
 window.spin = async () => {
   const wheel = document.getElementById("wheel");
