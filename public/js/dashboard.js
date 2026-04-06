@@ -127,32 +127,7 @@ if (document.hidden) {
   }, 1000);
 };
 
-// 🔐 CAPTCHA VERIFY (NUEVO 🔥)
-app.post("/verify-captcha", async (req, res) => {
-  try {
-    const token = req.body.token;
 
-    const response = await fetch("https://www.google.com/recaptcha/api/siteverify", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: `secret=6LcbvagsAAAAAAUgJBdifHX8w1Rdpu5HZiJqB17M=${token}`
-    });
-
-    const data = await response.json();
-
-    if (data.success && data.score > 0.5) {
-      return res.json({ success: true });
-    } else {
-      return res.json({ success: false });
-    }
-
-  } catch (error) {
-    console.log("Captcha error:", error);
-    res.json({ success: false });
-  }
-});
 // ENCUESTA
 window.survey = () => {
   window.open(`https://timewall.io/wall?uid=${user.uid}`, "_blank");
