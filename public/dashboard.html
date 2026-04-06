@@ -1,169 +1,169 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>EarnPro</title>
-<link rel="stylesheet" href="/css/dashboard.css">
+  <meta charset="UTF-8">
+  <title>EarnPro Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-iframe {
-  width: 100%;
-  height: 250px;
-  border: none;
-  border-radius: 10px;
-}
-</style>
+  <!-- CSS -->
+  <link rel="stylesheet" href="dashboard.css">
+
+  <!-- Fuente -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 
-<body class="dashboard">
+<body>
 
-<div class="nav">
-  <div class="logo">💰 EarnPro</div>
-  <div class="nav-right">
-    <div class="balance-mini">$0.00</div>
-    <button onclick="logout()">Salir</button>
-  </div>
-</div>
+<header>
+  <h1>💰 EarnPro</h1>
+  <div class="profile"></div>
+</header>
 
 <div class="container">
 
-<div class="left">
+  <!-- 🔥 RESUMEN -->
+  <div class="grid">
 
-<h2>🔥 Gana dinero</h2>
-
-<div class="grid">
-
-<!-- 🎥 VIDEO -->
-<div class="card">
-  <h3>🎥 Videos</h3>
-  <video id="videoPlayer" width="100%" height="150" controls muted></video>
-  <p id="timerText">0/10</p>
-  <p id="videosLeft">Restantes: 6</p>
-  <button onclick="startVideo()">Ver y ganar</button>
-</div>
-
-<!-- 🎰 RULETA -->
-<div class="card">
-  <h3>🎰 Ruleta</h3>
- <div class="wheel-container">
-  <div id="wheel">
-    <div class="segment">$0.01</div>
-    <div class="segment">$0.02</div>
-    <div class="segment">$0.05</div>
-    <div class="segment">$0.10</div>
-    <div class="segment">$0.50</div>
-    <div class="segment">$0.00</div>
-  </div>
-</div>
-  <p id="spinCount">0 / 10 giros</p>
-  <button onclick="spin()">Girar</button>
-</div>
-
-<!-- 🎁 DAILY -->
-<div class="card">
-  <h3>🎁 Recompensa diaria</h3>
-  <button onclick="daily()">Reclamar</button>
-</div>
-
-<!-- 💸 OFERTAS -->
-<div class="card">
-  <h3>💸 Ofertas</h3>
-  <button onclick="offer()">Completar oferta</button>
-</div>
-
-<div class="card">
-  <h3>🎮 Juegos</h3>
-
-  <div class="game-grid">
-
-    <div class="game" onclick="playGame()">
-      <img src="https://img.icons8.com/color/96/controller.png">
-      <p>Arcade Game</p>
+    <div class="card">
+      <h3>Balance</h3>
+      <p id="balance">$0.00</p>
     </div>
 
-    <div class="game" onclick="playGame()">
-      <img src="https://img.icons8.com/color/96/joystick.png">
-      <p>Action Game</p>
+    <div class="card">
+      <h3>Referidos</h3>
+      <p id="refCount">0</p>
     </div>
 
-    <div class="game" onclick="playGame()">
-      <img src="https://img.icons8.com/color/96/puzzle.png">
-      <p>Puzzle Game</p>
+    <div class="card">
+      <h3>Hoy</h3>
+      <p id="today">$0.00</p>
     </div>
 
-    <div class="game" onclick="playGame()">
-      <img src="https://img.icons8.com/color/96/car.png">
-      <p>Racing Game</p>
+    <div class="card">
+      <h3>Videos</h3>
+      <p id="videos">0</p>
     </div>
 
   </div>
 
-  <p id="gameCount">0 / 10 juegos</p>
+  <!-- 🎥 VIDEO -->
+  <div class="section">
+    <h2>🎥 Ver videos y ganar</h2>
 
-  <button onclick="playGame()">🎮 Jugar y ganar</button>
+    <div class="video-box">
+      <video id="videoPlayer" controls muted></video>
+
+      <p id="timerText">0/10</p>
+      <p id="videosLeft">Restantes: 6</p>
+
+      <button class="btn" onclick="startVideo()">Reproducir</button>
+    </div>
+  </div>
+
+  <!-- 🎰 RULETA -->
+  <div class="section">
+    <h2>🎰 Ruleta</h2>
+
+    <div class="card center">
+      <div class="wheel-container">
+        <div id="wheel">
+          <div>$0.01</div>
+          <div>$0.02</div>
+          <div>$0.05</div>
+          <div>$0.10</div>
+          <div>$0.50</div>
+          <div>$0.00</div>
+        </div>
+      </div>
+
+      <p id="spinCount">0 / 10 giros</p>
+      <button class="btn" onclick="spin()">Girar</button>
+    </div>
+  </div>
+
+  <!-- 🎮 JUEGOS -->
+  <div class="section">
+    <h2>🎮 Juegos</h2>
+
+    <div class="game-grid">
+      <div class="game" onclick="playGame()">🎮 Arcade</div>
+      <div class="game" onclick="playGame()">🕹️ Acción</div>
+      <div class="game" onclick="playGame()">🧩 Puzzle</div>
+      <div class="game" onclick="playGame()">🚗 Racing</div>
+    </div>
+
+    <p id="gameCount">0 / 10 juegos</p>
+    <button class="btn" onclick="playGame()">Jugar y ganar</button>
+  </div>
+
+  <!-- 🎁 DAILY + CAJA -->
+  <div class="grid">
+
+    <div class="card">
+      <h3>🎁 Daily</h3>
+      <button class="btn" onclick="daily()">Reclamar</button>
+    </div>
+
+    <div class="card">
+      <h3>🎁 Caja sorpresa</h3>
+      <button class="btn" onclick="openBox()">Abrir</button>
+    </div>
+
+    <div class="card">
+      <h3>🎯 Misión</h3>
+      <p id="missionStatus">0 / 5</p>
+    </div>
+
+    <div class="card">
+      <h3>🏆 Nivel</h3>
+      <p id="levelText">Nivel 1</p>
+    </div>
+
+  </div>
+
+  <!-- 💸 RETIRO -->
+  <div class="section">
+    <h2>💸 Retirar dinero</h2>
+
+    <div class="card">
+      <input id="email" placeholder="PayPal">
+      <input id="amount" placeholder="Monto">
+      <button class="btn" onclick="withdraw()">Retirar</button>
+    </div>
+  </div>
+
+  <!-- 📊 REFERIDOS -->
+  <div class="section">
+    <h2>📊 Referidos</h2>
+
+    <div class="card">
+      <p>Invitados: <span id="refCount">0</span></p>
+      <p>Ganado: $<span id="refEarn">0.00</span></p>
+    </div>
+
+    <div class="card">
+      <input id="refLink" readonly>
+      <button class="btn blue" onclick="copyRef()">Copiar link</button>
+    </div>
+  </div>
+
+  <!-- 📜 HISTORIAL -->
+  <div class="section">
+    <h2>📜 Historial</h2>
+    <div class="card" id="withdrawList"></div>
+  </div>
+
 </div>
 
-<!-- 💰 PANEL DERECHO -->
-<div class="right">
-
-<div class="card">
-  <h3>💰 Balance</h3>
-  <h1 id="balance">$0.00</h1>
+<!-- NAV -->
+<div class="nav">
+  <div class="active">🏠<br>Inicio</div>
+  <div>🎥<br>Videos</div>
+  <div>👥<br>Referidos</div>
+  <div>💳<br>Retirar</div>
 </div>
 
-<div class="card">
-  <h3>💸 Retirar</h3>
-  <input id="email" placeholder="PayPal">
-  <input id="amount" placeholder="Monto">
-  <button onclick="withdraw()">Retirar</button>
-</div>
-
- 
-<div class="card">
-  <h3>🎁 Daily</h3>
-  <button onclick="daily()">Reclamar</button>
-</div>
-
-<div class="card">
-  <h3>🎯 Misión</h3>
-  <p id="missionStatus">0 / 5 juegos</p>
-</div>
-
-<div class="card">
-  <h3>🏆 Nivel</h3>
-  <p id="levelText">Nivel 1</p>
-</div>
-
-<div class="card">
-  <h3>🎁 Caja sorpresa</h3>
-  <button onclick="openBox()">Abrir</button>
-</div>
-
-<h3>📜 Historial</h3>
-<div id="withdrawList"></div>
-
-<div class="card">
-  <h3>📊 Referidos</h3>
-  <p>Invitados: <span id="refCount">0</span></p>
-  <p>Ganado: $<span id="refEarn">0.00</span></p>
-</div>
-
-<div class="card">
-  <h3>🔗 Tu link</h3>
-  <input id="refLink" readonly>
-  <button onclick="copyRef()">Copiar</button>
-</div>
-
-</div>
-
-</div>
-
-<script type="module" src="/js/dashboard.js"></script>
-
-  <script src="https://quge5.com/88/tag.min.js"
-data-zone="226919"
-async
-data-cfasync="false"></script>
+<script type="module" src="dashboard.js"></script>
 
 </body>
 </html>
