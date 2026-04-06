@@ -202,3 +202,27 @@ iframe {
   background: #22c55e;
   border: 1px solid #000;
 }
+
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.game {
+  background: #1e293b;
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.game:hover {
+  transform: scale(1.05);
+  background: #22c55e;
+}
+
+.game img {
+  width: 60px;
+}
