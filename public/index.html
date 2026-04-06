@@ -6,10 +6,12 @@
 
 <title>EarnPro</title>
 
-<!-- 🔥 MONETAG VERIFICACIÓN -->
 <meta name="monetag" content="139886b3940e2e0ab7082d178476fe5b">
 
 <link rel="stylesheet" href="style.css">
+
+<!-- 🔐 RECAPTCHA -->
+<script src="https://www.google.com/recaptcha/enterprise.js?render=6LcbvagsAAAAAAUgJBdifHX8w1Rdpu5HZiJqB17M"></script>
 </head>
 
 <body>
@@ -19,8 +21,8 @@
   <div>
     <input id="email" placeholder="Correo">
     <input id="password" type="password" placeholder="Contraseña">
-    <button onclick="login()">Entrar</button>
-    <button onclick="register()">Regístrate</button>
+    <button onclick="loginCaptcha()">Entrar</button>
+    <button onclick="registerCaptcha()">Regístrate</button>
   </div>
 </div>
 
@@ -36,18 +38,16 @@
 </div>
 
 <div class="main">
-
 <div class="left">
   <h2>Gana dinero online</h2>
   <p>Completa tareas y gana dinero real.</p>
-  <div class="btn" onclick="register()">🚀 Empezar</div>
+  <div class="btn" onclick="registerCaptcha()">🚀 Empezar</div>
 </div>
 
 <div class="right">
   <h3>💰 Tu saldo</h3>
   <p id="saldo">$0</p>
 </div>
-
 </div>
 
 <script type="module" src="js/auth.js"></script>
@@ -55,13 +55,27 @@
 <!-- 💰 MONETAG -->
 <script src="//omg10.com/4/10828691"></script>
 
-  <script>
+<script>
 const params = new URLSearchParams(window.location.search);
 const ref = params.get("ref");
 
 if (ref) {
   sessionStorage.setItem("referrer", ref);
-  console.log("REF GUARDADO:", ref);
+}
+
+// 🔐 CAPTCHA
+async function getCaptchaToken(action) {
+  return await grecaptcha.enterprise.execute('6LcbvagsAAAAAAUgJBdifHX8w1Rdpu5HZiJqB17M', { action });
+}
+
+async function loginCaptcha() {
+  const token = await getCaptchaToken('login');
+  login(token);
+}
+
+async function registerCaptcha() {
+  const token = await getCaptchaToken('register');
+  register(token);
 }
 </script>
 
