@@ -71,30 +71,36 @@ iframe {
   <button onclick="offer()">Completar oferta</button>
 </div>
 
-<div class="card">
+<d<div class="card">
   <h3>🎮 Juegos</h3>
 
-  <!-- 🎮 JUEGO ACTIVO -->
-  <iframe id="gameFrame"
-src="https://games.cdn.famobi.com/html5games/f/8-ball-billiards-classic/v060/?fg_domain=play.famobi.com">
-</iframe>
+  <div class="game-grid">
 
-  <!-- 🎯 SELECTOR TIPO NETFLIX -->
-<!-- 🎯 SELECTOR -->
-<div class="game-row">
+    <div class="game" onclick="playGame()">
+      <img src="https://img.icons8.com/color/96/controller.png">
+      <p>Arcade Game</p>
+    </div>
 
-<img src="https://play.famobi.com/images/8-ball-billiards-classic-teaser.png"
-onclick="changeGame('https://games.cdn.famobi.com/html5games/f/8-ball-billiards-classic/v060/?fg_domain=play.famobi.com')">
+    <div class="game" onclick="playGame()">
+      <img src="https://img.icons8.com/color/96/joystick.png">
+      <p>Action Game</p>
+    </div>
 
-<img src="https://play.famobi.com/images/fruit-ninja-teaser.png"
-onclick="changeGame('https://games.cdn.famobi.com/html5games/f/fruit-ninja/v090/?fg_domain=play.famobi.com')">
+    <div class="game" onclick="playGame()">
+      <img src="https://img.icons8.com/color/96/puzzle.png">
+      <p>Puzzle Game</p>
+    </div>
 
-<img src="https://play.famobi.com/images/stack-smash-teaser.png"
-onclick="changeGame('https://games.cdn.famobi.com/html5games/f/stack-smash/v010/?fg_domain=play.famobi.com')">
+    <div class="game" onclick="playGame()">
+      <img src="https://img.icons8.com/color/96/car.png">
+      <p>Racing Game</p>
+    </div>
 
-</div>
+  </div>
 
-  <button onclick="rewardGame()">💰 Reclamar recompensa</button>
+  <p id="gameCount">0 / 10 juegos</p>
+
+  <button onclick="playGame()">🎮 Jugar y ganar</button>
 </div>
 
 <!-- 💰 PANEL DERECHO -->
