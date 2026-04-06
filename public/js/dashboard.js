@@ -231,6 +231,39 @@ window.game = async () => {
   }, 20000);
 };
 
+window.playGame = async () => {
+  if (!user) return;
+
+  const today = new Date().toDateString();
+  let data = JSON.parse(localStorage.getItem("games")) || {
+    date: today,
+    count: 0
+  };
+
+  if (data.date !== today) data = { date: today, count: 0 };
+
+  if (data.count >= 10)
+    return showToast("Límite diario alcanzado ❌");
+
+  data.count++;
+  localStorage.setItem("games", JSON.stringify(data));
+
+  updateGameUI(data.count);
+
+  // 🔥 TU LINK (DINERO REAL)
+  window.open("https://omg10.com/4/10751693", "_blank");
+
+  showToast("Interactúa 20 segundos ⏳");
+
+  setTimeout(async () => {
+    await updateDoc(doc(db, "users", user.uid), {
+      balance: increment(0.30)
+    });
+
+    showToast("Ganaste $0.30 🎮💰");
+  }, 20000);
+};
+
 // 💸 OFERTAS
 window.offer = async () => {
   window.open(LINK, "_blank");
@@ -390,3 +423,8 @@ window.rewardGame = async () => {
     showToast("Ganaste $0.10🎮💰");
   }, 20000);
 };
+
+function updateGameUI(count) {
+  document.getElementById("gameCount").innerText =
+    `${count} / 10 juegos`;
+}
