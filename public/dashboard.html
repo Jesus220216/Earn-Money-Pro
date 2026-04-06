@@ -45,7 +45,16 @@ iframe {
 <!-- 🎰 RULETA -->
 <div class="card">
   <h3>🎰 Ruleta</h3>
-  <div id="wheel">🎡</div>
+ <div class="wheel-container">
+  <div id="wheel">
+    <div class="segment">$0.01</div>
+    <div class="segment">$0.02</div>
+    <div class="segment">$0.05</div>
+    <div class="segment">$0.10</div>
+    <div class="segment">$0.50</div>
+    <div class="segment">$0.00</div>
+  </div>
+</div>
   <p id="spinCount">0 / 10 giros</p>
   <button onclick="spin()">Girar</button>
 </div>
