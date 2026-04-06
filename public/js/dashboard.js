@@ -1,35 +1,18 @@
 import { auth, db } from "./firebase.js";
-import { 
-  onAuthStateChanged, signOut 
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-
-import { 
-  doc, getDoc, setDoc, updateDoc, increment, 
-  addDoc, collection, onSnapshot 
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+import { doc, getDoc, setDoc, updateDoc, increment, addDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 // 🔗 LINK MONETIZACIÓN
 const LINK = "https://omg10.com/4/10751693";
 
-// 🧠 VARIABLES
+// VARIABLES
 let user;
 let balance = 0;
 let videosLeft = 0;
-let lastAction = 0;
 
-// 🔒 ANTI SPAM
-function antiSpam() {
-  if (Date.now() - lastAction < 4000) return false;
-  lastAction = Date.now();
-  return true;
-}
-
-// 🔥 ABRIR ANUNCIO (CONTROLADO)
+// 🔥 ANUNCIO
 function openAd() {
-  if (window.lastAd && Date.now() - window.lastAd < 5000) return false;
-  window.lastAd = Date.now();
   window.open(LINK, "_blank");
-  return true;
 }
 
 // LOGIN
@@ -39,7 +22,7 @@ onAuthStateChanged(auth, async (u) => {
   user = u;
 
   await initUser();
-  await resetDailyLimits();
+  await resetDaily();
 
   realtimeBalance();
   loadWithdrawals();
@@ -48,15 +31,14 @@ onAuthStateChanged(auth, async (u) => {
 
 // 🧠 CREAR USUARIO + REFERIDOS
 async function initUser() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const referrer = urlParams.get("ref");
+  const referrer = new URLSearchParams(window.location.search).get("ref");
 
   const refDoc = doc(db, "users", user.uid);
   const snap = await getDoc(refDoc);
 
   if (!snap.exists()) {
     await setDoc(refDoc, {
-      balance: 1, // 🎁 bono registro
+      balance: 1,
       referrer: referrer || null,
       referrals: 0,
       referralEarnings: 0,
@@ -66,26 +48,24 @@ async function initUser() {
       lastReset: new Date().toDateString()
     });
 
-    // 🔥 REFERIDO
+    // REFERIDO
     if (referrer && referrer !== user.uid) {
-      try {
-        const refUser = doc(db, "users", referrer);
-        const refSnap = await getDoc(refUser);
+      const refUser = doc(db, "users", referrer);
+      const refSnap = await getDoc(refUser);
 
-        if (refSnap.exists()) {
-          await updateDoc(refUser, {
-            referrals: increment(1),
-            referralEarnings: increment(0.5),
-            balance: increment(0.5)
-          });
-        }
-      } catch {}
+      if (refSnap.exists()) {
+        await updateDoc(refUser, {
+          referrals: increment(1),
+          referralEarnings: increment(0.5),
+          balance: increment(0.5)
+        });
+      }
     }
   }
 }
 
-// 🔄 RESET DIARIO
-async function resetDailyLimits() {
+// RESET DIARIO
+async function resetDaily() {
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
   const data = snap.data();
@@ -102,11 +82,10 @@ async function resetDailyLimits() {
     videosLeft = data.videosLeft || 0;
   }
 
-  document.getElementById("videosLeft").innerText =
-    "Restantes: " + videosLeft;
+  document.getElementById("videosLeft").innerText = "Restantes: " + videosLeft;
 }
 
-// 💰 BALANCE REALTIME
+// BALANCE
 function realtimeBalance() {
   onSnapshot(doc(db, "users", user.uid), (snap) => {
     const data = snap.data() || {};
@@ -114,25 +93,81 @@ function realtimeBalance() {
 
     document.getElementById("balance").innerText = "$" + balance.toFixed(2);
     document.getElementById("refCount").innerText = data.referrals || 0;
-    document.getElementById("refEarn").innerText =
-      (data.referralEarnings || 0).toFixed(2);
-
-    document.getElementById("spinCount").innerText =
-      `${data.spins || 0}/10`;
+    document.getElementById("refEarn").innerText = (data.referralEarnings || 0).toFixed(2);
+    document.getElementById("spinCount").innerText = `${data.spins || 0}/10`;
   });
 }
 
-// 🎮 JUGAR
-window.playGame = async () => {
-  if (!antiSpam()) return showToast("Espera ⏳");
+// 🎥 VIDEO (FIX REAL)
+window.startVideo = () => {
+  const video = document.getElementById("videoPlayer");
 
-  if (!openAd()) return;
+  video.src = "https://www.w3schools.com/html/mov_bbb.mp4";
+  video.play();
 
-  let start = Date.now();
+  openAd();
 
   setTimeout(async () => {
-    if (Date.now() - start < 15000) return;
+    await updateDoc(doc(db, "users", user.uid), {
+      balance: increment(0.03),
+      videosLeft: increment(-1)
+    });
 
+    videosLeft--;
+    document.getElementById("videosLeft").innerText = "Restantes: " + videosLeft;
+
+    showToast("Ganaste $0.03 🎥");
+  }, 10000);
+};
+
+// 🎰 RULETA CON ANIMACIÓN
+window.spin = async () => {
+  const wheel = document.getElementById("wheel");
+
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+  let spins = snap.data()?.spins || 0;
+
+  if (spins >= 10) return showToast("Límite alcanzado ❌");
+
+  spins++;
+  await updateDoc(ref, { spins });
+
+  const rewards = [0.01, 0.02, 0.05, 0.1, 0];
+  const index = Math.floor(Math.random() * rewards.length);
+  const reward = rewards[index];
+
+  // 🎡 ANIMACIÓN
+  const deg = 360 * 5 + (index * (360 / rewards.length));
+  wheel.style.transform = `rotate(${deg}deg)`;
+
+  openAd();
+
+  setTimeout(async () => {
+    if (reward > 0) {
+      await updateDoc(ref, {
+        balance: increment(reward)
+      });
+
+      showToast(`Ganaste $${reward} 🎰`);
+    }
+
+    if (spins === 10) {
+      await updateDoc(ref, {
+        balance: increment(1)
+      });
+
+      showToast("BONUS $1 🔥");
+    }
+
+  }, 4000);
+};
+
+// 🎮 JUEGO REAL + DINERO
+window.playGame = async () => {
+  openAd();
+
+  setTimeout(async () => {
     await updateDoc(doc(db, "users", user.uid), {
       balance: increment(0.05)
     });
@@ -141,55 +176,12 @@ window.playGame = async () => {
   }, 15000);
 };
 
-// 🎰 RULETA
-window.spin = async () => {
-  if (!antiSpam()) return showToast("Espera ⏳");
-
-  const ref = doc(db, "users", user.uid);
-  const snap = await getDoc(ref);
-  let spins = snap.data()?.spins || 0;
-
-  if (spins >= 10)
-    return showToast("Límite alcanzado ❌");
-
-  openAd();
-
-  spins++;
-
-  await updateDoc(ref, { spins });
-
-  const rewards = [0.01, 0.02, 0.05, 0.1, 0];
-  const reward = rewards[Math.floor(Math.random() * rewards.length)];
-
-  setTimeout(async () => {
-    if (reward > 0) {
-      await updateDoc(ref, {
-        balance: increment(reward)
-      });
-      showToast(`Ganaste $${reward} 🎰`);
-    } else {
-      showToast("Nada 😅");
-    }
-
-    if (spins === 10) {
-      await updateDoc(ref, {
-        balance: increment(1)
-      });
-      showToast("BONUS $1 🔥");
-    }
-
-  }, 3000);
-};
-
 // 🎁 DAILY
 window.daily = async () => {
-  if (!antiSpam()) return showToast("Espera ⏳");
-
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
-  const last = snap.data()?.lastDaily || 0;
 
-  if (Date.now() - last < 86400000)
+  if (Date.now() - snap.data()?.lastDaily < 86400000)
     return showToast("Ya reclamaste ❌");
 
   openAd();
@@ -204,47 +196,13 @@ window.daily = async () => {
   }, 10000);
 };
 
-// 🎥 VIDEO
-window.startVideo = async () => {
-  if (!antiSpam()) return showToast("Espera ⏳");
-
-  if (videosLeft <= 0)
-    return showToast("No hay más videos ❌");
-
-  openAd();
-
-  let start = Date.now();
-
-  setTimeout(async () => {
-    if (Date.now() - start < 10000) return;
-
-    await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(0.02),
-      videosLeft: increment(-1)
-    });
-
-    videosLeft--;
-
-    document.getElementById("videosLeft").innerText =
-      "Restantes: " + videosLeft;
-
-    showToast("Ganaste $0.02 🎥");
-  }, 10000);
-};
-
-// 💳 RETIRO SEGURO
+// 💳 RETIRO
 window.withdraw = async () => {
   const amount = parseFloat(document.getElementById("amount").value);
   const email = document.getElementById("email").value;
 
-  if (!email.includes("@"))
-    return showToast("Email inválido ❌");
-
-  if (amount < 5)
-    return showToast("Mínimo $5 ❌");
-
-  if (amount > balance)
-    return showToast("Saldo insuficiente ❌");
+  if (amount < 5) return showToast("Mínimo $5 ❌");
+  if (amount > balance) return showToast("Saldo insuficiente ❌");
 
   await addDoc(collection(db, "withdrawals"), {
     userId: user.uid,
@@ -261,7 +219,7 @@ window.withdraw = async () => {
   showToast("Retiro enviado 🚀");
 };
 
-// 📊 HISTORIAL
+// HISTORIAL
 function loadWithdrawals() {
   onSnapshot(collection(db, "withdrawals"), (snap) => {
     const div = document.getElementById("withdrawList");
@@ -281,13 +239,20 @@ function loadWithdrawals() {
   });
 }
 
-// 🔗 REFERIDOS
+// REFERIDOS
 function generateRefLink() {
   document.getElementById("refLink").value =
     `${window.location.origin}?ref=${user.uid}`;
 }
 
-// 📢 TOAST
+// COPIAR
+window.copyRef = async () => {
+  const text = document.getElementById("refLink").value;
+  await navigator.clipboard.writeText(text);
+  showToast("Link copiado ✅");
+};
+
+// TOAST
 function showToast(msg) {
   const t = document.createElement("div");
   t.innerText = msg;
@@ -301,20 +266,8 @@ function showToast(msg) {
   setTimeout(() => t.remove(), 2000);
 }
 
-// 🚪 LOGOUT
+// LOGOUT
 window.logout = async () => {
   await signOut(auth);
   location.href = "index.html";
-};
-
-// 📋 COPIAR LINK
-window.copyRef = async () => {
-  const text = document.getElementById("refLink").value;
-
-  try {
-    await navigator.clipboard.writeText(text);
-    showToast("Link copiado ✅");
-  } catch {
-    showToast("Error ❌");
-  }
 };
