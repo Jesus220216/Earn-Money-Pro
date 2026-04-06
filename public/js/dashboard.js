@@ -122,10 +122,10 @@ window.openGame = async () => {
 
   setTimeout(async () => {
     await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(0.30)
+      balance: increment(0.10)
     });
 
-    showToast("Ganaste $0.30 🎮💰");
+    showToast("Ganaste $0.10 🎮💰");
   }, 20000);
 };
 
@@ -224,10 +224,10 @@ window.game = async () => {
 
   setTimeout(async () => {
     await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(0.25)
+      balance: increment(0.10)
     });
 
-    showToast("Ganaste $0.25 🎮");
+    showToast("Ganaste $0.10 🎮");
   }, 20000);
 };
 
@@ -275,10 +275,10 @@ window.offer = async () => {
 
   setTimeout(async () => {
     await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(0.30)
+      balance: increment(0.10)
     });
 
-    showToast("Ganaste $0.30 💸");
+    showToast("Ganaste $0.10 💸");
   }, 20000);
 };
 
