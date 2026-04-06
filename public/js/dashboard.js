@@ -236,14 +236,32 @@ async function addMoney(amount) {
 }
 // 🎁 DAILY
 window.daily = async () => {
+  if (!user) return showToast("Inicia sesión");
+
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
-window.open("https://omg10.com/4/10828691", "_blank");
-  const last = snap.data()?.lastDaily || 0;
 
-  if (Date.now() - last < 86400000)
+  if (!snap.exists()) {
+    showToast("Usuario no existe ❌");
+    return;
+  }
+
+  const data = snap.data();
+  const last = data?.lastDaily || 0;
+
+  // abrir anuncio
+  window.open("https://omg10.com/4/10828691", "_blank");
+
+  // validar tiempo (24h)
+  if (Date.now() - last < 86400000) {
     return showToast("Ya reclamaste ❌");
+  }
 
+  // 🔥 ACTUALIZAR FIREBASE
+  await updateDoc(ref, {
+    balance: increment(0.20), // suma automática
+    lastDaily: Date.now()
+  });
 
   showToast("Ganaste $0.20 🎁");
 };
