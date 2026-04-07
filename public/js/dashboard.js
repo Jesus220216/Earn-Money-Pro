@@ -48,8 +48,9 @@ async function initUser() {
   lastReset: new Date().toDateString(),
 
   // 🔥 NUEVO
-  todayEarnings: 0,
-  todayDate: new Date().toDateString()
+await updateDoc(doc(db, "users", user.uid), {
+  balance: increment(0.05),
+  todayEarnings: increment(0.05)
 });
 
     // REFERIDO
@@ -147,6 +148,10 @@ window.startVideo = () => {
 
     showToast("Ganaste $0.03 🎥");
   }, 10000);
+};
+
+window.openBox = () => {
+  showToast("Próximamente 🎁");
 };
 
 // 🎰 RULETA CON ANIMACIÓN
@@ -309,3 +314,8 @@ window.logout = function () {
       console.error("Error:", error);
     });
 };
+
+document.getElementById("refCount").innerText = data.referrals || 0;
+
+const ref2 = document.getElementById("refCountRef");
+if (ref2) ref2.innerText = data.referrals || 0;
