@@ -267,7 +267,13 @@ function showToast(msg) {
 }
 
 // LOGOUT
-window.logout = async () => {
-  await signOut(auth);
-  location.href = "index.html";
+window.logout = function () {
+  signOut(auth)
+    .then(() => {
+      alert("Sesión cerrada");
+      window.location.href = "index.html";
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
 };
