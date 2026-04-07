@@ -202,3 +202,18 @@ input {
     grid-template-columns: 1fr;
   }
 }
+.logout-btn {
+  background: linear-gradient(45deg, #ef4444, #dc2626);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.logout-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(239,68,68,0.7);
+}
