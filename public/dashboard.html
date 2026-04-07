@@ -5,10 +5,7 @@
   <title>EarnPro Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- CSS -->
   <link rel="stylesheet" href="css/dashboard.css">
-
-  <!-- Fuente -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 
@@ -16,47 +13,43 @@
 
 <header>
   <h1>💰 EarnPro</h1>
-  <div class="profile"></div>
 </header>
 
 <div class="container">
 
   <!-- 🔥 RESUMEN -->
- <div class="cards">
+  <div class="grid">
 
-  <div class="card">
-    <h3>💰 Balance</h3>
-    <p id="balance">$0.00</p>
+    <div class="card">
+      <h3>💰 Balance</h3>
+      <p id="balance">$0.00</p>
+    </div>
+
+    <div class="card">
+      <h3>👥 Referidos</h3>
+      <p id="refCount">0</p>
+    </div>
+
+    <div class="card">
+      <h3>📅 Hoy</h3>
+      <p id="today">$0.00</p>
+    </div>
+
+    <div class="card">
+      <h3>🎥 Videos</h3>
+      <p id="videos">0</p>
+    </div>
+
   </div>
-
-  <div class="card">
-    <h3>👥 Referidos</h3>
-    <p id="refCount">0</p>
-  </div>
-
-  <div class="card">
-    <h3>📅 Ganado hoy</h3>
-    <p id="today">$0.00</p>
-  </div>
-
-  <div class="card">
-    <h3>🎥 Videos vistos</h3>
-    <p id="videos">0</p>
-  </div>
-
-</div>
 
   <!-- 🎥 VIDEO -->
   <div class="section">
-    <h2>🎥 Ver videos y ganar</h2>
+    <h2>🎥 Ver videos</h2>
 
     <div class="video-box">
       <video id="videoPlayer" controls muted></video>
-
-      <p id="timerText">0/10</p>
       <p id="videosLeft">Restantes: 6</p>
-
-      <button class="btn" onclick="startVideo()">Reproducir</button>
+      <button class="btn" onclick="startVideo()">Ver video</button>
     </div>
   </div>
 
@@ -65,18 +58,7 @@
     <h2>🎰 Ruleta</h2>
 
     <div class="card center">
-      <div class="wheel-container">
-        <div id="wheel">
-          <div>$0.01</div>
-          <div>$0.02</div>
-          <div>$0.05</div>
-          <div>$0.10</div>
-          <div>$0.50</div>
-          <div>$0.00</div>
-        </div>
-      </div>
-
-      <p id="spinCount">0 / 10 giros</p>
+      <p id="spinCount">0 / 10</p>
       <button class="btn" onclick="spin()">Girar</button>
     </div>
   </div>
@@ -85,83 +67,45 @@
   <div class="section">
     <h2>🎮 Juegos</h2>
 
-    <div class="game-grid">
-      <div class="game" onclick="playGame()">🎮 Arcade</div>
-      <div class="game" onclick="playGame()">🕹️ Acción</div>
-      <div class="game" onclick="playGame()">🧩 Puzzle</div>
-      <div class="game" onclick="playGame()">🚗 Racing</div>
-    </div>
-
-    <p id="gameCount">0 / 10 juegos</p>
-    <button class="btn" onclick="playGame()">Jugar y ganar</button>
+    <button class="btn" onclick="playGame()">Jugar</button>
   </div>
 
-  <!-- 🎁 DAILY + CAJA -->
-  <div class="grid">
+  <!-- 🎁 DAILY -->
+  <div class="section">
+    <h2>🎁 Daily</h2>
 
-    <div class="card">
-      <h3>🎁 Daily</h3>
-      <button class="btn" onclick="daily()">Reclamar</button>
-    </div>
-
-    <div class="card">
-      <h3>🎁 Caja sorpresa</h3>
-      <button class="btn" onclick="openBox()">Abrir</button>
-    </div>
-
-    <div class="card">
-      <h3>🎯 Misión</h3>
-      <p id="missionStatus">0 / 5</p>
-    </div>
-
-    <div class="card">
-      <h3>🏆 Nivel</h3>
-      <p id="levelText">Nivel 1</p>
-    </div>
-
+    <button class="btn" onclick="daily()">Reclamar</button>
   </div>
 
   <!-- 💸 RETIRO -->
   <div class="section">
-    <h2>💸 Retirar dinero</h2>
+    <h2>💸 Retirar</h2>
 
-    <div class="card">
-      <input id="email" placeholder="PayPal">
-      <input id="amount" placeholder="Monto">
-      <button class="btn" onclick="withdraw()">Retirar</button>
-    </div>
+    <input id="email" placeholder="PayPal">
+    <input id="amount" placeholder="Monto">
+    <button class="btn" onclick="withdraw()">Retirar</button>
   </div>
 
-  <!-- 📊 REFERIDOS -->
+  <!-- 👥 REFERIDOS -->
   <div class="section">
-    <h2>📊 Referidos</h2>
+    <h2>👥 Referidos</h2>
 
-    <div class="card">
-      <p>Invitados: <span id="refCount">0</span></p>
-      <p>Ganado: $<span id="refEarn">0.00</span></p>
-    </div>
+    <p>Invitados: <span id="refCountRef">0</span></p>
+    <p>Ganado: $<span id="refEarn">0.00</span></p>
 
-    <div class="card">
-      <input id="refLink" readonly>
-   <button class="btn blue" onclick="copyRef()">Copiar link</button>
-    </div>
+    <input id="refLink" readonly>
+    <button class="btn" onclick="copyRef()">Copiar link</button>
   </div>
 
   <!-- 📜 HISTORIAL -->
   <div class="section">
     <h2>📜 Historial</h2>
-    <div class="card" id="withdrawList"></div>
+    <div id="withdrawList"></div>
   </div>
 
-</div>
+  <!-- 🚪 LOGOUT -->
+  <button class="btn" onclick="logout()">Cerrar sesión</button>
 
-<!-- NAV -->
-<div class="nav">
-  <div class="active">🏠<br>Inicio</div>
-  <div>🎥<br>Videos</div>
-  <div>👥<br>Referidos</div>
-  <div>💳<br>Retirar</div>  
-   <button class="logout-btn" onclick="logout()">Cerrar sesión</button>
 </div>
 
 <script type="module" src="js/dashboard.js"></script>
