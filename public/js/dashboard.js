@@ -37,16 +37,20 @@ async function initUser() {
   const snap = await getDoc(refDoc);
 
   if (!snap.exists()) {
-    await setDoc(refDoc, {
-      balance: 1,
-      referrer: referrer || null,
-      referrals: 0,
-      referralEarnings: 0,
-      videosLeft: 6,
-      spins: 0,
-      lastDaily: 0,
-      lastReset: new Date().toDateString()
-    });
+   await setDoc(refDoc, {
+  balance: 1,
+  referrer: referrer || null,
+  referrals: 0,
+  referralEarnings: 0,
+  videosLeft: 6,
+  spins: 0,
+  lastDaily: 0,
+  lastReset: new Date().toDateString(),
+
+  // 🔥 NUEVO
+  todayEarnings: 0,
+  todayDate: new Date().toDateString()
+});
 
     // REFERIDO
     if (referrer && referrer !== user.uid) {
@@ -89,12 +93,37 @@ async function resetDaily() {
 function realtimeBalance() {
   onSnapshot(doc(db, "users", user.uid), (snap) => {
     const data = snap.data() || {};
-    balance = data.balance || 0;
 
-    document.getElementById("balance").innerText = "$" + balance.toFixed(2);
-    document.getElementById("refCount").innerText = data.referrals || 0;
-    document.getElementById("refEarn").innerText = (data.referralEarnings || 0).toFixed(2);
-    document.getElementById("spinCount").innerText = `${data.spins || 0}/10`;
+    // 💰 BALANCE TOTAL
+    balance = data.balance || 0;
+    document.getElementById("balance").innerText =
+      "$" + balance.toFixed(2);
+
+    // 👥 REFERIDOS
+    document.getElementById("refCount").innerText =
+      data.referrals || 0;
+
+    // 📅 GANADO HOY
+    const todayDate = new Date().toDateString();
+
+    if (data.todayDate !== todayDate) {
+      // reset automático diario
+      updateDoc(doc(db, "users", user.uid), {
+        todayEarnings: 0,
+        todayDate: todayDate
+      });
+    }
+
+    const today = data.todayEarnings || 0;
+
+    document.getElementById("today").innerText =
+      "$" + today.toFixed(2);
+
+    // 🎥 VIDEOS VISTOS HOY
+    const videosWatched = (6 - (data.videosLeft || 0));
+
+    document.getElementById("videos").innerText =
+      videosWatched;
   });
 }
 
@@ -108,11 +137,11 @@ window.startVideo = () => {
   openAd();
 
   setTimeout(async () => {
-    await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(0.03),
-      videosLeft: increment(-1)
-    });
-
+   await updateDoc(doc(db, "users", user.uid), {
+  balance: increment(0.02),
+  videosLeft: increment(-1),
+  todayEarnings: increment(0.02) // 🔥 AÑADIR
+});
     videosLeft--;
     document.getElementById("videosLeft").innerText = "Restantes: " + videosLeft;
 
@@ -153,9 +182,10 @@ window.spin = async () => {
     }
 
     if (spins === 10) {
-      await updateDoc(ref, {
-        balance: increment(1)
-      });
+     await updateDoc(ref, {
+  balance: increment(reward),
+  todayEarnings: increment(reward) // 🔥
+});
 
       showToast("BONUS $1 🔥");
     }
@@ -168,9 +198,10 @@ window.playGame = async () => {
   openAd();
 
   setTimeout(async () => {
-    await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(0.05)
-    });
+   await updateDoc(doc(db, "users", user.uid), {
+  balance: increment(0.05),
+  todayEarnings: increment(0.05) // 🔥
+});
 
     showToast("Ganaste $0.05 🎮");
   }, 15000);
@@ -188,9 +219,10 @@ window.daily = async () => {
 
   setTimeout(async () => {
     await updateDoc(ref, {
-      balance: increment(0.2),
-      lastDaily: Date.now()
-    });
+  balance: increment(0.2),
+  lastDaily: Date.now(),
+  todayEarnings: increment(0.2) // 🔥
+});
 
     showToast("Ganaste $0.20 🎁");
   }, 10000);
