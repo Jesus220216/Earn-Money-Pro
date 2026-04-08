@@ -276,6 +276,10 @@ function loadWithdrawals() {
   });
 }
 
+function openLocker(){
+  alert("Complete 1 quick step to earn your reward 💰");
+}
+
 // REFERIDOS
 function generateRefLink() {
   document.getElementById("refLink").value =
