@@ -7,14 +7,10 @@
 
 <link rel="stylesheet" href="css/dashboard.css">
 
-<!-- CPA LOCKER -->
-<script src="https://playabledownloads.com/script_include.php?id=1889035"></script>
-
 </head>
 
 <body>
 
-<!-- TOPBAR -->
 <div class="topbar">
   <div class="logo">💰 EarnPro</div>
 
@@ -26,97 +22,61 @@
 
 <div class="layout">
 
-<!-- LEFT -->
 <div class="left">
-
 <h2>🔥 Earn Money</h2>
 
 <div class="grid">
 
-<!-- 🎥 VIDEO -->
 <div class="card">
   <h3>🎥 Watch & Earn</h3>
-
-  <video id="videoPlayer" controls muted>
-    <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-  </video>
-
-  <p id="timerText">0/20 sec</p>
+  <video id="videoPlayer" controls muted></video>
   <p id="videosLeft">Left: 6</p>
-
   <button onclick="startVideo()">Start</button>
 </div>
 
-<!-- 🎰 SPIN -->
 <div class="card">
-  <h3>🎰 Spin & Earn</h3>
-
-  <div class="wheel">🎡</div>
-
-  <p id="spinStatus">Ready</p>
-  <p id="spinCount">0 / 10 spins</p>
-
+  <h3>🎰 Spin</h3>
+  <div id="wheel">🎡</div>
   <button onclick="spin()">Spin</button>
 </div>
 
-<!-- 🎁 DAILY -->
 <div class="card">
-  <h3>🎁 Daily Reward</h3>
+  <h3>🎁 Daily</h3>
   <button onclick="daily()">Claim</button>
 </div>
 
-<!-- 📋 SURVEY -->
-<div class="card highlight">
-  <h3>📋 Surveys</h3>
-  <p>High paying offers</p>
-  <button onclick="openLocker()">Start</button>
-</div>
-
-<!-- 🎁 CPA -->
-<div class="card highlight">
-  <h3>🔥 Premium Offers</h3>
-  <p>Earn up to $5</p>
-  <button onclick="openLocker()">Start</button>
-</div>
-
-<!-- 🎮 GAMES -->
 <div class="card">
-  <h3>🎮 Play Games</h3>
-  <button onclick="openLocker()">Play</button>
+  <h3>🔥 Offers</h3>
+  <button onclick="openLocker()">Start</button>
 </div>
 
 </div>
 </div>
 
-<!-- RIGHT -->
 <div class="right">
 
-<div class="card big">
+<div class="card">
   <h3>💰 Balance</h3>
   <h1 id="balance">$0.00</h1>
 </div>
 
 <div class="card">
   <h3>💸 Withdraw</h3>
-  <input placeholder="PayPal email">
-  <input placeholder="Amount">
+  <input id="email" placeholder="PayPal email">
+  <input id="amount" placeholder="Amount">
   <button onclick="withdraw()">Withdraw</button>
 </div>
 
 <div class="card">
   <h3>📊 Referrals</h3>
-  <p>Users: 0</p>
-  <p>Earnings: $0.00</p>
+  <p id="refCount">0</p>
 </div>
 
 </div>
 
 </div>
 
-<!-- MONETAG -->
-<script src="//omg10.com/4/10828691"></script>
-
-<script src="js/dashboard.js"></script>
+<script type="module" src="js/dashboard.js"></script>
 
 </body>
 </html>
