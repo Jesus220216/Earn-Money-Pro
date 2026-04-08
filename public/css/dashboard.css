@@ -1,4 +1,3 @@
-/* RESET */
 * {
   margin: 0;
   padding: 0;
@@ -31,7 +30,7 @@ header {
   padding: 20px;
 }
 
-/* GRID RESUMEN */
+/* GRID */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -41,16 +40,17 @@ header {
 /* CARDS */
 .card {
   background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
   padding: 15px;
   border-radius: 16px;
-  transition: 0.3s;
   text-align: center;
+  border: 1px solid rgba(255,255,255,0.08);
+  animation: fadeIn 0.6s ease;
 }
 
 .card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 0 20px rgba(34,197,94,0.4);
+  box-shadow: 0 0 25px rgba(34,197,94,0.6);
 }
 
 .card h3 {
@@ -64,22 +64,25 @@ header {
   color: #22c55e;
 }
 
-/* SECCIONES */
+/* EARN BOX */
+.earn-box {
+  background: linear-gradient(90deg,#22c55e,#16a34a);
+  padding: 20px;
+  border-radius: 16px;
+  text-align: center;
+  color: black;
+  margin-top: 20px;
+}
+
+/* SECTION */
 .section {
   margin-top: 25px;
 }
 
-.section h2 {
-  margin-bottom: 10px;
-  font-size: 18px;
-}
-
-/* VIDEO */
 .video-box {
   background: rgba(255,255,255,0.05);
   padding: 15px;
   border-radius: 16px;
-  text-align: center;
 }
 
 video {
@@ -87,13 +90,13 @@ video {
   border-radius: 12px;
 }
 
-/* BOTONES */
+/* BOTÓN */
 .btn {
   margin-top: 10px;
   width: 100%;
-  padding: 12px;
+  padding: 14px;
+  border-radius: 12px;
   border: none;
-  border-radius: 10px;
   background: linear-gradient(90deg,#22c55e,#16a34a);
   color: black;
   font-weight: bold;
@@ -102,48 +105,8 @@ video {
 }
 
 .btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 10px #22c55e;
-}
-
-.btn.blue {
-  background: #3b82f6;
-  color: white;
-}
-
-/* INPUT */
-input {
-  width: 100%;
-  padding: 10px;
-  border-radius: 10px;
-  border: none;
-  margin-top: 10px;
-}
-
-/* RUEDA */
-.wheel-container {
-  display: flex;
-  justify-content: center;
-  margin: 10px 0;
-}
-
-#wheel {
-  width: 160px;
-  height: 160px;
-  border-radius: 50%;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  overflow: hidden;
-  transition: transform 4s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-#wheel div {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  background: #22c55e;
-  border: 1px solid #000;
+  transform: scale(1.07);
+  box-shadow: 0 0 15px #22c55e;
 }
 
 /* JUEGOS */
@@ -158,7 +121,7 @@ input {
   padding: 15px;
   border-radius: 12px;
   cursor: pointer;
-  transition: 0.3s;
+  text-align: center;
 }
 
 .game:hover {
@@ -167,7 +130,7 @@ input {
   color: black;
 }
 
-/* NAV INFERIOR */
+/* NAV */
 .nav {
   position: fixed;
   bottom: 0;
@@ -176,44 +139,14 @@ input {
   display: flex;
   justify-content: space-around;
   padding: 10px;
-  border-top: 1px solid #1e293b;
-}
-
-.nav div {
-  text-align: center;
-  color: #94a3b8;
-  font-size: 12px;
 }
 
 .nav .active {
   color: #22c55e;
 }
 
-/* HISTORIAL */
-#withdrawList {
-  max-height: 200px;
-  overflow-y: auto;
-  font-size: 13px;
-}
-
-/* RESPONSIVE */
-@media(max-width: 768px){
-  .grid {
-    grid-template-columns: 1fr;
-  }
-}
-.logout-btn {
-  background: linear-gradient(45deg, #ef4444, #dc2626);
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 10px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.logout-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 10px rgba(239,68,68,0.7);
+/* ANIMACIÓN */
+@keyframes fadeIn {
+  from {opacity:0; transform:translateY(10px);}
+  to {opacity:1; transform:translateY(0);}
 }
