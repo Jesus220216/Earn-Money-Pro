@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<title>EarnPro</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>EarnPro Dashboard</title>
 
 <link rel="stylesheet" href="css/dashboard.css">
 
@@ -15,60 +14,102 @@
 
 <body>
 
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">💰 EarnPro</div>
+
+  <div class="top-right">
+    <div class="balance-mini">$0.00</div>
+    <button onclick="logout()">Salir</button>
+  </div>
+</div>
+
 <div class="layout">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <h2>💰 EarnPro</h2>
+<!-- LEFT -->
+<div class="left">
 
-    <a class="active">🏠</a>
-    <a>💰</a>
-    <a>👥</a>
-    <a>💳</a>
-  </aside>
+<h2>🔥 Earn Money</h2>
 
-  <!-- MAIN -->
-  <main class="main">
+<div class="grid">
 
-    <!-- TOP -->
-    <div class="topbar">
-      <h3>Dashboard</h3>
-      <div class="balance">$0.00</div>
-    </div>
+<!-- 🎥 VIDEO -->
+<div class="card">
+  <h3>🎥 Watch & Earn</h3>
 
-    <!-- CARDS -->
-    <div class="cards">
-      <div class="card">
-        <span>Balance</span>
-        <h2>$0.00</h2>
-      </div>
+  <video id="videoPlayer" controls muted>
+    <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+  </video>
 
-      <div class="card">
-        <span>Offers</span>
-        <h2>0</h2>
-      </div>
+  <p id="timerText">0/20 sec</p>
+  <p id="videosLeft">Left: 6</p>
 
-      <div class="card">
-        <span>Referrals</span>
-        <h2>0</h2>
-      </div>
-    </div>
+  <button onclick="startVideo()">Start</button>
+</div>
 
-    <!-- EARN BOX -->
-    <div class="earn">
-      <h2>💰 Earn Now</h2>
-      <p>Complete 1 step to unlock rewards</p>
-      <button onclick="openLocker()">Start</button>
-    </div>
+<!-- 🎰 SPIN -->
+<div class="card">
+  <h3>🎰 Spin & Earn</h3>
 
-    <!-- OFFERS -->
-    <div class="offers">
-      <div class="offer" onclick="openLocker()">📱 App - $2</div>
-      <div class="offer" onclick="openLocker()">📋 Survey - $1</div>
-      <div class="offer" onclick="openLocker()">🎮 Game - $5</div>
-    </div>
+  <div class="wheel">🎡</div>
 
-  </main>
+  <p id="spinStatus">Ready</p>
+  <p id="spinCount">0 / 10 spins</p>
+
+  <button onclick="spin()">Spin</button>
+</div>
+
+<!-- 🎁 DAILY -->
+<div class="card">
+  <h3>🎁 Daily Reward</h3>
+  <button onclick="daily()">Claim</button>
+</div>
+
+<!-- 📋 SURVEY -->
+<div class="card highlight">
+  <h3>📋 Surveys</h3>
+  <p>High paying offers</p>
+  <button onclick="openLocker()">Start</button>
+</div>
+
+<!-- 🎁 CPA -->
+<div class="card highlight">
+  <h3>🔥 Premium Offers</h3>
+  <p>Earn up to $5</p>
+  <button onclick="openLocker()">Start</button>
+</div>
+
+<!-- 🎮 GAMES -->
+<div class="card">
+  <h3>🎮 Play Games</h3>
+  <button onclick="openLocker()">Play</button>
+</div>
+
+</div>
+</div>
+
+<!-- RIGHT -->
+<div class="right">
+
+<div class="card big">
+  <h3>💰 Balance</h3>
+  <h1 id="balance">$0.00</h1>
+</div>
+
+<div class="card">
+  <h3>💸 Withdraw</h3>
+  <input placeholder="PayPal email">
+  <input placeholder="Amount">
+  <button onclick="withdraw()">Withdraw</button>
+</div>
+
+<div class="card">
+  <h3>📊 Referrals</h3>
+  <p>Users: 0</p>
+  <p>Earnings: $0.00</p>
+</div>
+
+</div>
 
 </div>
 
