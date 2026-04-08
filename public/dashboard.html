@@ -10,68 +10,78 @@
 
 <!-- CPA LOCKER -->
 <script src="https://playabledownloads.com/script_include.php?id=1889035"></script>
+
 </head>
 
 <body>
 
-<div class="sidebar">
+<header>
   <h2>💰 EarnPro</h2>
+  <div class="profile"></div>
+</header>
 
-  <a href="#">🏠 Dashboard</a>
-  <a href="#">💰 Earn</a>
-  <a href="#">👥 Referrals</a>
-  <a href="#">💳 Withdraw</a>
+<div class="container">
+
+  <!-- BALANCE -->
+  <div class="grid">
+    <div class="card">
+      <h3>Balance</h3>
+      <p>$0.00</p>
+    </div>
+
+    <div class="card">
+      <h3>Offers</h3>
+      <p>0</p>
+    </div>
+
+    <div class="card">
+      <h3>Referrals</h3>
+      <p>0</p>
+    </div>
+  </div>
+
+  <!-- GANAR DINERO -->
+  <div class="earn-box">
+    <h2>💰 Earn Money Now</h2>
+    <p>Complete 1 simple step and get paid instantly</p>
+    <button class="btn" onclick="openLocker()">Start Earning</button>
+  </div>
+
+  <!-- VIDEO -->
+  <div class="section">
+    <h2>Watch & Earn</h2>
+    <div class="video-box">
+      <video controls>
+        <source src="video.mp4" type="video/mp4">
+      </video>
+      <button class="btn">Earn $0.10</button>
+    </div>
+  </div>
+
+  <!-- JUEGOS -->
+  <div class="section">
+    <h2>Play & Earn</h2>
+    <div class="game-grid">
+      <div class="game" onclick="openLocker()">🎮 Game 1</div>
+      <div class="game" onclick="openLocker()">🎮 Game 2</div>
+    </div>
+  </div>
+
 </div>
 
-<div class="main">
-
-  <div class="top">
-    <h2>Dashboard</h2>
-    <div>Balance: <strong>$0.00</strong></div>
-  </div>
-
-  <div class="card">
-    <h3>🔥 Earn Money Now</h3>
-    <p>Complete 1 simple step and earn rewards instantly</p>
-
-    <div class="btn" onclick="openLocker()">💰 Start Earning</div>
-  </div>
-
-  <div class="card">
-    <h3>Your Stats</h3>
-    <p>Completed Offers: 0</p>
-    <p>Total Earned: $0</p>
-  </div>
-
-  <div class="offers">
-
-    <div class="offer">
-      <h4>Download App</h4>
-      <p>Earn $2</p>
-      <div class="btn" onclick="openLocker()">Start</div>
-    </div>
-
-    <div class="offer">
-      <h4>Survey</h4>
-      <p>Earn $1</p>
-      <div class="btn" onclick="openLocker()">Start</div>
-    </div>
-
-    <div class="offer">
-      <h4>Game Offer</h4>
-      <p>Earn $5</p>
-      <div class="btn" onclick="openLocker()">Start</div>
-    </div>
-
-  </div>
-
+<!-- NAV -->
+<div class="nav">
+  <div class="active">🏠 Home</div>
+  <div>💰 Earn</div>
+  <div>👥 Ref</div>
+  <div>💳 Cashout</div>
 </div>
-
-<!-- JS -->
-<script src="dashboard.js"></script>
 
 <!-- MONETAG -->
 <script src="//omg10.com/4/10828691"></script>
+
+<!-- JS -->
+<script src="dashboard.js"></script>
 
 </body>
 </html>
