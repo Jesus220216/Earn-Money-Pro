@@ -2,7 +2,7 @@ import { auth, db } from "./firebase.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, increment, addDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-// 🔗 LINK MONETIZACIÓN
+// 🔗 LINK MONETAG
 const LINK = "https://omg10.com/4/10751693";
 
 // VARIABLES
@@ -10,12 +10,12 @@ let user;
 let balance = 0;
 let videosLeft = 0;
 
-// 🔥 ANUNCIO
+// 🔥 ABRIR ANUNCIO
 function openAd() {
   window.open(LINK, "_blank");
 }
 
-// LOGIN
+// 🔐 LOGIN
 onAuthStateChanged(auth, async (u) => {
   if (!u) return location.href = "index.html";
 
@@ -29,7 +29,7 @@ onAuthStateChanged(auth, async (u) => {
   generateRefLink();
 });
 
-// 🧠 CREAR USUARIO + REFERIDOS
+// 🧠 CREAR USUARIO
 async function initUser() {
   const referrer = new URLSearchParams(window.location.search).get("ref");
 
@@ -37,23 +37,27 @@ async function initUser() {
   const snap = await getDoc(refDoc);
 
   if (!snap.exists()) {
-   await setDoc(refDoc, {
-  balance: 1,
-  referrer: referrer || null,
-  referrals: 0,
-  referralEarnings: 0,
-  videosLeft: 6,
-  spins: 0,
-  lastDaily: 0,
-  lastReset: new Date().toDateString(),
 
-  // 🔥 NUEVO
-await updateDoc(doc(db, "users", user.uid), {
-  balance: increment(0.05),
-  todayEarnings: increment(0.05)
-});
+    await setDoc(refDoc, {
+      balance: 1,
+      referrer: referrer || null,
+      referrals: 0,
+      referralEarnings: 0,
+      videosLeft: 6,
+      spins: 0,
+      lastDaily: 0,
+      lastReset: new Date().toDateString(),
+      todayEarnings: 0,
+      todayDate: new Date().toDateString()
+    });
 
-    // REFERIDO
+    // 🎁 BONUS
+    await updateDoc(refDoc, {
+      balance: increment(0.05),
+      todayEarnings: increment(0.05)
+    });
+
+    // 👥 REFERIDO
     if (referrer && referrer !== user.uid) {
       const refUser = doc(db, "users", referrer);
       const refSnap = await getDoc(refUser);
@@ -69,7 +73,7 @@ await updateDoc(doc(db, "users", user.uid), {
   }
 }
 
-// RESET DIARIO
+// 🔄 RESET DIARIO
 async function resetDaily() {
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
@@ -90,25 +94,19 @@ async function resetDaily() {
   document.getElementById("videosLeft").innerText = "Restantes: " + videosLeft;
 }
 
-// BALANCE
+// 💰 BALANCE REALTIME
 function realtimeBalance() {
   onSnapshot(doc(db, "users", user.uid), (snap) => {
     const data = snap.data() || {};
 
-    // 💰 BALANCE TOTAL
     balance = data.balance || 0;
-    document.getElementById("balance").innerText =
-      "$" + balance.toFixed(2);
+    document.getElementById("balance").innerText = "$" + balance.toFixed(2);
 
-    // 👥 REFERIDOS
-    document.getElementById("refCount").innerText =
-      data.referrals || 0;
+    document.getElementById("refCount").innerText = data.referrals || 0;
 
-    // 📅 GANADO HOY
     const todayDate = new Date().toDateString();
 
     if (data.todayDate !== todayDate) {
-      // reset automático diario
       updateDoc(doc(db, "users", user.uid), {
         todayEarnings: 0,
         todayDate: todayDate
@@ -117,19 +115,22 @@ function realtimeBalance() {
 
     const today = data.todayEarnings || 0;
 
-    document.getElementById("today").innerText =
-      "$" + today.toFixed(2);
+    const todayEl = document.getElementById("today");
+    if (todayEl) todayEl.innerText = "$" + today.toFixed(2);
 
-    // 🎥 VIDEOS VISTOS HOY
     const videosWatched = (6 - (data.videosLeft || 0));
-
-    document.getElementById("videos").innerText =
-      videosWatched;
+    const vidEl = document.getElementById("videos");
+    if (vidEl) vidEl.innerText = videosWatched;
   });
 }
 
-// 🎥 VIDEO (FIX REAL)
-window.startVideo = () => {
+// 🎥 VIDEO
+window.startVideo = async () => {
+
+  if (videosLeft <= 0) {
+    return showToast("No te quedan videos hoy ❌");
+  }
+
   const video = document.getElementById("videoPlayer");
 
   video.src = "https://www.w3schools.com/html/mov_bbb.mp4";
@@ -138,28 +139,29 @@ window.startVideo = () => {
   openAd();
 
   setTimeout(async () => {
-   await updateDoc(doc(db, "users", user.uid), {
-  balance: increment(0.02),
-  videosLeft: increment(-1),
-  todayEarnings: increment(0.02) // 🔥 AÑADIR
-});
+
+    await updateDoc(doc(db, "users", user.uid), {
+      balance: increment(0.03),
+      videosLeft: increment(-1),
+      todayEarnings: increment(0.03)
+    });
+
     videosLeft--;
     document.getElementById("videosLeft").innerText = "Restantes: " + videosLeft;
 
     showToast("Ganaste $0.03 🎥");
+
   }, 10000);
 };
 
-window.openBox = () => {
-  showToast("Próximamente 🎁");
-};
-
-// 🎰 RULETA CON ANIMACIÓN
+// 🎰 RULETA
 window.spin = async () => {
+
   const wheel = document.getElementById("wheel");
 
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
+
   let spins = snap.data()?.spins || 0;
 
   if (spins >= 10) return showToast("Límite alcanzado ❌");
@@ -171,49 +173,44 @@ window.spin = async () => {
   const index = Math.floor(Math.random() * rewards.length);
   const reward = rewards[index];
 
-  // 🎡 ANIMACIÓN
   const deg = 360 * 5 + (index * (360 / rewards.length));
   wheel.style.transform = `rotate(${deg}deg)`;
 
   openAd();
 
   setTimeout(async () => {
+
     if (reward > 0) {
       await updateDoc(ref, {
-        balance: increment(reward)
+        balance: increment(reward),
+        todayEarnings: increment(reward)
       });
 
       showToast(`Ganaste $${reward} 🎰`);
     }
 
-    if (spins === 10) {
-     await updateDoc(ref, {
-  balance: increment(reward),
-  todayEarnings: increment(reward) // 🔥
-});
-
-      showToast("BONUS $1 🔥");
-    }
-
   }, 4000);
 };
 
-// 🎮 JUEGO REAL + DINERO
+// 🎮 JUEGO
 window.playGame = async () => {
   openAd();
 
   setTimeout(async () => {
-   await updateDoc(doc(db, "users", user.uid), {
-  balance: increment(0.05),
-  todayEarnings: increment(0.05) // 🔥
-});
+
+    await updateDoc(doc(db, "users", user.uid), {
+      balance: increment(0.05),
+      todayEarnings: increment(0.05)
+    });
 
     showToast("Ganaste $0.05 🎮");
+
   }, 15000);
 };
 
 // 🎁 DAILY
 window.daily = async () => {
+
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
 
@@ -223,18 +220,21 @@ window.daily = async () => {
   openAd();
 
   setTimeout(async () => {
+
     await updateDoc(ref, {
-  balance: increment(0.2),
-  lastDaily: Date.now(),
-  todayEarnings: increment(0.2) // 🔥
-});
+      balance: increment(0.2),
+      lastDaily: Date.now(),
+      todayEarnings: increment(0.2)
+    });
 
     showToast("Ganaste $0.20 🎁");
+
   }, 10000);
 };
 
-// 💳 RETIRO
+// 💸 RETIRO
 window.withdraw = async () => {
+
   const amount = parseFloat(document.getElementById("amount").value);
   const email = document.getElementById("email").value;
 
@@ -256,10 +256,12 @@ window.withdraw = async () => {
   showToast("Retiro enviado 🚀");
 };
 
-// HISTORIAL
+// 📜 HISTORIAL
 function loadWithdrawals() {
   onSnapshot(collection(db, "withdrawals"), (snap) => {
     const div = document.getElementById("withdrawList");
+    if (!div) return;
+
     div.innerHTML = "";
 
     snap.forEach(docu => {
@@ -276,24 +278,22 @@ function loadWithdrawals() {
   });
 }
 
-function openLocker(){
-  alert("Complete 1 quick step to earn your reward 💰");
-}
-
-// REFERIDOS
+// 🔗 REFERIDOS
 function generateRefLink() {
-  document.getElementById("refLink").value =
-    `${window.location.origin}?ref=${user.uid}`;
+  const refInput = document.getElementById("refLink");
+  if (refInput) {
+    refInput.value = `${window.location.origin}?ref=${user.uid}`;
+  }
 }
 
-// COPIAR
+// 📋 COPIAR LINK
 window.copyRef = async () => {
   const text = document.getElementById("refLink").value;
   await navigator.clipboard.writeText(text);
   showToast("Link copiado ✅");
 };
 
-// TOAST
+// 🔔 TOAST
 function showToast(msg) {
   const t = document.createElement("div");
   t.innerText = msg;
@@ -307,19 +307,11 @@ function showToast(msg) {
   setTimeout(() => t.remove(), 2000);
 }
 
-// LOGOUT
+// 🚪 LOGOUT
 window.logout = function () {
   signOut(auth)
     .then(() => {
-      alert("Sesión cerrada");
       window.location.href = "index.html";
     })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
+    .catch(console.error);
 };
-
-document.getElementById("refCount").innerText = data.referrals || 0;
-
-const ref2 = document.getElementById("refCountRef");
-if (ref2) ref2.innerText = data.referrals || 0;
