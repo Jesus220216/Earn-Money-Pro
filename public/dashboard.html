@@ -1,82 +1,315 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>EarnPro</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link rel="stylesheet" href="css/dashboard.css">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EarnPro Dashboard - Gana Dinero Fácil</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+     <link rel="stylesheet" href="css/dashboard.css">
 </head>
-
 <body>
+    <div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+        <!-- Header Hero -->
+        <div class="header-hero">
+            <div class="header-background">
+                <img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663427137618/DZNVjeDi2TTeJHBF4drPLX/hero-dashboard-eXtDujZMPEtYity8XHWzjU.webp" alt="background">
+            </div>
+            <div class="header-content">
+                <div class="header-text">
+                    <h1>EarnPro Dashboard</h1>
+                    <p>Bienvenido de vuelta, usuario. Sigue ganando dinero fácil.</p>
+                </div>
+                <div class="header-badge">
+                    <span class="badge-icon">⚡</span>
+                    <span class="badge-text">+$18.50 hoy</span>
+                </div>
+            </div>
+        </div>
 
-<div class="topbar">
-  <div class="logo">💰 EarnPro</div>
+        <!-- Main Content -->
+        <div class="main-container">
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <!-- Card 1: Saldo Actual -->
+                <div class="stat-card glass">
+                    <div class="card-content">
+                        <div class="card-header">
+                            <div class="card-icon gradient-emerald">
+                                📈
+                            </div>
+                            <span class="card-badge">Disponible</span>
+                        </div>
+                        <h3 class="card-title">Saldo Actual</h3>
+                        <p class="card-value">$125.50</p>
+                        <p class="card-subtitle">Disponible para retirar</p>
+                    </div>
+                </div>
 
-  <div class="top-right">
-    <div class="balance-mini">$0.00</div>
-    <button onclick="logout()">Salir</button>
-  </div>
-</div>
+                <!-- Card 2: Referidos -->
+                <div class="stat-card glass">
+                    <div class="card-content">
+                        <div class="card-header">
+                            <div class="card-icon gradient-navy">
+                                👥
+                            </div>
+                            <span class="card-badge">Info</span>
+                        </div>
+                        <h3 class="card-title">Referidos</h3>
+                        <p class="card-value">12</p>
+                        <p class="card-subtitle">Amigos invitados</p>
+                    </div>
+                </div>
 
-<div class="layout">
+                <!-- Card 3: Ganancias Hoy -->
+                <div class="stat-card glass">
+                    <div class="card-content">
+                        <div class="card-header">
+                            <div class="card-icon gradient-navy">
+                                ⚡
+                            </div>
+                            <span class="card-badge">Info</span>
+                        </div>
+                        <h3 class="card-title">Ganancias Hoy</h3>
+                        <p class="card-value">$18.50</p>
+                        <p class="card-subtitle">En las últimas 24 horas</p>
+                    </div>
+                </div>
 
-<div class="left">
-<h2>🔥 Earn Money</h2>
+                <!-- Card 4: Total Ganado -->
+                <div class="stat-card glass">
+                    <div class="card-content">
+                        <div class="card-header">
+                            <div class="card-icon gradient-emerald">
+                                📈
+                            </div>
+                            <span class="card-badge">Info</span>
+                        </div>
+                        <h3 class="card-title">Total Ganado</h3>
+                        <p class="card-value">$1250.75</p>
+                        <p class="card-subtitle">Desde que te uniste</p>
+                    </div>
+                </div>
+            </div>
 
-<div class="grid">
+            <!-- Main Sections Grid -->
+            <div class="main-grid">
+                <!-- Left Column -->
+                <div class="left-column">
+                    <!-- Juegos Section -->
+                    <div class="section-card">
+                        <div class="section-image">
+                            <img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663427137618/DZNVjeDi2TTeJHBF4drPLX/games-section-adP5BB59vRtawVJK66zDDN.webp" alt="Juegos">
+                            <div class="section-overlay"></div>
+                            <div class="section-title-overlay">
+                                <h2>Juega y Gana</h2>
+                                <p>Diviértete con nuestros juegos exclusivos</p>
+                            </div>
+                        </div>
+                        <div class="section-content">
+                            <div class="games-grid">
+                                <div class="game-item">
+                                    <div class="game-icon">🧩</div>
+                                    <p class="game-name">Puzzle</p>
+                                    <p class="game-reward">$0.50</p>
+                                </div>
+                                <div class="game-item">
+                                    <div class="game-icon">🎯</div>
+                                    <p class="game-name">Trivia</p>
+                                    <p class="game-reward">$1.00</p>
+                                </div>
+                                <div class="game-item">
+                                    <div class="game-icon">🧠</div>
+                                    <p class="game-name">Memoria</p>
+                                    <p class="game-reward">$0.75</p>
+                                </div>
+                            </div>
+                            <button class="btn btn-emerald">
+                                🎮 Jugar Ahora
+                                <span class="btn-arrow">→</span>
+                            </button>
+                        </div>
+                    </div>
 
-<div class="card">
-  <h3>🎥 Watch & Earn</h3>
-  <video id="videoPlayer" controls muted></video>
-  <p id="videosLeft">Left: 6</p>
-  <button onclick="startVideo()">Start</button>
-</div>
+                    <!-- Encuestas Section -->
+                    <div class="section-card">
+                        <div class="section-image">
+                            <img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663427137618/DZNVjeDi2TTeJHBF4drPLX/surveys-section-oQowva7jWMnnikQXWdUWRj.webp" alt="Encuestas">
+                            <div class="section-overlay"></div>
+                            <div class="section-title-overlay">
+                                <h2>Completa Encuestas</h2>
+                                <p>Tu opinión vale dinero</p>
+                            </div>
+                        </div>
+                        <div class="section-content">
+                            <div class="surveys-list">
+                                <div class="survey-item">
+                                    <div>
+                                        <p class="survey-title">Encuesta: Preferencias de Compra</p>
+                                        <p class="survey-time">5 min</p>
+                                    </div>
+                                    <p class="survey-reward">$2.50</p>
+                                </div>
+                                <div class="survey-item">
+                                    <div>
+                                        <p class="survey-title">Encuesta: Hábitos de Consumo</p>
+                                        <p class="survey-time">8 min</p>
+                                    </div>
+                                    <p class="survey-reward">$3.00</p>
+                                </div>
+                                <div class="survey-item">
+                                    <div>
+                                        <p class="survey-title">Encuesta: Redes Sociales</p>
+                                        <p class="survey-time">3 min</p>
+                                    </div>
+                                    <p class="survey-reward">$1.50</p>
+                                </div>
+                            </div>
+                            <button class="btn btn-blue">
+                                📋 Ver Encuestas Disponibles
+                                <span class="btn-arrow">→</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
-<div class="card">
-  <h3>🎰 Spin</h3>
-  <div id="wheel">🎡</div>
-  <button onclick="spin()">Spin</button>
-</div>
+                <!-- Right Column (Sidebar) -->
+                <div class="right-column">
+                    <!-- Videos & Ads Section -->
+                    <div class="section-card">
+                        <div class="section-image">
+                            <img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663427137618/DZNVjeDi2TTeJHBF4drPLX/videos-section-M3px8J2qeG2ZZcwcuCQzL2.webp" alt="Videos">
+                            <div class="section-overlay"></div>
+                            <div class="section-title-overlay">
+                                <h2>Ver Videos</h2>
+                            </div>
+                        </div>
+                        <div class="section-content">
+                            <div class="videos-list">
+                                <div class="video-item">
+                                    <div class="video-info">
+                                        <span class="video-icon">▶</span>
+                                        <span>Video 1</span>
+                                    </div>
+                                    <span class="video-reward">$0.25</span>
+                                </div>
+                                <div class="video-item">
+                                    <div class="video-info">
+                                        <span class="video-icon">▶</span>
+                                        <span>Video 2</span>
+                                    </div>
+                                    <span class="video-reward">$0.30</span>
+                                </div>
+                                <div class="video-item">
+                                    <div class="video-info">
+                                        <span class="video-icon">▶</span>
+                                        <span>Video 3</span>
+                                    </div>
+                                    <span class="video-reward">$0.25</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-emerald btn-small">
+                                🎬 Ver Videos
+                            </button>
+                        </div>
+                    </div>
 
-<div class="card">
-  <h3>🎁 Daily</h3>
-  <button onclick="daily()">Claim</button>
-</div>
+                    <!-- Ofertas Section -->
+                    <div class="section-card">
+                        <div class="section-image">
+                            <img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663427137618/DZNVjeDi2TTeJHBF4drPLX/offers-section-cQowva7jWMnnikQXWdUWRj.webp" alt="Ofertas">
+                            <div class="section-overlay"></div>
+                            <div class="section-title-overlay">
+                                <h2>Ofertas Especiales</h2>
+                            </div>
+                        </div>
+                        <div class="section-content">
+                            <div class="offers-list">
+                                <div class="offer-item">
+                                    <div class="offer-info">
+                                        <span class="offer-icon">🎁</span>
+                                        <span>Oferta Premium</span>
+                                    </div>
+                                    <span class="offer-reward">$5.00</span>
+                                </div>
+                                <div class="offer-item">
+                                    <div class="offer-info">
+                                        <span class="offer-icon">🎁</span>
+                                        <span>Descuento App</span>
+                                    </div>
+                                    <span class="offer-reward">$3.50</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-amber btn-small">
+                                🎁 Ver Ofertas
+                            </button>
+                        </div>
+                    </div>
 
-<div class="card">
-  <h3>🔥 Offers</h3>
-  <button onclick="openLocker()">Start</button>
-</div>
+                    <!-- Quick Stats -->
+                    <div class="quick-stats">
+                        <h3>Estadísticas Rápidas</h3>
+                        <div class="stats-list">
+                            <div class="stat-row">
+                                <span>Nivel</span>
+                                <span class="stat-value">Gold</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>Racha</span>
+                                <span class="stat-value">7 días</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>Próximo Retiro</span>
+                                <span class="stat-value">$150</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-</div>
-</div>
-
-<div class="right">
-
-<div class="card">
-  <h3>💰 Balance</h3>
-  <h1 id="balance">$0.00</h1>
-</div>
-
-<div class="card">
-  <h3>💸 Withdraw</h3>
-  <input id="email" placeholder="PayPal email">
-  <input id="amount" placeholder="Amount">
-  <button onclick="withdraw()">Withdraw</button>
-</div>
-
-<div class="card">
-  <h3>📊 Referrals</h3>
-  <p id="refCount">0</p>
-</div>
-
-</div>
-
-</div>
-
-<script type="module" src="js/dashboard.js"></script>
-
+            <!-- Recent Activity -->
+            <div class="activity-section">
+                <div class="activity-header">
+                    <h2>Actividad Reciente</h2>
+                </div>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-dot completed"></div>
+                        <div class="activity-info">
+                            <p class="activity-type">Encuesta completada</p>
+                            <p class="activity-time">Hace 2 horas</p>
+                        </div>
+                        <p class="activity-amount">+$2.50</p>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-dot completed"></div>
+                        <div class="activity-info">
+                            <p class="activity-type">Video visto</p>
+                            <p class="activity-time">Hace 4 horas</p>
+                        </div>
+                        <p class="activity-amount">+$0.75</p>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-dot completed"></div>
+                        <div class="activity-info">
+                            <p class="activity-type">Juego jugado</p>
+                            <p class="activity-time">Hace 6 horas</p>
+                        </div>
+                        <p class="activity-amount">+$1.25</p>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-dot completed"></div>
+                        <div class="activity-info">
+                            <p class="activity-type">Oferta completada</p>
+                            <p class="activity-time">Hace 1 día</p>
+                        </div>
+                        <p class="activity-amount">+$5.00</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
+
