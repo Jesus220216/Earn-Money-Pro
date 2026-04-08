@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Dashboard - EarnPro</title>
+<title>EarnPro Dashboard</title>
 
 <link rel="stylesheet" href="css/dashboard.css">
 
@@ -15,95 +15,67 @@
 
 <body>
 
-<header>
-  <h2>💰 EarnPro</h2>
-  <div class="profile"></div>
-</header>
+<div class="layout">
 
-<div class="container">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h2>💰 EarnPro</h2>
 
-  <!-- BALANCE -->
-  <div class="grid">
-    <div class="card">
-      <h3>Balance</h3>
-      <p>$0.00</p>
+    <a class="active">🏠</a>
+    <a>💰</a>
+    <a>👥</a>
+    <a>💳</a>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOP -->
+    <div class="topbar">
+      <h3>Dashboard</h3>
+      <div class="balance">$0.00</div>
     </div>
 
-    <div class="card">
-      <h3>Offers</h3>
-      <p>0</p>
+    <!-- CARDS -->
+    <div class="cards">
+      <div class="card">
+        <span>Balance</span>
+        <h2>$0.00</h2>
+      </div>
+
+      <div class="card">
+        <span>Offers</span>
+        <h2>0</h2>
+      </div>
+
+      <div class="card">
+        <span>Referrals</span>
+        <h2>0</h2>
+      </div>
     </div>
 
-    <div class="card">
-      <h3>Referrals</h3>
-      <p>0</p>
+    <!-- EARN BOX -->
+    <div class="earn">
+      <h2>💰 Earn Now</h2>
+      <p>Complete 1 step to unlock rewards</p>
+      <button onclick="openLocker()">Start</button>
     </div>
-  </div>
 
-  <!-- 🎰 RULETA -->
-<div class="card">
-  <h3>🎰 Ruleta</h3>
-
-  <div class="wheel-container">
-    <div id="wheel">🎡</div>
-  </div>
-
-  <p id="spinStatus">Listo para girar</p>
-
-  <!-- 🔥 PROGRESO -->
-  <div class="spin-bar">
-    <div id="spinFill"></div>
-  </div>
-  <p id="spinCount">0 / 10 giros</p>
-
-  <button onclick="spin()">Girar</button>
-</div>
-
-
-  <!-- GANAR DINERO -->
-  <div class="earn-box">
-    <h2>💰 Earn Money Now</h2>
-    <p>Complete 1 simple step and get paid instantly</p>
-    <button class="btn" onclick="openLocker()">Start Earning</button>
-  </div>
-
-  <!-- VIDEO -->
-  <div class="section">
-    <h2>Watch & Earn</h2>
-    <div class="video-box">
-      <video controls>
-        <source src="video.mp4" type="video/mp4">
-      </video>
-      <button class="btn">Earn $0.10</button>
+    <!-- OFFERS -->
+    <div class="offers">
+      <div class="offer" onclick="openLocker()">📱 App - $2</div>
+      <div class="offer" onclick="openLocker()">📋 Survey - $1</div>
+      <div class="offer" onclick="openLocker()">🎮 Game - $5</div>
     </div>
-  </div>
 
-  <!-- JUEGOS -->
-  <div class="section">
-    <h2>Play & Earn</h2>
-    <div class="game-grid">
-      <div class="game" onclick="openLocker()">🎮 Game 1</div>
-      <div class="game" onclick="openLocker()">🎮 Game 2</div>
-    </div>
-  </div>
+  </main>
 
-</div>
-
-<!-- NAV -->
-<div class="nav">
-  <div class="active">🏠 Home</div>
-  <div>💰 Earn</div>
-  <div>👥 Ref</div>
-  <div>💳 Cashout</div>
 </div>
 
 <!-- MONETAG -->
 <script src="//omg10.com/4/10828691"></script>
 
-<!-- JS -->
-<link rel="stylesheet" href="css/dashboard.css">
-
-  <script src="js/dashboard.js"></script>
+<script src="js/dashboard.js"></script>
 
 </body>
 </html>
