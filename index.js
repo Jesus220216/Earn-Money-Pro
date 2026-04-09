@@ -3,6 +3,7 @@ const admin = require("firebase-admin");
 const path = require("path");
 
 const app = express();
+app.use(express.json());
 
 // 🔐 FIREBASE
 const serviceAccount = JSON.parse(process.env.FIREBASE_KEY);
@@ -13,92 +14,146 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
-// 🔐 SECRET
-const SECRET = "EarnPro_SECURE_9xLk29@2026";
+// 🔐 SECRET SEGURO
+const SECRET = process.env.SECRET;
 
-// 🔥 ADMIN PANEL
-app.get("/admin", (req, res) => {
-  res.send("ADMIN OK 🔥");
-});
-
-// 🔥 STATIC
+// 🌐 STATIC
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// 💰 POSTBACK (MEJORADO)
-app.get("/postback", async (req, res) => {
+// 🔥 ADMIN PANEL SIMPLE
+app.get("/admin", (req, res) => {
+  res.send("ADMIN OK 🔥");
+});
+
+
+// 💰 GANANCIA POR ANUNCIO
+app.post("/reward", async (req, res) => {
   try {
-    const { userID, amount, transactionID, secret } = req.query;
+    const { uid, amount } = req.body;
 
-    if (secret !== SECRET) return res.send("denied");
+    if (!uid || !amount) return res.send("invalid");
 
-    const parsedAmount = parseFloat(amount);
-    if (!userID || !parsedAmount) return res.send("error");
+    const value = parseFloat(amount);
+    if (isNaN(value)) return res.send("invalid amount");
 
-    // 🚫 límite duro
-    if (parsedAmount > 2) return res.send("blocked");
+    const userRef = db.collection("users").doc(uid);
+    const userDoc = await userRef.get();
 
-    const userRef = db.collection("users").doc(userID);
-    const userSnap = await userRef.get();
+    if (!userDoc.exists) return res.send("no user");
 
-    if (!userSnap.exists) return res.send("no user");
+    const user = userDoc.data();
+    const now = Date.now();
 
-    const user = userSnap.data();
-
-    // 🚫 límite diario
-    if ((user.dailyEarn || 0) > 5) {
+    // 🛑 ANTI FRAUDE
+    if ((user.dailyEarn || 0) >= 3)
       return res.send("limit");
-    }
 
-    await userRef.set({
-      balance: admin.firestore.FieldValue.increment(parsedAmount),
-      dailyEarn: admin.firestore.FieldValue.increment(parsedAmount)
-    }, { merge: true });
+    if (now - (user.lastEarn || 0) < 60000)
+      return res.send("too fast");
+
+    // 💰 SUMAR
+    await userRef.update({
+      balance: admin.firestore.FieldValue.increment(value),
+      dailyEarn: (user.dailyEarn || 0) + value,
+      lastEarn: now
+    });
 
     res.send("ok");
 
-  } catch (e) {
-    console.log(e);
-    res.send("fail");
+  } catch (err) {
+    console.error(err);
+    res.send("error");
   }
 });
 
-// 💳 RETIROS ADMIN
+
+// 🎯 POSTBACK CPA (CORREGIDO)
+app.get("/postback", async (req, res) => {
+  try {
+    const { uid, amount, secret } = req.query;
+
+    if (!uid || !amount || !secret)
+      return res.send("invalid");
+
+    if (secret !== SECRET)
+      return res.send("denied");
+
+    const value = parseFloat(amount);
+    if (isNaN(value)) return res.send("invalid amount");
+
+    if (value > 5) return res.send("blocked");
+
+    const userRef = db.collection("users").doc(uid);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) return res.send("no user");
+
+    await userRef.update({
+      balance: admin.firestore.FieldValue.increment(value)
+    });
+
+    res.send("ok");
+
+  } catch (err) {
+    console.error(err);
+    res.send("error");
+  }
+});
+
+
+// 💳 VER RETIROS
 app.get("/admin/withdrawals", async (req, res) => {
-  if (req.query.secret !== SECRET) return res.send("denied");
+  if (req.query.secret !== SECRET)
+    return res.send("denied");
 
   const snap = await db.collection("withdrawals").get();
-  const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  const data = snap.docs.map(d => ({
+    id: d.id,
+    ...d.data()
+  }));
 
   res.json(data);
 });
 
-// ✅ APROBAR
-app.get("/admin/approve", async (req, res) => {
-  if (req.query.secret !== SECRET) return res.send("denied");
 
-  await db.collection("withdrawals").doc(req.query.id).update({
+// ✅ APROBAR RETIRO
+app.get("/admin/approve", async (req, res) => {
+  if (req.query.secret !== SECRET)
+    return res.send("denied");
+
+  const { id } = req.query;
+
+  if (!id) return res.send("invalid");
+
+  await db.collection("withdrawals").doc(id).update({
     status: "approved"
   });
 
   res.send("ok");
 });
 
-// ❌ RECHAZAR
-app.get("/admin/reject", async (req, res) => {
-  if (req.query.secret !== SECRET) return res.send("denied");
 
-  await db.collection("withdrawals").doc(req.query.id).update({
+// ❌ RECHAZAR RETIRO
+app.get("/admin/reject", async (req, res) => {
+  if (req.query.secret !== SECRET)
+    return res.send("denied");
+
+  const { id } = req.query;
+
+  if (!id) return res.send("invalid");
+
+  await db.collection("withdrawals").doc(id).update({
     status: "rejected"
   });
 
   res.send("ok");
 });
 
-// 🚀 SERVER
-app.listen(process.env.PORT || 3000, () => {
-  console.log("🔥 IMPERIO ACTIVO");
-});
+
+// 🚀 START
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log("Server running on " + PORT));
