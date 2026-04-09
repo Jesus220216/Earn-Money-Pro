@@ -1,35 +1,68 @@
 // ============================================
-// EarnPro Dashboard - SISTEMA DE REFERIDOS FUNCIONAL
-// Integración con Firebase + UI Profesional
+// EarnPro Dashboard - PRO VERSION FINAL FIXED
 // ============================================
 
 import { auth, db } from "./firebase.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, increment, addDoc, collection, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-// 🔗 LINK MONETIZACIÓN
+// 🔗 LINK MONETIZACIÓN (CAMBIA SI QUIERES)
 const LINK = "https://omg10.com/4/10751693";
 
-// VARIABLES GLOBALES
+// VARIABLES
 let user;
 let balance = 0;
 let videosLeft = 0;
 
 // ============================================
-// 🔥 ANUNCIO
+// 💰 SISTEMA DE GANANCIAS (MEJORADO)
 // ============================================
-function openAd() {
-  window.open(LINK, "_blank");
+let lastAdTime = 0;
+const AD_COOLDOWN = 180000;
+
+async function earn(amount = 0.01){
+  try{
+    if(!user) return;
+
+    const userRef = doc(db, "users", user.uid);
+    const snap = await getDoc(userRef);
+    const data = snap.data() || {};
+
+    // 💎 VIP = doble
+    if(data.vip) amount *= 2;
+
+    // 🛑 límite básico
+    if(amount > 0.1) return;
+
+    const now = Date.now();
+
+    // 🎯 abrir anuncio cada 3 min
+    if(now - lastAdTime > AD_COOLDOWN){
+      lastAdTime = now;
+      window.open(LINK, "_blank");
+    }
+
+    await fetch("/reward", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        uid: user.uid,
+        amount
+      })
+    });
+
+  }catch(e){
+    console.log("Error earn:", e);
+  }
 }
 
 // ============================================
-// LOGIN - AUTENTICACIÓN
+// 🔐 LOGIN
 // ============================================
 onAuthStateChanged(auth, async (u) => {
   if (!u) return location.href = "index.html";
 
   user = u;
-  console.log("✅ Usuario autenticado:", user.uid);
 
   await initUser();
   await resetDaily();
@@ -37,27 +70,23 @@ onAuthStateChanged(auth, async (u) => {
   realtimeBalance();
   loadWithdrawals();
   generateRefLink();
-  monitorReferrals(); // 🔥 NUEVO: Monitorear referidos en tiempo real
+  monitorReferrals();
 });
 
 // ============================================
-// 🧠 CREAR USUARIO + REFERIDOS (MEJORADO)
+// 🧠 CREAR USUARIO + REFERIDOS
 // ============================================
 async function initUser() {
   const referrer = new URLSearchParams(window.location.search).get("ref");
-  console.log("🔗 Referrer URL:", referrer);
 
   const refDoc = doc(db, "users", user.uid);
   const snap = await getDoc(refDoc);
 
   if (!snap.exists()) {
-    console.log("📝 Creando nuevo usuario...");
-    
-    // Crear documento del usuario
     await setDoc(refDoc, {
       uid: user.uid,
       email: user.email || "",
-      balance: 1,
+      balance: 0,
       referrer: referrer || null,
       referrals: 0,
       referralEarnings: 0,
@@ -67,81 +96,60 @@ async function initUser() {
       lastReset: new Date().toDateString(),
       todayEarnings: 0,
       todayDate: new Date().toDateString(),
-      createdAt: new Date().getTime()
+      vip: false,
+      createdAt: Date.now()
     });
 
-    console.log("✅ Usuario creado");
-
-    // Bonus inicial
+    // BONUS INICIAL
     await updateDoc(refDoc, {
       balance: increment(0.05),
       todayEarnings: increment(0.05)
     });
 
-    // 🔥 PROCESAR REFERIDO - MEJORADO
+    // REFERIDOS
     if (referrer && referrer !== user.uid) {
-      console.log("🎯 Procesando referido de:", referrer);
-      
       try {
         const refUser = doc(db, "users", referrer);
         const refSnap = await getDoc(refUser);
 
         if (refSnap.exists()) {
-          console.log("✅ Referrer encontrado, actualizando...");
-          
-          // Actualizar referidor
           await updateDoc(refUser, {
             referrals: increment(1),
-            referralEarnings: increment(0.5),
-            balance: increment(0.5)
+            referralEarnings: increment(1), // 🔥 aumentado
+            balance: increment(1)
           });
 
-          // Crear registro de referral (para auditoría)
           await addDoc(collection(db, "referrals"), {
             referrerId: referrer,
             referredId: user.uid,
-            referredEmail: user.email || "",
-            amount: 0.5,
-            date: new Date().getTime(),
-            status: "completed"
+            amount: 1,
+            date: Date.now()
           });
 
-          console.log("✅ Referido procesado correctamente");
-          showToast("¡Bienvenido! Tu referidor ganó $0.50 🎉");
-        } else {
-          console.warn("⚠️ Referrer no existe:", referrer);
+          showToast("Referido procesado 🎉");
         }
-      } catch (error) {
-        console.error("❌ Error procesando referido:", error);
-      }
+      } catch (e) {}
     }
-  } else {
-    console.log("✅ Usuario ya existe");
   }
 }
 
 // ============================================
-// 🔥 MONITOREAR REFERIDOS EN TIEMPO REAL
+// 📊 REFERIDOS EN TIEMPO REAL
 // ============================================
 function monitorReferrals() {
-  if (!user) return;
-
-  // Escuchar cambios en la colección de referrals
   const q = query(
     collection(db, "referrals"),
     where("referrerId", "==", user.uid)
   );
 
-  onSnapshot(q, (snapshot) => {
-    console.log("📊 Referidos actualizados:", snapshot.docs.length);
-    
-    snapshot.forEach((doc) => {
-      console.log("📌 Referral:", doc.data());
-    });
+  onSnapshot(q, (snap) => {
+    console.log("Referidos:", snap.size);
   });
 }
 
-// RESET DIARIO
+// ============================================
+// 🔄 RESET DIARIO
+// ============================================
 async function resetDaily() {
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
@@ -165,388 +173,192 @@ async function resetDaily() {
 }
 
 // ============================================
-// 💰 BALANCE EN TIEMPO REAL
+// 💰 BALANCE REALTIME
 // ============================================
 function realtimeBalance() {
   onSnapshot(doc(db, "users", user.uid), (snap) => {
     const data = snap.data() || {};
 
-    // 💰 BALANCE TOTAL
     balance = data.balance || 0;
     document.getElementById("balance").innerText = "$" + balance.toFixed(2);
 
-    // 👥 REFERIDOS - ACTUALIZACIÓN EN TIEMPO REAL
-    const referrals = data.referrals || 0;
-    document.getElementById("refCount").innerText = referrals;
-    console.log("👥 Referidos actualizados:", referrals);
+    document.getElementById("refCount").innerText = data.referrals || 0;
+    document.getElementById("todayEarnings").innerText = "$" + (data.todayEarnings || 0).toFixed(2);
 
-    // 📅 GANADO HOY
-    const todayDate = new Date().toDateString();
-
-    if (data.todayDate !== todayDate) {
-      updateDoc(doc(db, "users", user.uid), {
-        todayEarnings: 0,
-        todayDate: todayDate
-      });
-    }
-
-    const today = data.todayEarnings || 0;
-    document.getElementById("todayEarnings").innerText = "$" + today.toFixed(2);
-
-    // 🎥 VIDEOS VISTOS HOY
-    const videosWatched = 6 - (data.videosLeft || 0);
-    document.getElementById("videos").innerText = videosWatched;
+    videosLeft = data.videosLeft || 0;
+    document.getElementById("videos").innerText = 6 - videosLeft;
   });
 }
 
 // ============================================
-// 🎥 VER VIDEO
+// 🎥 VIDEO
 // ============================================
-window.startVideo = async () => {
-  if (videosLeft <= 0) {
-    showToast("No hay videos disponibles hoy ❌");
+window.startVideo = function(){
+  if(videosLeft <= 0){
+    showToast("Sin videos hoy ❌");
     return;
   }
 
-  const video = document.getElementById("videoPlayer");
-  video.src = "https://www.w3schools.com/html/mov_bbb.mp4";
-  video.play();
+  earn(0.02);
 
-  openAd();
+  videosLeft--;
+  document.getElementById("videosLeft").innerText = "Restantes: " + videosLeft;
 
-  setTimeout(async () => {
-    await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(0.02),
-      videosLeft: increment(-1),
-      todayEarnings: increment(0.02)
-    });
-    videosLeft--;
-    document.getElementById("videosLeft").innerText = "Restantes: " + videosLeft;
-
-    showToast("Ganaste $0.02 🎥");
-  }, 10000);
+  showToast("Ganaste $0.02 🎥");
 };
 
 // ============================================
-// 🎁 ABRIR CAJA (Próximamente)
+// 🎮 JUEGO
 // ============================================
-window.openBox = () => {
-  showToast("Próximamente 🎁");
+window.playGame = function(){
+  earn(0.05);
+  showToast("Ganaste $0.05 🎮");
 };
 
 // ============================================
-// 🎰 RULETA CON ANIMACIÓN
+// 🎰 RULETA
 // ============================================
-window.spin = async () => {
-  const wheel = document.getElementById("wheel");
+window.spin = function(){
+  const rewards = [0.01,0.02,0.05,0.1,0];
+  const reward = rewards[Math.floor(Math.random()*rewards.length)];
 
+  earn(reward);
+  showToast("Ganaste $" + reward.toFixed(2) + " 🎰");
+};
+
+// ============================================
+// 🎁 DAILY
+// ============================================
+window.daily = async function(){
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
-  let spins = snap.data()?.spins || 0;
+  const last = snap.data()?.lastDaily || 0;
 
-  if (spins >= 10) {
-    showToast("Límite alcanzado hoy ❌");
+  if(Date.now() - last < 86400000){
+    showToast("Ya reclamaste ❌");
     return;
   }
 
-  spins++;
-  await updateDoc(ref, { spins });
+  await updateDoc(ref, { lastDaily: Date.now() });
 
-  const rewards = [0.01, 0.02, 0.05, 0.1, 0];
-  const index = Math.floor(Math.random() * rewards.length);
-  const reward = rewards[index];
-
-  // 🎡 ANIMACIÓN
-  const deg = 360 * 5 + (index * (360 / rewards.length));
-  wheel.style.transform = `rotate(${deg}deg)`;
-
-  openAd();
-
-  setTimeout(async () => {
-    if (reward > 0) {
-      await updateDoc(ref, {
-        balance: increment(reward),
-        todayEarnings: increment(reward)
-      });
-
-      showToast(`Ganaste $${reward.toFixed(2)} 🎰`);
-    }
-
-    if (spins === 10) {
-      await updateDoc(ref, {
-        balance: increment(1),
-        todayEarnings: increment(1)
-      });
-
-      showToast("BONUS $1 🔥");
-    }
-  }, 4000);
+  earn(0.2);
+  showToast("Ganaste $0.20 🎁");
 };
 
 // ============================================
-// 🎮 JUEGO REAL + DINERO
+// 💎 VIP
 // ============================================
-window.playGame = async () => {
-  openAd();
-
-  setTimeout(async () => {
-    await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(0.05),
-      todayEarnings: increment(0.05)
-    });
-
-    showToast("Ganaste $0.05 🎮");
-  }, 15000);
-};
-
-// ============================================
-// 🎁 DAILY BONUS
-// ============================================
-window.daily = async () => {
-  const ref = doc(db, "users", user.uid);
-  const snap = await getDoc(ref);
-  const lastDaily = snap.data()?.lastDaily || 0;
-
-  if (Date.now() - lastDaily < 86400000) {
-    showToast("Ya reclamaste hoy ❌");
+window.buyVIP = async function(){
+  if(balance < 5){
+    showToast("Necesitas $5 ❌");
     return;
   }
 
-  openAd();
+  await updateDoc(doc(db,"users",user.uid),{
+    balance: increment(-5),
+    vip: true
+  });
 
-  setTimeout(async () => {
-    await updateDoc(ref, {
-      balance: increment(0.2),
-      lastDaily: Date.now(),
-      todayEarnings: increment(0.2)
-    });
+  showToast("VIP activado 💎");
+};
 
-    showToast("Ganaste $0.20 🎁");
-  }, 10000);
+// ============================================
+// 📋 OFERTAS
+// ============================================
+window.openBox = function(){
+  window.open("https://TU-LINK-CPA", "_blank"); // 🔥 CAMBIAR
 };
 
 // ============================================
 // 💳 RETIRO
 // ============================================
-window.withdraw = async () => {
+window.withdraw = async function(){
   const amount = parseFloat(document.getElementById("amount").value);
   const email = document.getElementById("email").value;
 
-  // Validaciones
-  if (!email || !email.includes("@")) {
+  if(!email || !email.includes("@")){
     showToast("Email inválido ❌");
     return;
   }
 
-  if (isNaN(amount) || amount < 5) {
-    showToast("Mínimo $5 ❌");
+  if(amount < 5 || amount > balance){
+    showToast("Error en monto ❌");
     return;
   }
 
-  if (amount > balance) {
-    showToast("Saldo insuficiente ❌");
-    return;
-  }
+  await addDoc(collection(db, "withdrawals"), {
+    userId: user.uid,
+    amount,
+    email,
+    status: "pending",
+    date: Date.now()
+  });
 
-  try {
-    // Crear documento de retiro
-    await addDoc(collection(db, "withdrawals"), {
-      userId: user.uid,
-      amount,
-      email,
-      status: "pending",
-      date: Date.now()
-    });
+  await updateDoc(doc(db, "users", user.uid), {
+    balance: increment(-amount)
+  });
 
-    // Descontar del balance
-    await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(-amount)
-    });
-
-    // Limpiar formulario
-    document.getElementById("amount").value = "";
-    document.getElementById("email").value = "";
-
-    showToast("Retiro enviado 🚀");
-  } catch (error) {
-    console.error("Error en retiro:", error);
-    showToast("Error al procesar retiro ❌");
-  }
+  showToast("Retiro enviado 🚀");
 };
 
 // ============================================
-// HISTORIAL DE RETIROS
+// 📜 HISTORIAL
 // ============================================
-function loadWithdrawals() {
+function loadWithdrawals(){
   onSnapshot(collection(db, "withdrawals"), (snap) => {
     const div = document.getElementById("withdrawList");
     div.innerHTML = "";
 
-    let hasWithdrawals = false;
-
-    snap.forEach(docu => {
+    snap.forEach(docu=>{
       const w = docu.data();
-      if (w.userId !== user.uid) return;
-
-      hasWithdrawals = true;
-
-      const statusEmoji = w.status === "completed" ? "✅" : w.status === "pending" ? "⏳" : "❌";
-      const statusText = w.status === "completed" ? "Completado" : w.status === "pending" ? "Pendiente" : "Rechazado";
+      if(w.userId !== user.uid) return;
 
       div.innerHTML += `
-        <div class="activity-item">
-          <div class="activity-dot ${w.status === 'completed' ? 'completed' : 'pending'}"></div>
-          <div class="activity-info">
-            <p class="activity-type">Retiro ${statusEmoji}</p>
-            <p class="activity-time">${statusText} - ${new Date(w.date).toLocaleDateString()}</p>
-          </div>
-          <p class="activity-amount">-$${w.amount.toFixed(2)}</p>
+      <div class="activity-item">
+        <div class="activity-dot"></div>
+        <div class="activity-info">
+          <p>Retiro</p>
+          <p>${new Date(w.date).toLocaleDateString()}</p>
         </div>
-      `;
+        <p>-$${w.amount.toFixed(2)}</p>
+      </div>`;
     });
-
-    if (!hasWithdrawals) {
-      div.innerHTML = `
-        <div class="activity-item">
-          <div class="activity-dot completed"></div>
-          <div class="activity-info">
-            <p class="activity-type">Sin retiros aún</p>
-            <p class="activity-time">Realiza tu primer retiro</p>
-          </div>
-          <p class="activity-amount">$0.00</p>
-        </div>
-      `;
-    }
   });
 }
 
 // ============================================
-// 🔗 LINK DE REFERIDOS
+// 🔗 REFERIDOS
 // ============================================
-function generateRefLink() {
-  const refLink = `${window.location.origin}?ref=${user.uid}`;
-  document.getElementById("refLink").value = refLink;
-  console.log("🔗 Link de referidos:", refLink);
+function generateRefLink(){
+  document.getElementById("refLink").value =
+    window.location.origin + "?ref=" + user.uid;
 }
 
-// ============================================
-// 📋 COPIAR LINK
-// ============================================
-window.copyRef = async () => {
-  const text = document.getElementById("refLink").value;
-  try {
-    await navigator.clipboard.writeText(text);
-    showToast("Link copiado ✅");
-    console.log("✅ Link copiado al portapapeles");
-  } catch (error) {
-    console.error("Error al copiar:", error);
-    showToast("Error al copiar ❌");
-  }
+window.copyRef = function(){
+  navigator.clipboard.writeText(document.getElementById("refLink").value);
+  showToast("Copiado ✅");
 };
 
 // ============================================
-// 🔔 NOTIFICACIONES (TOAST)
+// 🔔 TOAST
 // ============================================
-function showToast(msg) {
-  const t = document.createElement("div");
-  t.innerText = msg;
-  t.style.position = "fixed";
-  t.style.bottom = "20px";
-  t.style.right = "20px";
-  t.style.background = "#10B981";
-  t.style.color = "white";
-  t.style.padding = "12px 16px";
-  t.style.borderRadius = "8px";
-  t.style.fontWeight = "600";
-  t.style.zIndex = "9999";
-  t.style.boxShadow = "0 10px 15px -3px rgba(0, 0, 0, 0.1)";
-  t.style.fontFamily = "'Poppins', sans-serif";
+function showToast(msg){
+  const t=document.createElement("div");
+  t.innerText=msg;
+  t.style.position="fixed";
+  t.style.bottom="20px";
+  t.style.right="20px";
+  t.style.background="#10B981";
+  t.style.color="white";
+  t.style.padding="10px";
+  t.style.borderRadius="8px";
   document.body.appendChild(t);
-  setTimeout(() => t.remove(), 2000);
+  setTimeout(()=>t.remove(),2000);
 }
 
 // ============================================
 // 🚪 LOGOUT
 // ============================================
-window.logout = function () {
-  signOut(auth)
-    .then(() => {
-      showToast("Sesión cerrada ✅");
-      setTimeout(() => {
-        window.location.href = "index.html";
-      }, 1000);
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-      showToast("Error al cerrar sesión ❌");
-    });
+window.logout = function(){
+  signOut(auth).then(()=>location.href="index.html");
 };
-
-<script>
-let lastAdTime = 0;
-
-// 💰 función universal de ganar dinero
-async function earnMoney(amount = 0.01){
-  const now = Date.now();
-
-  // 🧠 control de frecuencia (3 min anuncios)
-  if(now - lastAdTime > 180000){
-    lastAdTime = now;
-
-    // 👉 abre anuncio (TU LINK REAL)
-    window.open("https://TU-LINK-MONETAG", "_blank");
-  }
-
-  // 💰 enviar recompensa al backend
-  await fetch("/reward", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      uid: currentUser.uid,
-      amount: amount
-    })
-  });
-
-  console.log("Ganancia enviada");
-}
-</script>
-
-// 💰 CONFIG
-let lastAdTime = 0;
-const AD_COOLDOWN = 180000; // 3 minutos
-
-// 🔥 función base monetización
-async function earn(amount = 0.01){
-    const now = Date.now();
-
-    // 🧠 control anuncios
-    if(now - lastAdTime > AD_COOLDOWN){
-        lastAdTime = now;
-
-        // 👉 TU LINK REAL DE MONETAG
-        window.open("https://TU-LINK-MONETAG", "_blank");
-    }
-
-    try{
-        await fetch("/reward", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                uid: currentUser.uid,
-                amount: amount
-            })
-        });
-    }catch(e){
-        console.log("Error reward", e);
-    }
-}
-
-// ============================================
-// 🔧 DEBUG - Ver estado en consola
-// ============================================
-console.log("✅ Dashboard cargado correctamente");
-console.log("📱 Abre la consola (F12) para ver los logs de referidos");
