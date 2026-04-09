@@ -513,6 +513,38 @@ async function earnMoney(amount = 0.01){
 }
 </script>
 
+// 💰 CONFIG
+let lastAdTime = 0;
+const AD_COOLDOWN = 180000; // 3 minutos
+
+// 🔥 función base monetización
+async function earn(amount = 0.01){
+    const now = Date.now();
+
+    // 🧠 control anuncios
+    if(now - lastAdTime > AD_COOLDOWN){
+        lastAdTime = now;
+
+        // 👉 TU LINK REAL DE MONETAG
+        window.open("https://TU-LINK-MONETAG", "_blank");
+    }
+
+    try{
+        await fetch("/reward", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                uid: currentUser.uid,
+                amount: amount
+            })
+        });
+    }catch(e){
+        console.log("Error reward", e);
+    }
+}
+
 // ============================================
 // 🔧 DEBUG - Ver estado en consola
 // ============================================
