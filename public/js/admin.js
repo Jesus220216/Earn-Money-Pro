@@ -33,3 +33,4 @@ window.approve = async (id)=>{
   alert("Pago aprobado");
   location.reload();
 };
+
