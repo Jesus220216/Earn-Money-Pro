@@ -362,4 +362,3 @@ function showToast(msg){
 window.logout = function(){
   signOut(auth).then(()=>location.href="index.html");
 };
-
