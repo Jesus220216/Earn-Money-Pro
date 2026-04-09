@@ -15,7 +15,7 @@ admin.initializeApp({
 const db = admin.firestore();
 
 // 🔐 SECRET SEGURO
-const SECRET = process.env.SECRET;
+const SECRET = "EarnPro_SECURE_9xLk29@2026";
 
 // 🌐 STATIC
 app.use(express.static(path.join(__dirname, "public")));
