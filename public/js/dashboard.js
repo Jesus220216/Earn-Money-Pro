@@ -1,11 +1,11 @@
 // ============================================
-// EarnPro Dashboard - JavaScript Mejorado
+// EarnPro Dashboard - SISTEMA DE REFERIDOS FUNCIONAL
 // Integración con Firebase + UI Profesional
 // ============================================
 
 import { auth, db } from "./firebase.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-import { doc, getDoc, setDoc, updateDoc, increment, addDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { doc, getDoc, setDoc, updateDoc, increment, addDoc, collection, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 // 🔗 LINK MONETIZACIÓN
 const LINK = "https://omg10.com/4/10751693";
@@ -29,6 +29,7 @@ onAuthStateChanged(auth, async (u) => {
   if (!u) return location.href = "index.html";
 
   user = u;
+  console.log("✅ Usuario autenticado:", user.uid);
 
   await initUser();
   await resetDaily();
@@ -36,19 +37,26 @@ onAuthStateChanged(auth, async (u) => {
   realtimeBalance();
   loadWithdrawals();
   generateRefLink();
+  monitorReferrals(); // 🔥 NUEVO: Monitorear referidos en tiempo real
 });
 
 // ============================================
-// 🧠 CREAR USUARIO + REFERIDOS
+// 🧠 CREAR USUARIO + REFERIDOS (MEJORADO)
 // ============================================
 async function initUser() {
   const referrer = new URLSearchParams(window.location.search).get("ref");
+  console.log("🔗 Referrer URL:", referrer);
 
   const refDoc = doc(db, "users", user.uid);
   const snap = await getDoc(refDoc);
 
   if (!snap.exists()) {
+    console.log("📝 Creando nuevo usuario...");
+    
+    // Crear documento del usuario
     await setDoc(refDoc, {
+      uid: user.uid,
+      email: user.email || "",
       balance: 1,
       referrer: referrer || null,
       referrals: 0,
@@ -58,34 +66,82 @@ async function initUser() {
       lastDaily: 0,
       lastReset: new Date().toDateString(),
       todayEarnings: 0,
-      todayDate: new Date().toDateString()
+      todayDate: new Date().toDateString(),
+      createdAt: new Date().getTime()
     });
 
+    console.log("✅ Usuario creado");
+
     // Bonus inicial
-    await updateDoc(doc(db, "users", user.uid), {
+    await updateDoc(refDoc, {
       balance: increment(0.05),
       todayEarnings: increment(0.05)
     });
 
-    // REFERIDO
+    // 🔥 PROCESAR REFERIDO - MEJORADO
     if (referrer && referrer !== user.uid) {
-      const refUser = doc(db, "users", referrer);
-      const refSnap = await getDoc(refUser);
+      console.log("🎯 Procesando referido de:", referrer);
+      
+      try {
+        const refUser = doc(db, "users", referrer);
+        const refSnap = await getDoc(refUser);
 
-      if (refSnap.exists()) {
-        await updateDoc(refUser, {
-          referrals: increment(1),
-          referralEarnings: increment(0.5),
-          balance: increment(0.5)
-        });
+        if (refSnap.exists()) {
+          console.log("✅ Referrer encontrado, actualizando...");
+          
+          // Actualizar referidor
+          await updateDoc(refUser, {
+            referrals: increment(1),
+            referralEarnings: increment(0.5),
+            balance: increment(0.5)
+          });
+
+          // Crear registro de referral (para auditoría)
+          await addDoc(collection(db, "referrals"), {
+            referrerId: referrer,
+            referredId: user.uid,
+            referredEmail: user.email || "",
+            amount: 0.5,
+            date: new Date().getTime(),
+            status: "completed"
+          });
+
+          console.log("✅ Referido procesado correctamente");
+          showToast("¡Bienvenido! Tu referidor ganó $0.50 🎉");
+        } else {
+          console.warn("⚠️ Referrer no existe:", referrer);
+        }
+      } catch (error) {
+        console.error("❌ Error procesando referido:", error);
       }
     }
+  } else {
+    console.log("✅ Usuario ya existe");
   }
 }
 
 // ============================================
-// RESET DIARIO
+// 🔥 MONITOREAR REFERIDOS EN TIEMPO REAL
 // ============================================
+function monitorReferrals() {
+  if (!user) return;
+
+  // Escuchar cambios en la colección de referrals
+  const q = query(
+    collection(db, "referrals"),
+    where("referrerId", "==", user.uid)
+  );
+
+  onSnapshot(q, (snapshot) => {
+    console.log("📊 Referidos actualizados:", snapshot.docs.length);
+    
+    snapshot.forEach((doc) => {
+      console.log("📌 Referral:", doc.data());
+    });
+  });
+}
+
+// RESET DIARIO
 async function resetDaily() {
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
@@ -119,14 +175,15 @@ function realtimeBalance() {
     balance = data.balance || 0;
     document.getElementById("balance").innerText = "$" + balance.toFixed(2);
 
-    // 👥 REFERIDOS
-    document.getElementById("refCount").innerText = data.referrals || 0;
+    // 👥 REFERIDOS - ACTUALIZACIÓN EN TIEMPO REAL
+    const referrals = data.referrals || 0;
+    document.getElementById("refCount").innerText = referrals;
+    console.log("👥 Referidos actualizados:", referrals);
 
     // 📅 GANADO HOY
     const todayDate = new Date().toDateString();
 
     if (data.todayDate !== todayDate) {
-      // Reset automático diario
       updateDoc(doc(db, "users", user.uid), {
         todayEarnings: 0,
         todayDate: todayDate
@@ -367,7 +424,9 @@ function loadWithdrawals() {
 // 🔗 LINK DE REFERIDOS
 // ============================================
 function generateRefLink() {
-  document.getElementById("refLink").value = `${window.location.origin}?ref=${user.uid}`;
+  const refLink = `${window.location.origin}?ref=${user.uid}`;
+  document.getElementById("refLink").value = refLink;
+  console.log("🔗 Link de referidos:", refLink);
 }
 
 // ============================================
@@ -378,6 +437,7 @@ window.copyRef = async () => {
   try {
     await navigator.clipboard.writeText(text);
     showToast("Link copiado ✅");
+    console.log("✅ Link copiado al portapapeles");
   } catch (error) {
     console.error("Error al copiar:", error);
     showToast("Error al copiar ❌");
@@ -421,3 +481,9 @@ window.logout = function () {
       showToast("Error al cerrar sesión ❌");
     });
 };
+
+// ============================================
+// 🔧 DEBUG - Ver estado en consola
+// ============================================
+console.log("✅ Dashboard cargado correctamente");
+console.log("📱 Abre la consola (F12) para ver los logs de referidos");
