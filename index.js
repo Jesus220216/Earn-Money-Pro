@@ -30,7 +30,9 @@ app.get("/admin", (req, res) => {
 });
 
 
-// 💰 GANANCIA POR ANUNCIO
+// ============================================
+// 💰 GANANCIA (ANTI FRAUDE PRO)
+// ============================================
 app.post("/reward", async (req, res) => {
   try {
     const { uid, amount } = req.body;
@@ -40,6 +42,9 @@ app.post("/reward", async (req, res) => {
     const value = parseFloat(amount);
     if (isNaN(value)) return res.send("invalid amount");
 
+    // 🛑 límite por acción
+    if (value > 0.1) return res.send("too high");
+
     const userRef = db.collection("users").doc(uid);
     const userDoc = await userRef.get();
 
@@ -48,30 +53,42 @@ app.post("/reward", async (req, res) => {
     const user = userDoc.data();
     const now = Date.now();
 
-    // 🛑 ANTI FRAUDE
-    if ((user.dailyEarn || 0) >= 3)
-      return res.send("limit");
+    // 🛑 ANTI BOT
+    const ua = req.headers["user-agent"] || "";
+    if (!ua || ua.length < 10) return res.send("bot");
 
-    if (now - (user.lastEarn || 0) < 60000)
+    const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+
+    // 🛑 ANTI SPAM (tiempo entre acciones)
+    if (now - (user.lastEarn || 0) < 15000)
       return res.send("too fast");
 
-    // 💰 SUMAR
+    // 🛑 LÍMITE DIARIO
+    if ((user.dailyEarn || 0) >= 5)
+      return res.send("daily limit");
+
+    // 💰 ACTUALIZAR
     await userRef.update({
       balance: admin.firestore.FieldValue.increment(value),
       dailyEarn: (user.dailyEarn || 0) + value,
-      lastEarn: now
+      lastEarn: now,
+      lastIP: ip
     });
+
+    console.log("💰 Reward:", uid, value);
 
     res.send("ok");
 
   } catch (err) {
-    console.error(err);
+    console.error("❌ reward error:", err);
     res.send("error");
   }
 });
 
 
-// 🎯 POSTBACK CPA (CORREGIDO)
+// ============================================
+// 🎯 POSTBACK CPA (PROTEGIDO)
+// ============================================
 app.get("/postback", async (req, res) => {
   try {
     const { uid, amount, secret } = req.query;
@@ -85,7 +102,8 @@ app.get("/postback", async (req, res) => {
     const value = parseFloat(amount);
     if (isNaN(value)) return res.send("invalid amount");
 
-    if (value > 5) return res.send("blocked");
+    // 🛑 límite CPA
+    if (value > 10) return res.send("blocked");
 
     const userRef = db.collection("users").doc(uid);
     const userDoc = await userRef.get();
@@ -96,21 +114,26 @@ app.get("/postback", async (req, res) => {
       balance: admin.firestore.FieldValue.increment(value)
     });
 
+    console.log("🎯 CPA:", uid, value);
+
     res.send("ok");
 
   } catch (err) {
-    console.error(err);
+    console.error("❌ postback error:", err);
     res.send("error");
   }
 });
 
 
+// ============================================
 // 💳 VER RETIROS
+// ============================================
 app.get("/admin/withdrawals", async (req, res) => {
   if (req.query.secret !== SECRET)
     return res.send("denied");
 
   const snap = await db.collection("withdrawals").get();
+
   const data = snap.docs.map(d => ({
     id: d.id,
     ...d.data()
@@ -120,40 +143,51 @@ app.get("/admin/withdrawals", async (req, res) => {
 });
 
 
+// ============================================
 // ✅ APROBAR RETIRO
+// ============================================
 app.get("/admin/approve", async (req, res) => {
   if (req.query.secret !== SECRET)
     return res.send("denied");
 
   const { id } = req.query;
-
   if (!id) return res.send("invalid");
 
   await db.collection("withdrawals").doc(id).update({
     status: "approved"
   });
 
+  console.log("✅ Approved:", id);
+
   res.send("ok");
 });
 
 
+// ============================================
 // ❌ RECHAZAR RETIRO
+// ============================================
 app.get("/admin/reject", async (req, res) => {
   if (req.query.secret !== SECRET)
     return res.send("denied");
 
   const { id } = req.query;
-
   if (!id) return res.send("invalid");
 
   await db.collection("withdrawals").doc(id).update({
     status: "rejected"
   });
 
+  console.log("❌ Rejected:", id);
+
   res.send("ok");
 });
 
 
+// ============================================
 // 🚀 START
+// ============================================
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log("Server running on " + PORT));
+
+app.listen(PORT, () => {
+  console.log("🔥 Server PRO running on port " + PORT);
+});
