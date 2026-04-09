@@ -1,12 +1,12 @@
 // ============================================
-// EarnPro Dashboard - PRO VERSION FINAL FIXED
+// EarnPro Dashboard - PRO FULL FIXED FINAL
 // ============================================
 
 import { auth, db } from "./firebase.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, increment, addDoc, collection, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-// 🔗 LINK MONETIZACIÓN (CAMBIA SI QUIERES)
+// 🔗 LINK MONETIZACIÓN
 const LINK = "https://omg10.com/4/10751693";
 
 // VARIABLES
@@ -15,7 +15,7 @@ let balance = 0;
 let videosLeft = 0;
 
 // ============================================
-// 💰 SISTEMA DE GANANCIAS (MEJORADO)
+// 💰 SISTEMA GANANCIAS PRO (FIX REAL)
 // ============================================
 let lastAdTime = 0;
 const AD_COOLDOWN = 180000;
@@ -24,25 +24,15 @@ async function earn(amount = 0.01){
   try{
     if(!user) return;
 
-    const userRef = doc(db, "users", user.uid);
-    const snap = await getDoc(userRef);
-    const data = snap.data() || {};
-
-    // 💎 VIP = doble
-    if(data.vip) amount *= 2;
-
-    // 🛑 límite básico
-    if(amount > 0.1) return;
-
     const now = Date.now();
 
-    // 🎯 abrir anuncio cada 3 min
+    // 🎯 anuncio controlado
     if(now - lastAdTime > AD_COOLDOWN){
       lastAdTime = now;
       window.open(LINK, "_blank");
     }
 
-    await fetch("/reward", {
+    const res = await fetch("/reward", {
       method: "POST",
       headers: {"Content-Type":"application/json"},
       body: JSON.stringify({
@@ -50,6 +40,19 @@ async function earn(amount = 0.01){
         amount
       })
     });
+
+    const text = await res.text();
+
+    if(text !== "ok"){
+      console.log("Bloqueado:", text);
+
+      if(text === "too fast") showToast("Espera unos segundos ⏱");
+      if(text === "daily limit") showToast("Límite diario ❌");
+
+      return;
+    }
+
+    showToast("+" + amount.toFixed(2) + " 💰");
 
   }catch(e){
     console.log("Error earn:", e);
@@ -100,7 +103,6 @@ async function initUser() {
       createdAt: Date.now()
     });
 
-    // BONUS INICIAL
     await updateDoc(refDoc, {
       balance: increment(0.05),
       todayEarnings: increment(0.05)
@@ -115,7 +117,7 @@ async function initUser() {
         if (refSnap.exists()) {
           await updateDoc(refUser, {
             referrals: increment(1),
-            referralEarnings: increment(1), // 🔥 aumentado
+            referralEarnings: increment(1),
             balance: increment(1)
           });
 
@@ -134,7 +136,7 @@ async function initUser() {
 }
 
 // ============================================
-// 📊 REFERIDOS EN TIEMPO REAL
+// 📊 REFERIDOS
 // ============================================
 function monitorReferrals() {
   const q = query(
@@ -177,7 +179,10 @@ async function resetDaily() {
 // ============================================
 function realtimeBalance() {
   onSnapshot(doc(db, "users", user.uid), (snap) => {
-    const data = snap.data() || {};
+
+    if(!snap.exists()) return;
+
+    const data = snap.data();
 
     balance = data.balance || 0;
     document.getElementById("balance").innerText = "$" + balance.toFixed(2);
@@ -191,18 +196,20 @@ function realtimeBalance() {
 }
 
 // ============================================
-// 🎥 VIDEO
+// 🎥 VIDEO (FIX)
 // ============================================
-window.startVideo = function(){
+window.startVideo = async function(){
   if(videosLeft <= 0){
     showToast("Sin videos hoy ❌");
     return;
   }
 
-  earn(0.02);
+  await earn(0.02);
 
-  videosLeft--;
-  document.getElementById("videosLeft").innerText = "Restantes: " + videosLeft;
+  await updateDoc(doc(db, "users", user.uid), {
+    videosLeft: increment(-1),
+    todayEarnings: increment(0.02)
+  });
 
   showToast("Ganaste $0.02 🎥");
 };
@@ -260,13 +267,6 @@ window.buyVIP = async function(){
   });
 
   showToast("VIP activado 💎");
-};
-
-// ============================================
-// 📋 OFERTAS
-// ============================================
-window.openBox = function(){
-  window.open("https://TU-LINK-CPA", "_blank"); // 🔥 CAMBIAR
 };
 
 // ============================================
