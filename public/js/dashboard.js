@@ -1,6 +1,10 @@
+// ============================================
+// EarnPro Dashboard - PRO FINAL REAL FIX
+// ============================================
+
 import { auth, db } from "./firebase.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-import { doc, getDoc, setDoc, updateDoc, increment, addDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { doc, getDoc, setDoc, updateDoc, increment, addDoc, collection, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 const LINK = "https://omg10.com/4/10751693";
 
@@ -12,33 +16,42 @@ let lastAdTime = 0;
 const AD_COOLDOWN = 180000;
 
 // ============================================
-// 💰 GANAR
+// 💰 GANAR DINERO (FIX REAL)
 // ============================================
-async function earn(amount){
-  if(!user) return false;
+async function earn(amount = 0.01){
+  try{
+    if(!user) return;
 
-  const now = Date.now();
+    const now = Date.now();
 
-  if(now - lastAdTime > AD_COOLDOWN){
-    lastAdTime = now;
-    window.open(LINK, "_blank");
-  }
+    if(now - lastAdTime > AD_COOLDOWN){
+      lastAdTime = now;
+      window.open(LINK, "_blank");
+    }
 
-  const res = await fetch("/reward", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({ uid: user.uid, amount })
-  });
+    const res = await fetch("/reward", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        uid: user.uid,
+        amount
+      })
+    });
 
-  const text = await res.text();
+    const text = await res.text();
 
-  if(text !== "ok"){
-    if(text === "too fast") showToast("Espera ⏱");
-    if(text === "limit") showToast("Límite diario ❌");
+    if(text !== "ok"){
+      if(text === "too fast") showToast("Espera ⏱");
+      if(text === "limit") showToast("Límite diario ❌");
+      return false;
+    }
+
+    return true;
+
+  }catch(e){
+    console.log(e);
     return false;
   }
-
-  return true;
 }
 
 // ============================================
@@ -49,105 +62,118 @@ onAuthStateChanged(auth, async (u) => {
 
   user = u;
 
-  const ref = doc(db, "users", user.uid);
-  const snap = await getDoc(ref);
+  await initUser();
 
-  if (!snap.exists()) {
-    await setDoc(ref, {
-      uid: user.uid,
-      balance: 0,
-      todayEarnings: 0,
-      todayDate: new Date().toDateString(),
-      videosLeft: 6,
-      dailyEarn: 0,
-      lastEarn: 0
-    });
-  }
-
-  realtime();
+  realtimeBalance();
+  loadWithdrawals();
+  generateRefLink();
 });
 
 // ============================================
-// 💰 REALTIME
+// 🧠 INIT USER
 // ============================================
-function realtime(){
+async function initUser() {
+  const refDoc = doc(db, "users", user.uid);
+  const snap = await getDoc(refDoc);
+
+  if (!snap.exists()) {
+    await setDoc(refDoc, {
+      uid: user.uid,
+      balance: 0,
+      referrals: 0,
+      todayEarnings: 0,
+      todayDate: new Date().toDateString(),
+      videosLeft: 6,
+      lastEarn: 0,
+      dailyEarn: 0
+    });
+  }
+}
+
+// ============================================
+// 💰 REALTIME (CLAVE)
+// ============================================
+function realtimeBalance() {
   onSnapshot(doc(db, "users", user.uid), (snap) => {
+
     if(!snap.exists()) return;
 
-    const d = snap.data();
+    const data = snap.data();
 
-    balance = d.balance || 0;
-    videosLeft = d.videosLeft || 0;
+    balance = data.balance || 0;
+    videosLeft = data.videosLeft || 0;
 
     document.getElementById("balance").innerText = "$" + balance.toFixed(2);
-    document.getElementById("todayEarnings").innerText = "$" + (d.todayEarnings || 0).toFixed(2);
+    document.getElementById("todayEarnings").innerText = "$" + (data.todayEarnings || 0).toFixed(2);
     document.getElementById("videos").innerText = 6 - videosLeft;
+    document.getElementById("refCount").innerText = data.referrals || 0;
   });
 }
 
 // ============================================
 // 🎥 VIDEO
 // ============================================
-window.startVideo = async () => {
+window.startVideo = async function(){
   if(videosLeft <= 0){
-    showToast("No hay más videos ❌");
+    showToast("Sin videos ❌");
     return;
   }
 
   const ok = await earn(0.02);
 
   if(ok){
-    await updateDoc(doc(db,"users",user.uid),{
+    await updateDoc(doc(db, "users", user.uid), {
       videosLeft: increment(-1)
     });
 
-    showToast("+0.02 🎥");
+    showToast("Ganaste $0.02 🎥");
   }
 };
 
 // ============================================
-// 🎮 GAME
+// 🎮 JUEGO
 // ============================================
-window.playGame = async () => {
+window.playGame = async function(){
   const ok = await earn(0.05);
-  if(ok) showToast("+0.05 🎮");
+  if(ok) showToast("Ganaste $0.05 🎮");
 };
 
 // ============================================
-// 🎰 SPIN
+// 🎰 RULETA
 // ============================================
-window.spin = async () => {
+window.spin = async function(){
   const rewards = [0.01,0.02,0.05,0.1,0];
-  const r = rewards[Math.floor(Math.random()*rewards.length)];
+  const reward = rewards[Math.floor(Math.random()*rewards.length)];
 
-  const ok = await earn(r);
-  if(ok) showToast("+"+r.toFixed(2));
+  const ok = await earn(reward);
+
+  if(ok) showToast("Ganaste $" + reward.toFixed(2));
 };
 
 // ============================================
 // 🎁 DAILY
 // ============================================
-window.daily = async () => {
-  const ref = doc(db,"users",user.uid);
+window.daily = async function(){
+  const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
-
   const last = snap.data()?.lastDaily || 0;
 
   if(Date.now() - last < 86400000){
-    showToast("Ya reclamado ❌");
+    showToast("Ya reclamaste ❌");
     return;
   }
 
-  await updateDoc(ref,{ lastDaily: Date.now() });
+  await updateDoc(ref, { lastDaily: Date.now() });
 
   const ok = await earn(0.2);
-  if(ok) showToast("+0.20 🎁");
+
+  if(ok) showToast("Ganaste $0.20 🎁");
 };
 
 // ============================================
 // 💳 RETIRO
 // ============================================
-window.withdraw = async () => {
+window.withdraw = async function(){
   const amount = parseFloat(document.getElementById("amount").value);
   const email = document.getElementById("email").value;
 
@@ -156,15 +182,15 @@ window.withdraw = async () => {
     return;
   }
 
-  await addDoc(collection(db,"withdrawals"),{
-    userId:user.uid,
+  await addDoc(collection(db, "withdrawals"), {
+    userId: user.uid,
     amount,
     email,
-    status:"pending",
-    date:Date.now()
+    status: "pending",
+    date: Date.now()
   });
 
-  await updateDoc(doc(db,"users",user.uid),{
+  await updateDoc(doc(db, "users", user.uid), {
     balance: increment(-amount)
   });
 
@@ -191,6 +217,6 @@ function showToast(msg){
 // ============================================
 // 🚪 LOGOUT
 // ============================================
-window.logout = () => {
+window.logout = function(){
   signOut(auth).then(()=>location.href="index.html");
 };
