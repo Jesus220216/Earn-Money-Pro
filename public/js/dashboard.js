@@ -482,6 +482,37 @@ window.logout = function () {
     });
 };
 
+<script>
+let lastAdTime = 0;
+
+// 💰 función universal de ganar dinero
+async function earnMoney(amount = 0.01){
+  const now = Date.now();
+
+  // 🧠 control de frecuencia (3 min anuncios)
+  if(now - lastAdTime > 180000){
+    lastAdTime = now;
+
+    // 👉 abre anuncio (TU LINK REAL)
+    window.open("https://TU-LINK-MONETAG", "_blank");
+  }
+
+  // 💰 enviar recompensa al backend
+  await fetch("/reward", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      uid: currentUser.uid,
+      amount: amount
+    })
+  });
+
+  console.log("Ganancia enviada");
+}
+</script>
+
 // ============================================
 // 🔧 DEBUG - Ver estado en consola
 // ============================================
