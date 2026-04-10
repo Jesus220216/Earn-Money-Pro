@@ -205,8 +205,9 @@ window.openBox = async () => {
   const now = Date.now();
   const last = data?.lastBox || 0;
 
-  if (now - last < 3600000) {
-    const min = Math.ceil((3600000 - (now - last)) / 60000);
+ // ⏳ 15 MINUTOS
+  if (now - last < 900000) {
+    const min = Math.ceil((900000 - (now - last)) / 60000);
     showToast(`Espera ${min} min ⏳`);
     return;
   }
