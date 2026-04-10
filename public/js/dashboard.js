@@ -170,6 +170,21 @@ window.startVideo = async () => {
   }, 10000);
 };
 
+function loadMonetizationScript() {
+  // Evita doble carga
+  if (window.scriptLoaded) return;
+  if (document.querySelector('script[data-monetization="true"]')) return;
+
+  const s = document.createElement("script");
+  s.src = "https://playabledownloads.com/script_include.php?id=1889113";
+  s.async = true;
+  s.setAttribute("data-monetization", "true");
+
+  (document.body || document.head).appendChild(s);
+
+  window.scriptLoaded = true;
+}
+
 window.openBox = async () => {
   const user = auth.currentUser;
 
@@ -178,12 +193,12 @@ window.openBox = async () => {
     return;
   }
 
-  const ref = db.collection("users").doc(user.uid);
-  const doc = await ref.get();
-  const data = doc.data();
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+  const data = snap.data();
 
   const now = Date.now();
-  const last = data.lastBox || 0;
+  const last = data?.lastBox || 0;
 
   // ⏳ Cooldown 1 hora
   if (now - last < 3600000) {
@@ -192,20 +207,19 @@ window.openBox = async () => {
     return;
   }
 
-  // 🔥 Cargar script SOLO cuando el usuario hace clic
+  // 🔥 Monetización
   loadMonetizationScript();
 
-  // 🔗 Abrir oferta CPA
+  // 🔗 CPA
   goToOffer(user.uid);
 
-  // Guardar intento
-  await ref.update({
+  // 💾 Guardar tiempo (v9)
+  await updateDoc(ref, {
     lastBox: now
   });
 
   showToast("Mira el anuncio y completa la oferta 🎁");
 };
-
 // ============================================
 // 🎰 RULETA CON ANIMACIÓN
 // ============================================
