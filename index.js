@@ -6,7 +6,14 @@ const app = express();
 app.use(express.json());
 
 // 🔐 FIREBASE
-const serviceAccount = JSON.parse(process.env.FIREBASE_KEY);
+let serviceAccount;
+
+try {
+  serviceAccount = JSON.parse(process.env.FIREBASE_KEY);
+} catch (e) {
+  console.error("❌ FIREBASE_KEY ERROR");
+  process.exit(1);
+}
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
@@ -231,9 +238,9 @@ app.listen(PORT, () => {
   console.log("🔥 Server PRO running on port " + PORT);
 });
 
-const PORT = process.env.PORT || 3000;
+// 🔥 KEEP ALIVE (Render Free Fix)
+setInterval(() => {
+  console.log("🔥 keep alive");
+}, 300000);
 
-app.listen(PORT, () => {
-  console.log("🔥 Server PRO running on port " + PORT);
-});
 
