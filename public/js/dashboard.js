@@ -39,7 +39,7 @@ onAuthStateChanged(auth, async (u) => {
   realtimeBalance();
   loadWithdrawals();
   generateRefLink();
-  startBoxTimer();
+  initBoxTimer();
 });
 
 // ============================================
