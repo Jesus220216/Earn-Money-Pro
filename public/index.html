@@ -4,70 +4,108 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EarnPro - Gana Dinero Online</title>
+
     <meta name="monetag" content="139886b3940e2e0ab7082d178476fe5b">
+
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
 
-    <nav class="nav">
-        <div class="logo">💰 EarnPro</div>
-        <div class="auth-controls">
-            <input id="email" type="email" placeholder="Correo electrónico">
-            <input id="password" type="password" placeholder="Contraseña">
-            <button onclick="login()">Iniciar Sesión</button>
-            <button onclick="register()">Registrarse</button>
-        </div>
-    </nav>
+<nav class="nav">
+    <div class="logo">💰 EarnPro</div>
+    <div class="auth-controls">
+        <input id="email" type="email" placeholder="Correo electrónico">
+        <input id="password" type="password" placeholder="Contraseña">
+        <button onclick="login()">Iniciar Sesión</button>
+        <button onclick="register()">Registrarse</button>
+    </div>
+</nav>
 
-    <section class="hero">
-        <div class="container">
-            <h1>Gana Dinero Real Completando Tareas</h1>
-            <p>Únete a EarnPro y transforma tu tiempo libre en recompensas tangibles. ¡Es fácil, rápido y seguro!</p>
-            <a href="#" class="btn" onclick="register()">🚀 Empezar Ahora</a>
-        </div>
-    </section>
+<section class="hero">
+    <div class="container">
+        <h1>Gana Dinero Real Completando Tareas</h1>
+        <p>Únete a EarnPro y transforma tu tiempo libre en recompensas.</p>
 
-    <section class="features container">
-        <div class="feature-card">
-            <h3>Pagos Rápidos</h3>
-            <p>Recibe tus ganancias directamente en tu cuenta de PayPal, Amazon o Crypto.</p>
-        </div>
-        <div class="feature-card">
-            <h3>Tareas Variadas</h3>
-            <p>Desde ver videos hasta jugar, hay una tarea para cada uno.</p>
-        </div>
-        <div class="feature-card">
-            <h3>Comunidad Activa</h3>
-            <p>Únete a miles de usuarios que ya están ganando con EarnPro.</p>
-        </div>
-    </section>
+        <a href="#" class="btn" onclick="register(); return false;">
+            🚀 Empezar y Ganar Dinero
+        </a>
+    </div>
+</section>
 
-    <section class="cta-section">
-        <div class="container">
-            <h2>¿Listo para empezar a ganar?</h2>
-            <a href="#" class="btn" onclick="register()">¡Regístrate Hoy!</a>
-        </div>
-    </section>
+<section class="features container">
+    <div class="feature-card">
+        <h3>Pagos Rápidos</h3>
+        <p>PayPal, Crypto y más.</p>
+    </div>
 
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2026 EarnPro. Todos los derechos reservados.</p>
-        </div>
-    </footer>
+    <div class="feature-card">
+        <h3>Tareas Variadas</h3>
+        <p>Videos, juegos y ofertas.</p>
+    </div>
 
-    <script type="module" src="js/auth.js"></script>
-    <script src="//omg10.com/4/10828691"></script>
-    <script>
-        const params = new URLSearchParams(window.location.search);
-        const ref = params.get("ref");
-        if (ref) {
-            sessionStorage.setItem("referrer", ref);
-            console.log("REF GUARDADO:", ref);
-        }
-    </script>
-   
-    <script src="https://quge5.com/88/tag.min.js" data-zone="227876" async data-cfasync="false"></script>
+    <div class="feature-card">
+        <h3>Comunidad Activa</h3>
+        <p>Miles de usuarios ganando.</p>
+    </div>
+</section>
+
+<section class="cta-section">
+    <div class="container">
+        <h2>¿Listo para empezar?</h2>
+        <a href="#" class="btn" onclick="register(); return false;">
+            ¡Regístrate Hoy!
+        </a>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container">
+        <p>&copy; 2026 EarnPro</p>
+    </div>
+</footer>
+
+<script type="module" src="js/auth.js"></script>
+
+<!-- 🔥 POPUNDER (CONTROLADO) -->
+<script>
+setTimeout(() => {
+    let s = document.createElement("script");
+    s.src = "//omg10.com/4/10828691";
+    s.async = true;
+    document.body.appendChild(s);
+}, 12000);
+</script>
+
+<!-- 🔥 MONETAG CONTROLADO -->
+<script>
+setTimeout(() => {
+    let s = document.createElement("script");
+    s.src = "https://quge5.com/88/tag.min.js";
+    s.dataset.zone = "227876";
+    s.async = true;
+    document.body.appendChild(s);
+}, 15000);
+</script>
+
+<!-- 🔥 REF TRACKING -->
+<script>
+const params = new URLSearchParams(window.location.search);
+const ref = params.get("ref");
+
+if (ref) {
+    sessionStorage.setItem("referrer", ref);
+    console.log("REF VALIDADO:", ref);
+}
+</script>
+
+<!-- 🔥 UX FUNNEL -->
+<script>
+setTimeout(() => {
+    alert("🔥 Bienvenido a EarnPro! Completa tareas para ganar dinero.");
+}, 2000);
+</script>
 
 </body>
 </html>
