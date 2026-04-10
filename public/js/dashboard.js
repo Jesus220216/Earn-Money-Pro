@@ -185,6 +185,11 @@ function loadMonetizationScript() {
   window.scriptLoaded = true;
 }
 
+function goToOffer(uid) {
+  const link = `https://omg10.com/4/10751693?uid=${uid}`;
+  window.open(link, "_blank");
+}
+
 window.openBox = async () => {
   const user = auth.currentUser;
 
