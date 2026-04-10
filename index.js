@@ -237,7 +237,3 @@ app.listen(PORT, () => {
   console.log("🔥 Server PRO running on port " + PORT);
 });
 
-// 🔥 KEEP ALIVE (Render Free Fix)
-setInterval(() => {
-  console.log("🔥 keep alive");
-}, 300000);
