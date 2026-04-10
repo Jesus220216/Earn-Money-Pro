@@ -36,6 +36,7 @@ onAuthStateChanged(auth, async (u) => {
   realtimeBalance();
   loadWithdrawals();
   generateRefLink();
+  startBoxTimer();
 });
 
 // ============================================
@@ -205,22 +206,69 @@ window.openBox = async () => {
   const now = Date.now();
   const last = data?.lastBox || 0;
 
- // ⏳ 15 MINUTOS
-  if (now - last < 900000) {
-    const min = Math.ceil((900000 - (now - last)) / 60000);
-    showToast(`Espera ${min} min ⏳`);
+  if (now - last < COOLDOWN) {
+    showToast("Espera a que termine el tiempo ⏳");
+    startBoxTimer(last);
     return;
   }
 
-  // 🔗 SOLO CPA (SIN SCRIPT ROTO)
   goToOffer(user.uid);
 
   await updateDoc(ref, {
     lastBox: now
   });
 
+  startBoxTimer(now);
+
   showToast("Completa la oferta 🎁");
 };
+
+// ============================================
+// ⏳ CONTADOR VISUAL OPEN BOX (PRO)
+// ============================================
+function startBoxTimer() {
+  const timerEl = document.getElementById("boxTimer");
+
+  if (!timerEl || !user) return;
+
+  setInterval(async () => {
+    const ref = doc(db, "users", user.uid);
+    const snap = await getDoc(ref);
+    const data = snap.data();
+
+    const now = Date.now();
+    const last = data?.lastBox || 0;
+
+    const remaining = 900000 - (now - last); // 15 min
+
+    if (remaining <= 0) {
+      timerEl.innerText = "Disponible 🎁";
+      timerEl.style.color = "#10B981"; // verde
+      return;
+    }
+
+    const min = Math.floor(remaining / 60000);
+    const sec = Math.floor((remaining % 60000) / 1000);
+
+    timerEl.innerText = `Disponible en ${min}:${sec.toString().padStart(2, "0")}`;
+    timerEl.style.color = "#EF4444"; // rojo
+
+  }, 1000);
+}
+
+// ============================================
+// ⏳ INIT TIMER
+// ============================================
+async function initBoxTimer() {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+  const data = snap.data();
+
+  startBoxTimer(data?.lastBox || 0);
+}
 // ============================================
 // 🎰 RULETA CON ANIMACIÓN
 // ============================================
