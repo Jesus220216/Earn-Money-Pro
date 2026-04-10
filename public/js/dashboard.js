@@ -1,6 +1,5 @@
 // ============================================
-// EarnPro Dashboard - JavaScript Mejorado
-// Integración con Firebase + UI Profesional
+// EarnPro Dashboard - JavaScript PRO FINAL
 // ============================================
 
 import { auth, db } from "./firebase.js";
@@ -10,10 +9,14 @@ import { doc, getDoc, setDoc, updateDoc, increment, addDoc, collection, onSnapsh
 // 🔗 LINK MONETIZACIÓN
 const LINK = "https://omg10.com/4/10751693";
 
-// VARIABLES GLOBALES
+// ⏳ 15 MINUTOS
+const COOLDOWN = 900000;
+
+// VARIABLES
 let user;
 let balance = 0;
 let videosLeft = 0;
+let timerInterval = null;
 
 // ============================================
 // 🔥 ANUNCIO
@@ -23,7 +26,7 @@ function openAd() {
 }
 
 // ============================================
-// LOGIN - AUTENTICACIÓN
+// LOGIN
 // ============================================
 onAuthStateChanged(auth, async (u) => {
   if (!u) return location.href = "index.html";
@@ -36,11 +39,11 @@ onAuthStateChanged(auth, async (u) => {
   realtimeBalance();
   loadWithdrawals();
   generateRefLink();
-  startBoxTimer();
+  initBoxTimer();
 });
 
 // ============================================
-// 🧠 CREAR USUARIO + REFERIDOS
+// CREAR USUARIO
 // ============================================
 async function initUser() {
   const referrer = new URLSearchParams(window.location.search).get("ref");
@@ -57,18 +60,18 @@ async function initUser() {
       videosLeft: 6,
       spins: 0,
       lastDaily: 0,
+      lastBox: 0,
       lastReset: new Date().toDateString(),
       todayEarnings: 0,
       todayDate: new Date().toDateString()
     });
 
-    // Bonus inicial
-    await updateDoc(doc(db, "users", user.uid), {
+    await updateDoc(refDoc, {
       balance: increment(0.05),
       todayEarnings: increment(0.05)
     });
 
-    // REFERIDO
+    // REFERIDOS
     if (referrer && referrer !== user.uid) {
       const refUser = doc(db, "users", referrer);
       const refSnap = await getDoc(refUser);
@@ -110,51 +113,33 @@ async function resetDaily() {
 }
 
 // ============================================
-// 💰 BALANCE EN TIEMPO REAL
+// BALANCE REALTIME
 // ============================================
 function realtimeBalance() {
   onSnapshot(doc(db, "users", user.uid), (snap) => {
     const data = snap.data() || {};
 
-    // 💰 BALANCE TOTAL
     balance = data.balance || 0;
     document.getElementById("balance").innerText = "$" + balance.toFixed(2);
 
-    // 👥 REFERIDOS
     document.getElementById("refCount").innerText = data.referrals || 0;
-
-    // 📅 GANADO HOY
-    const todayDate = new Date().toDateString();
-
-    if (data.todayDate !== todayDate) {
-      // Reset automático diario
-      updateDoc(doc(db, "users", user.uid), {
-        todayEarnings: 0,
-        todayDate: todayDate
-      });
-    }
 
     const today = data.todayEarnings || 0;
     document.getElementById("todayEarnings").innerText = "$" + today.toFixed(2);
 
-    // 🎥 VIDEOS VISTOS HOY
     const videosWatched = 6 - (data.videosLeft || 0);
     document.getElementById("videos").innerText = videosWatched;
   });
 }
 
 // ============================================
-// 🎥 VER VIDEO
+// 🎥 VIDEO
 // ============================================
 window.startVideo = async () => {
   if (videosLeft <= 0) {
-    showToast("No hay videos disponibles hoy ❌");
+    showToast("No hay videos hoy ❌");
     return;
   }
-
-  const video = document.getElementById("videoPlayer");
-  video.src = "https://www.w3schools.com/html/mov_bbb.mp4";
-  video.play();
 
   openAd();
 
@@ -164,6 +149,7 @@ window.startVideo = async () => {
       videosLeft: increment(-1),
       todayEarnings: increment(0.02)
     });
+
     videosLeft--;
     document.getElementById("videosLeft").innerText = "Restantes: " + videosLeft;
 
@@ -171,33 +157,18 @@ window.startVideo = async () => {
   }, 10000);
 };
 
-function loadMonetizationScript() {
-  // Evita doble carga
-  if (window.scriptLoaded) return;
-  if (document.querySelector('script[data-monetization="true"]')) return;
-
-  const s = document.createElement("script");
-  s.src = "https://playabledownloads.com/script_include.php?id=1889113";
-  s.async = true;
-  s.setAttribute("data-monetization", "true");
-
-  (document.body || document.head).appendChild(s);
-
-  window.scriptLoaded = true;
-}
-
+// ============================================
+// 🔗 CPA
+// ============================================
 function goToOffer(uid) {
-  const link = `https://omg10.com/4/10751693?uid=${uid}`;
-  window.open(link, "_blank");
+  window.open(`${LINK}?uid=${uid}`, "_blank");
 }
 
+// ============================================
+// 🎁 OPEN BOX PRO
+// ============================================
 window.openBox = async () => {
-  const user = auth.currentUser;
-
-  if (!user) {
-    showToast("Inicia sesión");
-    return;
-  }
+  if (!user) return showToast("Inicia sesión");
 
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
@@ -207,7 +178,7 @@ window.openBox = async () => {
   const last = data?.lastBox || 0;
 
   if (now - last < COOLDOWN) {
-    showToast("Espera a que termine el tiempo ⏳");
+    showToast("Espera ⏳");
     startBoxTimer(last);
     return;
   }
@@ -224,76 +195,60 @@ window.openBox = async () => {
 };
 
 // ============================================
-// ⏳ CONTADOR VISUAL OPEN BOX (PRO)
+// ⏳ TIMER PRO
 // ============================================
-function startBoxTimer() {
-  const timerEl = document.getElementById("boxTimer");
+function startBoxTimer(lastTime) {
+  const el = document.getElementById("boxTimer");
+  if (!el) return;
 
-  if (!timerEl || !user) return;
+  if (timerInterval) clearInterval(timerInterval);
 
-  setInterval(async () => {
-    const ref = doc(db, "users", user.uid);
-    const snap = await getDoc(ref);
-    const data = snap.data();
-
+  timerInterval = setInterval(() => {
     const now = Date.now();
-    const last = data?.lastBox || 0;
-
-    const remaining = 900000 - (now - last); // 15 min
+    const remaining = COOLDOWN - (now - lastTime);
 
     if (remaining <= 0) {
-      timerEl.innerText = "Disponible 🎁";
-      timerEl.style.color = "#10B981"; // verde
+      el.innerText = "Disponible 🎁";
+      el.style.color = "#10B981";
+      clearInterval(timerInterval);
       return;
     }
 
     const min = Math.floor(remaining / 60000);
     const sec = Math.floor((remaining % 60000) / 1000);
 
-    timerEl.innerText = `Disponible en ${min}:${sec.toString().padStart(2, "0")}`;
-    timerEl.style.color = "#EF4444"; // rojo
+    el.innerText = `Disponible en ${min}:${sec.toString().padStart(2, "0")}`;
+    el.style.color = "#EF4444";
 
   }, 1000);
 }
 
 // ============================================
-// ⏳ INIT TIMER
+// INIT TIMER
 // ============================================
 async function initBoxTimer() {
-  const user = auth.currentUser;
-  if (!user) return;
-
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
   const data = snap.data();
 
   startBoxTimer(data?.lastBox || 0);
 }
+
 // ============================================
-// 🎰 RULETA CON ANIMACIÓN
+// 🎰 RULETA
 // ============================================
 window.spin = async () => {
-  const wheel = document.getElementById("wheel");
-
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
   let spins = snap.data()?.spins || 0;
 
-  if (spins >= 10) {
-    showToast("Límite alcanzado hoy ❌");
-    return;
-  }
+  if (spins >= 10) return showToast("Límite ❌");
 
   spins++;
   await updateDoc(ref, { spins });
 
   const rewards = [0.01, 0.02, 0.05, 0.1, 0];
-  const index = Math.floor(Math.random() * rewards.length);
-  const reward = rewards[index];
-
-  // 🎡 ANIMACIÓN
-  const deg = 360 * 5 + (index * (360 / rewards.length));
-  wheel.style.transform = `rotate(${deg}deg)`;
+  const reward = rewards[Math.floor(Math.random() * rewards.length)];
 
   openAd();
 
@@ -306,58 +261,7 @@ window.spin = async () => {
 
       showToast(`Ganaste $${reward.toFixed(2)} 🎰`);
     }
-
-    if (spins === 10) {
-      await updateDoc(ref, {
-        balance: increment(1),
-        todayEarnings: increment(1)
-      });
-
-      showToast("BONUS $1 🔥");
-    }
   }, 4000);
-};
-
-// ============================================
-// 🎮 JUEGO REAL + DINERO
-// ============================================
-window.playGame = async () => {
-  openAd();
-
-  setTimeout(async () => {
-    await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(0.05),
-      todayEarnings: increment(0.05)
-    });
-
-    showToast("Ganaste $0.05 🎮");
-  }, 15000);
-};
-
-// ============================================
-// 🎁 DAILY BONUS
-// ============================================
-window.daily = async () => {
-  const ref = doc(db, "users", user.uid);
-  const snap = await getDoc(ref);
-  const lastDaily = snap.data()?.lastDaily || 0;
-
-  if (Date.now() - lastDaily < 86400000) {
-    showToast("Ya reclamaste hoy ❌");
-    return;
-  }
-
-  openAd();
-
-  setTimeout(async () => {
-    await updateDoc(ref, {
-      balance: increment(0.2),
-      lastDaily: Date.now(),
-      todayEarnings: increment(0.2)
-    });
-
-    showToast("Ganaste $0.20 🎁");
-  }, 10000);
 };
 
 // ============================================
@@ -367,117 +271,51 @@ window.withdraw = async () => {
   const amount = parseFloat(document.getElementById("amount").value);
   const email = document.getElementById("email").value;
 
-  // Validaciones
-  if (!email || !email.includes("@")) {
-    showToast("Email inválido ❌");
-    return;
-  }
+  if (!email.includes("@")) return showToast("Email inválido");
+  if (amount < 5) return showToast("Mínimo $5");
+  if (amount > balance) return showToast("Sin saldo");
 
-  if (isNaN(amount) || amount < 5) {
-    showToast("Mínimo $5 ❌");
-    return;
-  }
+  await addDoc(collection(db, "withdrawals"), {
+    userId: user.uid,
+    amount,
+    email,
+    status: "pending",
+    date: Date.now()
+  });
 
-  if (amount > balance) {
-    showToast("Saldo insuficiente ❌");
-    return;
-  }
+  await updateDoc(doc(db, "users", user.uid), {
+    balance: increment(-amount)
+  });
 
-  try {
-    // Crear documento de retiro
-    await addDoc(collection(db, "withdrawals"), {
-      userId: user.uid,
-      amount,
-      email,
-      status: "pending",
-      date: Date.now()
-    });
-
-    // Descontar del balance
-    await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(-amount)
-    });
-
-    // Limpiar formulario
-    document.getElementById("amount").value = "";
-    document.getElementById("email").value = "";
-
-    showToast("Retiro enviado 🚀");
-  } catch (error) {
-    console.error("Error en retiro:", error);
-    showToast("Error al procesar retiro ❌");
-  }
+  showToast("Retiro enviado 🚀");
 };
 
 // ============================================
-// HISTORIAL DE RETIROS
+// HISTORIAL
 // ============================================
 function loadWithdrawals() {
   onSnapshot(collection(db, "withdrawals"), (snap) => {
     const div = document.getElementById("withdrawList");
     div.innerHTML = "";
 
-    let hasWithdrawals = false;
-
     snap.forEach(docu => {
       const w = docu.data();
       if (w.userId !== user.uid) return;
 
-      hasWithdrawals = true;
-
-      const statusEmoji = w.status === "completed" ? "✅" : w.status === "pending" ? "⏳" : "❌";
-      const statusText = w.status === "completed" ? "Completado" : w.status === "pending" ? "Pendiente" : "Rechazado";
-
-      div.innerHTML += `
-        <div class="activity-item">
-          <div class="activity-dot ${w.status === 'completed' ? 'completed' : 'pending'}"></div>
-          <div class="activity-info">
-            <p class="activity-type">Retiro ${statusEmoji}</p>
-            <p class="activity-time">${statusText} - ${new Date(w.date).toLocaleDateString()}</p>
-          </div>
-          <p class="activity-amount">-$${w.amount.toFixed(2)}</p>
-        </div>
-      `;
+      div.innerHTML += `<p>-$${w.amount} (${w.status})</p>`;
     });
-
-    if (!hasWithdrawals) {
-      div.innerHTML = `
-        <div class="activity-item">
-          <div class="activity-dot completed"></div>
-          <div class="activity-info">
-            <p class="activity-type">Sin retiros aún</p>
-            <p class="activity-time">Realiza tu primer retiro</p>
-          </div>
-          <p class="activity-amount">$0.00</p>
-        </div>
-      `;
-    }
   });
 }
 
 // ============================================
-// 🔗 LINK DE REFERIDOS
+// REF
 // ============================================
 function generateRefLink() {
   document.getElementById("refLink").value = `${window.location.origin}?ref=${user.uid}`;
 }
 
 // ============================================
-// 📋 COPIAR LINK
-// ============================================
-window.copyRef = async () => {
-  const text = document.getElementById("refLink").value;
-  try {
-    await navigator.clipboard.writeText(text);
-    showToast("Link copiado ✅");
-  } catch (error) {
-    console.error("Error al copiar:", error);
-    showToast("Error al copiar ❌");
-  }
-};
-
-// ============================================
-// 🔔 NOTIFICACIONES (TOAST)
+// TOAST
 // ============================================
 function showToast(msg) {
   const t = document.createElement("div");
@@ -487,29 +325,13 @@ function showToast(msg) {
   t.style.right = "20px";
   t.style.background = "#10B981";
   t.style.color = "white";
-  t.style.padding = "12px 16px";
-  t.style.borderRadius = "8px";
-  t.style.fontWeight = "600";
-  t.style.zIndex = "9999";
-  t.style.boxShadow = "0 10px 15px -3px rgba(0, 0, 0, 0.1)";
-  t.style.fontFamily = "'Poppins', sans-serif";
+  t.style.padding = "10px";
+  t.style.borderRadius = "6px";
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 2000);
 }
 
 // ============================================
-// 🚪 LOGOUT
+// LOGOUT
 // ============================================
-window.logout = function () {
-  signOut(auth)
-    .then(() => {
-      showToast("Sesión cerrada ✅");
-      setTimeout(() => {
-        window.location.href = "index.html";
-      }, 1000);
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-      showToast("Error al cerrar sesión ❌");
-    });
-};
+window.logout = () => signOut(auth);
