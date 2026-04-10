@@ -200,25 +200,20 @@ window.openBox = async () => {
   const now = Date.now();
   const last = data?.lastBox || 0;
 
-  // ⏳ Cooldown 1 hora
   if (now - last < 3600000) {
     const min = Math.ceil((3600000 - (now - last)) / 60000);
     showToast(`Espera ${min} min ⏳`);
     return;
   }
 
-  // 🔥 Monetización
-  loadMonetizationScript();
-
-  // 🔗 CPA
+  // 🔗 SOLO CPA (SIN SCRIPT ROTO)
   goToOffer(user.uid);
 
-  // 💾 Guardar tiempo (v9)
   await updateDoc(ref, {
     lastBox: now
   });
 
-  showToast("Mira el anuncio y completa la oferta 🎁");
+  showToast("Completa la oferta 🎁");
 };
 // ============================================
 // 🎰 RULETA CON ANIMACIÓN
