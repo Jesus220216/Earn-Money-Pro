@@ -14,7 +14,7 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
-// 🔐 SECRET SEGURO
+// 🔐 SECRET
 const SECRET = "EarnPro_SECURE_9xLk29@2026";
 
 // 🌐 STATIC
@@ -24,14 +24,14 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// 🔥 ADMIN PANEL SIMPLE
+// 🔥 ADMIN
 app.get("/admin", (req, res) => {
   res.send("ADMIN OK 🔥");
 });
 
 
 // ============================================
-// 💰 GANANCIA (ANTI FRAUDE PRO)
+// 💰 GANANCIAS (ANTI FRAUDE)
 // ============================================
 app.post("/reward", async (req, res) => {
   try {
@@ -42,7 +42,6 @@ app.post("/reward", async (req, res) => {
     const value = parseFloat(amount);
     if (isNaN(value)) return res.send("invalid amount");
 
-    // 🛑 límite por acción
     if (value > 0.1) return res.send("too high");
 
     const userRef = db.collection("users").doc(uid);
@@ -59,7 +58,7 @@ app.post("/reward", async (req, res) => {
 
     const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
 
-    // 🛑 ANTI SPAM (tiempo entre acciones)
+    // 🛑 ANTI SPAM
     if (now - (user.lastEarn || 0) < 15000)
       return res.send("too fast");
 
@@ -67,7 +66,6 @@ app.post("/reward", async (req, res) => {
     if ((user.dailyEarn || 0) >= 5)
       return res.send("daily limit");
 
-    // 💰 ACTUALIZAR
     await userRef.update({
       balance: admin.firestore.FieldValue.increment(value),
       dailyEarn: (user.dailyEarn || 0) + value,
@@ -86,30 +84,31 @@ app.post("/reward", async (req, res) => {
 });
 
 
-
-
-
 // ============================================
-// 🎯 POSTBACK CPA + LOOT BOX (PRO)
+// 🎁 LOOT BOX (PROBABILIDADES)
 // ============================================
 function getRewardType() {
   const rand = Math.random() * 100;
 
-  if (rand < 70) return "common";
-  if (rand < 90) return "rare";
+  if (rand < 80) return "common";
+  if (rand < 95) return "rare";
   if (rand < 99) return "epic";
   return "legendary";
 }
 
 function getRewardAmount(type) {
   switch(type) {
-    case "common": return 0.05;
-    case "rare": return 0.15;
-    case "epic": return 0.5;
-    case "legendary": return 2;
+    case "common": return 0.01;
+    case "rare": return 0.03;
+    case "epic": return 0.1;
+    case "legendary": return 0.5;
   }
 }
 
+
+// ============================================
+// 🎯 POSTBACK CPA (REAL + BONUS)
+// ============================================
 app.get("/postback", async (req, res) => {
   try {
     const { uid, amount, secret } = req.query;
@@ -123,7 +122,7 @@ app.get("/postback", async (req, res) => {
     const value = parseFloat(amount);
     if (isNaN(value)) return res.send("invalid amount");
 
-    // 🛑 Anti abuso CPA
+    // 🛑 PROTECCIÓN
     if (value > 10) return res.send("blocked");
 
     const userRef = db.collection("users").doc(uid);
@@ -131,19 +130,30 @@ app.get("/postback", async (req, res) => {
 
     if (!userDoc.exists) return res.send("no user");
 
-    // 🎁 Loot box generado en servidor (NO manipulable)
+    const userData = userDoc.data();
+
+    // 🛑 ANTI DUPLICADO
+    if (userData.lastCPA === value) {
+      return res.send("duplicate");
+    }
+
+    // 🎁 BONUS LOOT BOX
     const type = getRewardType();
-    const reward = getRewardAmount(type);
+    const bonus = getRewardAmount(type);
+
+    // 💰 TOTAL
+    const total = value + bonus;
 
     await userRef.update({
-      balance: admin.firestore.FieldValue.increment(reward),
+      balance: admin.firestore.FieldValue.increment(total),
       lastRewardType: type,
-      lastReward: reward,
+      lastBonus: bonus,
       lastCPA: value,
+      lastTotal: total,
       lastUpdate: Date.now()
     });
 
-    console.log(`🎁 ${type.toUpperCase()} | UID: ${uid} | +${reward}`);
+    console.log(`💰 CPA: ${value} + 🎁 ${type} (${bonus}) = ${total}`);
 
     res.send("ok");
 
