@@ -17,6 +17,7 @@ const COOLDOWN = 900000;
 let user;
 let balance = 0;
 let videosLeft = 0;
+let boxInterval = null;
 
 // ============================================
 // 🔥 ANUNCIO
