@@ -173,8 +173,40 @@ window.startVideo = async () => {
 // ============================================
 // 🎁 ABRIR CAJA (Próximamente)
 // ============================================
-window.openBox = () => {
-  showToast("Próximamente 🎁");
+window.openBox = async () => {
+  const user = auth.currentUser;
+
+  if (!user) {
+    showToast("Inicia sesión");
+    return;
+  }
+
+  const ref = db.collection("users").doc(user.uid);
+  const doc = await ref.get();
+  const data = doc.data();
+
+  const now = Date.now();
+  const last = data.lastBox || 0;
+
+  // ⏳ Cooldown 1 hora
+  if (now - last < 3600000) {
+    const min = Math.ceil((3600000 - (now - last)) / 60000);
+    showToast(`Espera ${min} min ⏳`);
+    return;
+  }
+
+  // 🔥 Cargar script SOLO cuando el usuario hace clic
+  loadMonetizationScript();
+
+  // 🔗 Abrir oferta CPA
+  goToOffer(user.uid);
+
+  // Guardar intento
+  await ref.update({
+    lastBox: now
+  });
+
+  showToast("Mira el anuncio y completa la oferta 🎁");
 };
 
 // ============================================
