@@ -86,9 +86,30 @@ app.post("/reward", async (req, res) => {
 });
 
 
+
+
+
 // ============================================
-// 🎯 POSTBACK CPA (PROTEGIDO)
+// 🎯 POSTBACK CPA + LOOT BOX (PRO)
 // ============================================
+function getRewardType() {
+  const rand = Math.random() * 100;
+
+  if (rand < 70) return "common";
+  if (rand < 90) return "rare";
+  if (rand < 99) return "epic";
+  return "legendary";
+}
+
+function getRewardAmount(type) {
+  switch(type) {
+    case "common": return 0.05;
+    case "rare": return 0.15;
+    case "epic": return 0.5;
+    case "legendary": return 2;
+  }
+}
+
 app.get("/postback", async (req, res) => {
   try {
     const { uid, amount, secret } = req.query;
@@ -102,7 +123,7 @@ app.get("/postback", async (req, res) => {
     const value = parseFloat(amount);
     if (isNaN(value)) return res.send("invalid amount");
 
-    // 🛑 límite CPA
+    // 🛑 Anti abuso CPA
     if (value > 10) return res.send("blocked");
 
     const userRef = db.collection("users").doc(uid);
@@ -110,11 +131,19 @@ app.get("/postback", async (req, res) => {
 
     if (!userDoc.exists) return res.send("no user");
 
+    // 🎁 Loot box generado en servidor (NO manipulable)
+    const type = getRewardType();
+    const reward = getRewardAmount(type);
+
     await userRef.update({
-      balance: admin.firestore.FieldValue.increment(value)
+      balance: admin.firestore.FieldValue.increment(reward),
+      lastRewardType: type,
+      lastReward: reward,
+      lastCPA: value,
+      lastUpdate: Date.now()
     });
 
-    console.log("🎯 CPA:", uid, value);
+    console.log(`🎁 ${type.toUpperCase()} | UID: ${uid} | +${reward}`);
 
     res.send("ok");
 
