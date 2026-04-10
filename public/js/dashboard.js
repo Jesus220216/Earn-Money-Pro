@@ -170,9 +170,6 @@ window.startVideo = async () => {
   }, 10000);
 };
 
-// ============================================
-// 🎁 ABRIR CAJA (Próximamente)
-// ============================================
 window.openBox = async () => {
   const user = auth.currentUser;
 
