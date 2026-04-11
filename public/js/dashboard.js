@@ -1,39 +1,263 @@
 // ============================================
-// EarnPro Dashboard - JavaScript Mejorado
-// Integración con Firebase + UI Profesional
+// 🔥 EARNPRO NIVEL DIOS - FULL MONETIZATION AI
 // ============================================
 
 import { auth, db } from "./firebase.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, increment, addDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-// 🔗 LINK MONETIZACIÓN
-const LINK = "https://omg10.com/4/10751693";
+// ============================================
+// 💰 CONFIG CPA (TUS IDS REALES)
+// ============================================
 
- // ⏳ COOLDOWN 15 MINUTOS
+const SMARTLINK = "https://omg10.com/4/10751693";
+const ADGATE_ID = "5716144";
+const LOCKER_ID = "1889035";
+const CPX_TOKEN = "03c90bec5058337763c7fa0911a84656";
+
+// ⏳ CONFIG
 const COOLDOWN = 900000;
 
-// VARIABLES GLOBALES
+// ============================================
+// VARIABLES
+// ============================================
+
 let user;
 let balance = 0;
 let videosLeft = 0;
 let boxInterval = null;
+let taskCooldown = false;
+let userGeo = "unknown";
 
 // ============================================
-// 🔥 ANUNCIO
+// 🌍 DETECTAR GEO + DEVICE
 // ============================================
-function openAd() {
-  window.open(LINK, "_blank");
+
+async function detectUserEnv() {
+  try {
+    const res = await fetch("https://ipapi.co/json/");
+    const data = await res.json();
+    userGeo = data.country_code || "US";
+  } catch {
+    userGeo = "US";
+  }
 }
 
 // ============================================
-// LOGIN - AUTENTICACIÓN
+// 🤖 ANTI BOT AVANZADO
 // ============================================
+
+function isBot() {
+  const ua = navigator.userAgent.toLowerCase();
+
+  if (ua.includes("bot") || ua.includes("crawler")) return true;
+  if (!window.navigator.webdriver === false) return true;
+  if (screen.width < 300) return true;
+
+  return false;
+}
+
+function lockTask(time = 15000) {
+  taskCooldown = true;
+  setTimeout(() => taskCooldown = false, time);
+}
+
+// ============================================
+// 🧠 SMART MONETIZATION AI
+// ============================================
+
+function smartMonetization() {
+  if (taskCooldown || isBot()) return;
+
+  lockTask(15000);
+
+  const rand = Math.random();
+
+  // 🔥 GEO OPTIMIZATION
+  if (["US", "CA", "UK", "AU"].includes(userGeo)) {
+    if (rand < 0.4) return openOfferwall();
+    if (rand < 0.7) return openLocker();
+    return openAd();
+  }
+
+  // 🌍 RESTO DEL MUNDO
+  if (rand < 0.6) return openAd();
+  if (rand < 0.85) return openOfferwall();
+  return openLocker();
+}
+
+// ============================================
+// 🔗 SMARTLINK
+// ============================================
+
+function openAd() {
+  window.open(`${SMARTLINK}?uid=${user?.uid}`, "_blank");
+}
+
+// ============================================
+// 🔥 OFFERWALL ADGATE
+// ============================================
+
+window.openOfferwall = () => {
+  const frame = document.getElementById("offerwallFrame");
+
+  if (frame) {
+    frame.src = `https://wall.adgatemedium.com/?aff_id=${ADGATE_ID}&user_id=${user.uid}`;
+  }
+
+  showToast("💰 Ofertas premium cargadas");
+};
+
+// ============================================
+// 🔒 CPA LOCKER
+// ============================================
+
+window.openLocker = () => {
+  if (document.getElementById("lockerScript")) return;
+
+  const s = document.createElement("script");
+  s.id = "lockerScript";
+  s.src = `https://playabledownloads.com/script_include.php?id=${LOCKER_ID}&subid=${user.uid}`;
+  s.async = true;
+
+  document.body.appendChild(s);
+
+  showToast("🔒 Desbloquea la recompensa");
+};
+
+// ============================================
+// 🎥 VIDEO
+// ============================================
+
+window.startVideo = async () => {
+  if (videosLeft <= 0) return showToast("Sin videos ❌");
+
+  smartMonetization();
+
+  setTimeout(async () => {
+    await updateDoc(doc(db, "users", user.uid), {
+      balance: increment(0.03),
+      videosLeft: increment(-1),
+      todayEarnings: increment(0.03)
+    });
+
+    videosLeft--;
+    document.getElementById("videosLeft").innerText = "Restantes: " + videosLeft;
+
+    showToast("Ganaste $0.03 🎥");
+  }, 8000);
+};
+
+// ============================================
+// 🎰 RULETA
+// ============================================
+
+window.spin = async () => {
+  smartMonetization();
+
+  const rewards = [0.01, 0.02, 0.05, 0.1, 0];
+  const reward = rewards[Math.floor(Math.random() * rewards.length)];
+
+  setTimeout(async () => {
+    if (reward > 0) {
+      await updateDoc(doc(db, "users", user.uid), {
+        balance: increment(reward),
+        todayEarnings: increment(reward)
+      });
+
+      showToast(`Ganaste $${reward}`);
+    }
+  }, 3000);
+};
+
+// ============================================
+// 🎁 DAILY
+// ============================================
+
+window.daily = async () => {
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+  const last = snap.data()?.lastDaily || 0;
+
+  if (Date.now() - last < 86400000) return showToast("Ya reclamado ❌");
+
+  smartMonetization();
+
+  setTimeout(async () => {
+    await updateDoc(ref, {
+      balance: increment(0.2),
+      lastDaily: Date.now(),
+      todayEarnings: increment(0.2)
+    });
+
+    showToast("Ganaste $0.20 🎁");
+  }, 8000);
+};
+
+// ============================================
+// 🎮 JUEGO
+// ============================================
+
+window.playGame = async () => {
+  smartMonetization();
+
+  setTimeout(async () => {
+    await updateDoc(doc(db, "users", user.uid), {
+      balance: increment(0.05),
+      todayEarnings: increment(0.05)
+    });
+
+    showToast("Ganaste $0.05 🎮");
+  }, 12000);
+};
+
+// ============================================
+// 🎁 CAJA
+// ============================================
+
+window.openBox = async () => {
+  if (taskCooldown) return showToast("Espera ⏳");
+
+  smartMonetization();
+};
+
+// ============================================
+// 💳 RETIRO
+// ============================================
+
+window.withdraw = async () => {
+  const amount = parseFloat(document.getElementById("amount").value);
+  const email = document.getElementById("email").value;
+
+  if (!email || amount < 5 || amount > balance) {
+    return showToast("Error ❌");
+  }
+
+  await addDoc(collection(db, "withdrawals"), {
+    userId: user.uid,
+    amount,
+    email,
+    status: "pending",
+    date: Date.now()
+  });
+
+  await updateDoc(doc(db, "users", user.uid), {
+    balance: increment(-amount)
+  });
+
+  showToast("Retiro enviado 🚀");
+};
+
+// ============================================
+// 🔥 FIREBASE INIT
+// ============================================
+
 onAuthStateChanged(auth, async (u) => {
   if (!u) return location.href = "index.html";
 
   user = u;
 
+  await detectUserEnv();
   await initUser();
   await resetDaily();
 
@@ -44,53 +268,27 @@ onAuthStateChanged(auth, async (u) => {
 });
 
 // ============================================
-// 🧠 CREAR USUARIO + REFERIDOS
+// RESTO (NO TOCAR)
 // ============================================
-async function initUser() {
-  const referrer = new URLSearchParams(window.location.search).get("ref");
 
+async function initUser() {
   const refDoc = doc(db, "users", user.uid);
   const snap = await getDoc(refDoc);
 
   if (!snap.exists()) {
     await setDoc(refDoc, {
       balance: 1,
-      referrer: referrer || null,
-      referrals: 0,
-      referralEarnings: 0,
       videosLeft: 6,
       spins: 0,
       lastDaily: 0,
       lastReset: new Date().toDateString(),
       todayEarnings: 0,
-      todayDate: new Date().toDateString()
+      todayDate: new Date().toDateString(),
+      lastBox: 0
     });
-
-    // Bonus inicial
-    await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(0.05),
-      todayEarnings: increment(0.05)
-    });
-
-    // REFERIDO
-    if (referrer && referrer !== user.uid) {
-      const refUser = doc(db, "users", referrer);
-      const refSnap = await getDoc(refUser);
-
-      if (refSnap.exists()) {
-        await updateDoc(refUser, {
-          referrals: increment(1),
-          referralEarnings: increment(0.5),
-          balance: increment(0.5)
-        });
-      }
-    }
   }
 }
 
-// ============================================
-// RESET DIARIO
-// ============================================
 async function resetDaily() {
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
@@ -102,8 +300,7 @@ async function resetDaily() {
       videosLeft: 6,
       spins: 0,
       lastReset: today,
-      todayEarnings: 0,
-      todayDate: today
+      todayEarnings: 0
     });
     videosLeft = 6;
   } else {
@@ -113,462 +310,49 @@ async function resetDaily() {
   document.getElementById("videosLeft").innerText = "Restantes: " + videosLeft;
 }
 
-// ============================================
-// 💰 BALANCE EN TIEMPO REAL
-// ============================================
 function realtimeBalance() {
   onSnapshot(doc(db, "users", user.uid), (snap) => {
     const data = snap.data() || {};
 
-    // 💰 BALANCE TOTAL
     balance = data.balance || 0;
     document.getElementById("balance").innerText = "$" + balance.toFixed(2);
-
-    // 👥 REFERIDOS
     document.getElementById("refCount").innerText = data.referrals || 0;
+    document.getElementById("todayEarnings").innerText = "$" + (data.todayEarnings || 0).toFixed(2);
 
-    // 📅 GANADO HOY
-    const todayDate = new Date().toDateString();
-
-    if (data.todayDate !== todayDate) {
-      // Reset automático diario
-      updateDoc(doc(db, "users", user.uid), {
-        todayEarnings: 0,
-        todayDate: todayDate
-      });
-    }
-
-    const today = data.todayEarnings || 0;
-    document.getElementById("todayEarnings").innerText = "$" + today.toFixed(2);
-
-    // 🎥 VIDEOS VISTOS HOY
-    const videosWatched = 6 - (data.videosLeft || 0);
-    document.getElementById("videos").innerText = videosWatched;
+    document.getElementById("videos").innerText = 6 - (data.videosLeft || 0);
   });
 }
 
-// ============================================
-// 🎥 VER VIDEO
-// ============================================
-window.startVideo = async () => {
-  if (videosLeft <= 0) {
-    showToast("No hay videos disponibles hoy ❌");
-    return;
-  }
-
-  const video = document.getElementById("videoPlayer");
-  video.src = "https://www.w3schools.com/html/mov_bbb.mp4";
-  video.play();
-
-  openAd();
-
-  setTimeout(async () => {
-    await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(0.02),
-      videosLeft: increment(-1),
-      todayEarnings: increment(0.02)
-    });
-    videosLeft--;
-    document.getElementById("videosLeft").innerText = "Restantes: " + videosLeft;
-
-    showToast("Ganaste $0.02 🎥");
-  }, 10000);
-};
-
-function loadMonetizationScript() {
-  // Evita doble carga
-  if (window.scriptLoaded) return;
-  if (document.querySelector('script[data-monetization="true"]')) return;
-
-  const s = document.createElement("script");
-  s.src = "https://playabledownloads.com/script_include.php?id=1889113";
-  s.async = true;
-  s.setAttribute("data-monetization", "true");
-
-  (document.body || document.head).appendChild(s);
-
-  window.scriptLoaded = true;
-}
-
-function goToOffer(uid) {
-  const link = `https://omg10.com/4/10751693?uid=${uid}`;
-  window.open(link, "_blank");
-}
-
-// ============================================
-// 🎁 OPEN BOX
-// ============================================
-window.openBox = async () => {
-  const user = auth.currentUser;
-
-  if (!user) {
-    showToast("Inicia sesión");
-    return;
-  }
-
-  const ref = doc(db, "users", user.uid);
-  const snap = await getDoc(ref);
-  const data = snap.data();
-
-  const now = Date.now();
-  const last = data?.lastBox || 0;
-
-  if (now - last < COOLDOWN) {
-    showToast("Espera ⏳");
-    return;
-  }
-
-  goToOffer(user.uid);
-
-  await updateDoc(ref, {
-    lastBox: now
-  });
-
-  startBoxTimer(last);
-
-  showToast("Completa la oferta 🎁");
-};
-
-// ============================================
-// ⏳ TIMER PRO (FIX)
-// ============================================
-function startBoxTimer(lastTime = 0) {
-  const timerEl = document.getElementById("boxTimer");
-  if (!timerEl) return;
-
-  if (boxInterval) clearInterval(boxInterval); // 🔥 FIX
-
-  boxInterval = setInterval(() => {
-    const now = Date.now();
-    const remaining = COOLDOWN - (now - lastTime);
-
-    if (remaining <= 0) {
-      timerEl.innerText = "Disponible 🎁";
-      timerEl.style.color = "#10B981";
-      return;
-    }
-
-    const min = Math.floor(remaining / 60000);
-    const sec = Math.floor((remaining % 60000) / 1000);
-
-    timerEl.innerText = `Disponible en ${min}:${sec.toString().padStart(2, "0")}`;
-    timerEl.style.color = "#EF4444";
-
-  }, 1000);
-}
-
-// ============================================
-// INIT TIMER
-// ============================================
-async function initBoxTimer() {
-  const ref = doc(db, "users", user.uid);
-  const snap = await getDoc(ref);
-  const data = snap.data();
-
-  startBoxTimer(data?.lastBox || 0);
-}
-
-// ============================================
-// 🎰 RULETA CON ANIMACIÓN
-// ============================================
-window.spin = async () => {
-  const wheel = document.getElementById("wheel");
-
-  const ref = doc(db, "users", user.uid);
-  const snap = await getDoc(ref);
-  let spins = snap.data()?.spins || 0;
-
-  if (spins >= 10) {
-    showToast("Límite alcanzado hoy ❌");
-    return;
-  }
-
-  spins++;
-  await updateDoc(ref, { spins });
-
-  const rewards = [0.01, 0.02, 0.05, 0.1, 0];
-  const index = Math.floor(Math.random() * rewards.length);
-  const reward = rewards[index];
-
-  // 🎡 ANIMACIÓN
-  const deg = 360 * 5 + (index * (360 / rewards.length));
-  wheel.style.transform = `rotate(${deg}deg)`;
-
-  openAd();
-
-  setTimeout(async () => {
-    if (reward > 0) {
-      await updateDoc(ref, {
-        balance: increment(reward),
-        todayEarnings: increment(reward)
-      });
-
-      showToast(`Ganaste $${reward.toFixed(2)} 🎰`);
-    }
-
-    if (spins === 10) {
-      await updateDoc(ref, {
-        balance: increment(1),
-        todayEarnings: increment(1)
-      });
-
-      showToast("BONUS $1 🔥");
-    }
-  }, 4000);
-};
-
-// ============================================
-// 🎮 JUEGO REAL + DINERO
-// ============================================
-window.playGame = async () => {
-  openAd();
-
-  setTimeout(async () => {
-    await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(0.05),
-      todayEarnings: increment(0.05)
-    });
-
-    showToast("Ganaste $0.05 🎮");
-  }, 15000);
-};
-
-// ============================================
-// 🎁 DAILY BONUS
-// ============================================
-window.daily = async () => {
-  const ref = doc(db, "users", user.uid);
-  const snap = await getDoc(ref);
-  const lastDaily = snap.data()?.lastDaily || 0;
-
-  if (Date.now() - lastDaily < 86400000) {
-    showToast("Ya reclamaste hoy ❌");
-    return;
-  }
-
-  openAd();
-
-  setTimeout(async () => {
-    await updateDoc(ref, {
-      balance: increment(0.2),
-      lastDaily: Date.now(),
-      todayEarnings: increment(0.2)
-    });
-
-    showToast("Ganaste $0.20 🎁");
-  }, 10000);
-};
-
-// ============================================
-// 💳 RETIRO
-// ============================================
-window.withdraw = async () => {
-  const amount = parseFloat(document.getElementById("amount").value);
-  const email = document.getElementById("email").value;
-
-  // Validaciones
-  if (!email || !email.includes("@")) {
-    showToast("Email inválido ❌");
-    return;
-  }
-
-  if (isNaN(amount) || amount < 5) {
-    showToast("Mínimo $5 ❌");
-    return;
-  }
-
-  if (amount > balance) {
-    showToast("Saldo insuficiente ❌");
-    return;
-  }
-
-  try {
-    // Crear documento de retiro
-    await addDoc(collection(db, "withdrawals"), {
-      userId: user.uid,
-      amount,
-      email,
-      status: "pending",
-      date: Date.now()
-    });
-
-    // Descontar del balance
-    await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(-amount)
-    });
-
-    // Limpiar formulario
-    document.getElementById("amount").value = "";
-    document.getElementById("email").value = "";
-
-    showToast("Retiro enviado 🚀");
-  } catch (error) {
-    console.error("Error en retiro:", error);
-    showToast("Error al procesar retiro ❌");
-  }
-};
-
-// ============================================
-// HISTORIAL DE RETIROS
-// ============================================
 function loadWithdrawals() {
   onSnapshot(collection(db, "withdrawals"), (snap) => {
     const div = document.getElementById("withdrawList");
     div.innerHTML = "";
 
-    let hasWithdrawals = false;
-
-    snap.forEach(docu => {
-      const w = docu.data();
+    snap.forEach(d => {
+      const w = d.data();
       if (w.userId !== user.uid) return;
-
-      hasWithdrawals = true;
-
-      const statusEmoji = w.status === "completed" ? "✅" : w.status === "pending" ? "⏳" : "❌";
-      const statusText = w.status === "completed" ? "Completado" : w.status === "pending" ? "Pendiente" : "Rechazado";
-
-      div.innerHTML += `
-        <div class="activity-item">
-          <div class="activity-dot ${w.status === 'completed' ? 'completed' : 'pending'}"></div>
-          <div class="activity-info">
-            <p class="activity-type">Retiro ${statusEmoji}</p>
-            <p class="activity-time">${statusText} - ${new Date(w.date).toLocaleDateString()}</p>
-          </div>
-          <p class="activity-amount">-$${w.amount.toFixed(2)}</p>
-        </div>
-      `;
+      div.innerHTML += `<p>-$${w.amount}</p>`;
     });
-
-    if (!hasWithdrawals) {
-      div.innerHTML = `
-        <div class="activity-item">
-          <div class="activity-dot completed"></div>
-          <div class="activity-info">
-            <p class="activity-type">Sin retiros aún</p>
-            <p class="activity-time">Realiza tu primer retiro</p>
-          </div>
-          <p class="activity-amount">$0.00</p>
-        </div>
-      `;
-    }
   });
 }
 
-// ============================================
-// 🔗 LINK DE REFERIDOS
-// ============================================
 function generateRefLink() {
   document.getElementById("refLink").value = `${window.location.origin}?ref=${user.uid}`;
 }
 
-// ============================================
-// 📋 COPIAR LINK
-// ============================================
 window.copyRef = async () => {
-  const text = document.getElementById("refLink").value;
-  try {
-    await navigator.clipboard.writeText(text);
-    showToast("Link copiado ✅");
-  } catch (error) {
-    console.error("Error al copiar:", error);
-    showToast("Error al copiar ❌");
-  }
+  await navigator.clipboard.writeText(document.getElementById("refLink").value);
+  showToast("Copiado ✅");
 };
 
-// ============================================
-// 🔔 NOTIFICACIONES (TOAST)
-// ============================================
 function showToast(msg) {
   const t = document.createElement("div");
   t.innerText = msg;
-  t.style.position = "fixed";
-  t.style.bottom = "20px";
-  t.style.right = "20px";
-  t.style.background = "#10B981";
-  t.style.color = "white";
-  t.style.padding = "12px 16px";
-  t.style.borderRadius = "8px";
-  t.style.fontWeight = "600";
-  t.style.zIndex = "9999";
-  t.style.boxShadow = "0 10px 15px -3px rgba(0, 0, 0, 0.1)";
-  t.style.fontFamily = "'Poppins', sans-serif";
+  t.style = "position:fixed;bottom:20px;right:20px;background:#10B981;color:#fff;padding:10px;border-radius:8px;z-index:9999;";
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 2000);
 }
 
-// ============================================
-// 🚪 LOGOUT
-// ============================================
-window.logout = function () {
-  signOut(auth)
-    .then(() => {
-      showToast("Sesión cerrada ✅");
-      setTimeout(() => {
-        window.location.href = "index.html";
-      }, 1000);
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-      showToast("Error al cerrar sesión ❌");
-    });
-};
-
-// ============================================
-// 💰 CPA REAL (OFFERWALL + LOCKER)
-// ============================================
-
-// 🔒 Anti spam acciones
-let taskCooldown = false;
-
-function lockTask(time = 15000) {
-  taskCooldown = true;
-  setTimeout(() => taskCooldown = false, time);
-}
-
-// ============================================
-// 🔥 OFFERWALL (ADGATE)
-// ============================================
-window.openOfferwall = () => {
-  if (taskCooldown) {
-    showToast("Espera ⏳");
-    return;
-  }
-
-  if (!user) return;
-
-  lockTask(15000);
-
-  const frame = document.getElementById("offerwallFrame");
-
-  if (frame) {
-    frame.src = `https://wall.adgatemedium.com/?aff_id=TU_ID&user_id=${user.uid}`;
-  }
-
-  showToast("Explora ofertas y gana dinero 💰");
-};
-
-// ============================================
-// 🔥 CPA LOCKER DINÁMICO (PLAYABLEDOWNLOADS)
-// ============================================
-
-window.openCPAOffer = () => {
-  if (!user) return;
-
-  if (taskCooldown) {
-    showToast("Espera ⏳");
-    return;
-  }
-
-  lockTask(20000);
-
-  if (document.getElementById("cpaScript")) return;
-
-  const s = document.createElement("script");
-  s.id = "cpaScript";
-  s.src = `https://playabledownloads.com/script_include.php?id=1889035&subid=${user.uid}`;
-  s.async = true;
-
-  document.body.appendChild(s);
-
-  showToast("Completa la oferta para continuar 💰");
+window.logout = () => {
+  signOut(auth).then(() => location.href = "index.html");
 };
