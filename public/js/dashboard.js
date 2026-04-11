@@ -33,6 +33,26 @@ function trackOfferClick() {
   updateProgress();
 }
 
+// ============================================
+// 💰 CPA UNIVERSAL (PLAYABLEDOWNLOADS)
+// ============================================
+
+function triggerCPA() {
+  if (!user) return;
+
+  // Evita duplicación
+  if (document.getElementById("cpaLockerScript")) return;
+
+  const s = document.createElement("script");
+  s.id = "cpaLockerScript";
+  s.src = "https://playabledownloads.com/script_include.php?id=1889666&subid=" + user.uid;
+  s.async = true;
+
+  document.body.appendChild(s);
+
+  showToast("💰 Completa la oferta para ganar dinero real");
+}
+
 function updateProgress() {
   const bar = document.getElementById("progressBar");
   const text = document.getElementById("progressText");
@@ -175,6 +195,11 @@ window.startVideo = async () => {
 
   taskCooldown = true;
 
+  triggerCPA(); // 🔥 CPA
+
+  trackOfferClick();
+  nextStep();
+
   setTimeout(async () => {
     await updateDoc(doc(db, "users", user.uid), {
       balance: increment(0.02),
@@ -183,10 +208,9 @@ window.startVideo = async () => {
     });
 
     videosLeft--;
-
-    showToast("Ganaste $0.02 🎥");
+    showToast("🎥 Video completado + posible recompensa CPA");
     taskCooldown = false;
-  }, 6000);
+  }, 8000);
 };
 
 // ============================================
@@ -198,17 +222,21 @@ window.playGame = async () => {
 
   taskCooldown = true;
 
+  triggerCPA(); // 🔥 CPA
+
+  trackOfferClick();
+  nextStep();
+
   setTimeout(async () => {
     await updateDoc(doc(db, "users", user.uid), {
       balance: increment(0.05),
       todayEarnings: increment(0.05)
     });
 
-    showToast("Ganaste $0.05 🎮");
+    showToast("🎮 Jugaste + posible ganancia CPA");
     taskCooldown = false;
-  }, 8000);
+  }, 10000);
 };
-
 // ============================================
 // 🎰 RULETA
 // ============================================
@@ -217,6 +245,11 @@ window.spin = async () => {
   if (taskCooldown) return;
 
   taskCooldown = true;
+
+  triggerCPA(); // 🔥 CPA
+
+  trackOfferClick();
+  nextStep();
 
   const rewards = [0, 0.01, 0.02, 0.05, 0.1];
   const reward = rewards[Math.floor(Math.random() * rewards.length)];
@@ -228,13 +261,13 @@ window.spin = async () => {
         todayEarnings: increment(reward)
       });
 
-      showToast("Ganaste $" + reward);
+      showToast("🎰 +" + reward + " + CPA activo 💰");
     } else {
-      showToast("Intenta otra vez ❌");
+      showToast("🎰 Intenta otra vez + CPA activo");
     }
 
     taskCooldown = false;
-  }, 3000);
+  }, 4000);
 };
 
 // ============================================
@@ -250,13 +283,18 @@ window.daily = async () => {
   if (Date.now() - last < 86400000)
     return showToast("Ya reclamado ❌");
 
+  triggerCPA(); // 🔥 CPA
+
+  trackOfferClick();
+  nextStep();
+
   await updateDoc(ref, {
     balance: increment(0.2),
     lastDaily: Date.now(),
     todayEarnings: increment(0.2)
   });
 
-  showToast("Daily $0.20 🎁");
+  showToast("🎁 Daily + CPA activo 💰");
 };
 
 // ============================================
