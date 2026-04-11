@@ -32,22 +32,22 @@
 <div class="stats-grid">
 
   <div class="stat-card">
-    <h3>Saldo</h3>
+    <h3>💰 Saldo</h3>
     <p id="balance">$0.00</p>
   </div>
 
   <div class="stat-card">
-    <h3>Referidos</h3>
+    <h3>👥 Referidos</h3>
     <p id="refCount">0</p>
   </div>
 
   <div class="stat-card">
-    <h3>Hoy</h3>
+    <h3>📈 Hoy</h3>
     <p id="todayEarnings">$0.00</p>
   </div>
 
   <div class="stat-card">
-    <h3>Videos</h3>
+    <h3>🎥 Videos</h3>
     <p id="videos">0</p>
   </div>
 
@@ -59,7 +59,7 @@
   <h2>🎯 Progreso Bonus</h2>
 
   <div style="background:#111827; border-radius:999px; overflow:hidden;">
-    <div id="progressBar" style="height:10px;width:0%;background:#10B981;"></div>
+    <div id="progressBar" style="height:10px;width:0%;background:#10B981;transition:width 0.3s ease;"></div>
   </div>
 
   <p id="progressText">0/3 ofertas completadas</p>
@@ -87,10 +87,11 @@
 <div style="margin-bottom:10px;">
   <button class="btn-pro btn-video" onclick="loadOffers()">Cargar ofertas</button>
   <button class="btn-pro btn-spin" onclick="openLocker()">Locker</button>
-  <button onclick="loadOffers()">🔥 Offerwall (PRO)</button>
 </div>
 
-<div id="offers"></div>
+<div id="offers" style="min-height: 50px;">
+  <p style="color: #94a3b8; font-size: 13px;">Cargando ofertas...</p>
+</div>
 
 </div>
 
@@ -99,20 +100,34 @@
 
 <h2>💳 Retiro</h2>
 
-<input type="email" id="email" placeholder="Email">
-<input type="number" id="amount" placeholder="Monto">
+<input type="email" id="email" placeholder="Email de PayPal" style="width: 100%; margin-bottom: 10px; padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
+<input type="number" id="amount" placeholder="Monto (mínimo $5)" style="width: 100%; margin-bottom: 10px; padding: 10px; border-radius: 8px; border: 1px solid #ccc;" step="0.01" min="5">
 
-<button class="btn-pro btn-game" onclick="withdraw()">Retirar</button>
+<button class="btn-pro btn-game" style="width: 100%;" onclick="withdraw()">Retirar</button>
+
+</div>
+
+<!-- REFERIDOS -->
+<div class="section-card" style="padding:15px; margin-top:20px;">
+
+<h2>🔗 Sistema de Referidos</h2>
+<p style="font-size: 13px; color: #94a3b8; margin-bottom: 10px;">¡Gana $1.00 por cada amigo que se registre con tu enlace!</p>
+
+<div style="display: flex; gap: 5px;">
+  <input type="text" id="refLink" readonly style="flex: 1; margin-top: 0; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #10B981; font-weight: bold;" value="Cargando enlace...">
+  <button class="btn-pro btn-video" onclick="copyRef()" style="white-space: nowrap;">Copiar</button>
+</div>
 
 </div>
 
 <!-- LOGOUT -->
-<div style="margin-top:20px; text-align:center;">
+<div style="margin-top:20px; text-align:center; margin-bottom:30px;">
 <button class="btn-pro btn-spin" onclick="logout()">Cerrar sesión</button>
 </div>
 
 </div>
 
+<!-- SCRIPT DE DASHBOARD -->
 <script type="module" src="/js/dashboard.js"></script>
 
 </body>
