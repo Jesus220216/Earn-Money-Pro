@@ -507,73 +507,87 @@ const url = `https://www.cpagrip.com/common/offer_feed_json.php?user_id=2515689&
   const people = Math.floor(Math.random() * 20) + 5;
   const timer = Math.floor(Math.random() * 10) + 5;
 
-  html += `
-    <div style="
-      background:#fff;
-      padding:14px;
-      margin-bottom:12px;
-      border-radius:12px;
-      box-shadow:0 4px 12px rgba(0,0,0,0.08);
-      border:1px solid #eee;
-    ">
-      
-      <h4 style="margin-bottom:5px;">💰 ${offer.title}</h4>
+ html += `
+<div style="
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 14px;
+  margin-bottom: 12px;
+  border-radius: 14px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  backdrop-filter: blur(10px);
+  color: #E5E7EB;
+  transition: all 0.3s ease;
+">
 
-      <p style="
-        font-size:13px;
-        color:#10B981;
-        font-weight:bold;
-        margin-bottom:6px;
-      ">
-        Gana hasta $${reward} 💸
-      </p>
+  <h4 style="
+    margin-bottom: 6px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+  ">
+    💰 ${offer.title}
+  </h4>
 
-      <p style="
-        font-size:11px;
-        color:#ff3b3b;
-        font-weight:bold;
-      ">
-        🔥 ${people} personas haciéndolo ahora
-      </p>
+  <p style="
+    font-size: 13px;
+    font-weight: 700;
+    color: #10B981;
+    margin-bottom: 6px;
+  ">
+    💸 Gana hasta $${reward}
+  </p>
 
-      <p style="
-        font-size:11px;
-        color:#999;
-        margin-bottom:10px;
-      ">
-        ⏳ Expira en ${timer} min
-      </p>
+  <p style="
+    font-size: 11px;
+    font-weight: 600;
+    color: #F87171;
+    margin-bottom: 4px;
+  ">
+    🔥 ${people} personas haciéndolo ahora
+  </p>
 
-      <a href="${offer.offerlink}" 
-         target="_blank" 
-         rel="noopener noreferrer"
-       onclick="trackOfferClick(); nextStep();
-         style="
-           display:block;
-           text-align:center;
-           padding:12px;
-           background:linear-gradient(90deg,#10B981,#059669);
-           color:#fff;
-           border-radius:8px;
-           text-decoration:none;
-           font-weight:bold;
-         ">
-         💸 Completar y ganar dinero
-      </a>
+  <p style="
+    font-size: 11px;
+    color: #94A3B8;
+    margin-bottom: 10px;
+  ">
+    ⏳ Expira en ${timer} min
+  </p>
 
-      <p style="
-        font-size:11px;
-        color:#10B981;
-        font-weight:bold;
-        margin-top:8px;
-      ">
-        🎯 Completa 3 ofertas y gana BONUS
-      </p>
+  <a href="${offer.offerlink}"
+     target="_blank"
+     rel="noopener noreferrer"
+     onclick="trackOfferClick(); nextStep();"
+     style="
+       display: block;
+       text-align: center;
+       padding: 12px;
+       border-radius: 12px;
+       font-weight: 800;
+       text-decoration: none;
+       color: #fff;
+       background: linear-gradient(135deg,#10B981,#059669);
+       box-shadow: 0 8px 20px rgba(16,185,129,0.25);
+       transition: all 0.2s ease;
+     "
+     onmouseover="this.style.transform='scale(1.03)'"
+     onmouseout="this.style.transform='scale(1)'"
+  >
+    🚀 Completar y ganar dinero
+  </a>
 
-    </div>
-  `;
-});
+  <p style="
+    font-size: 11px;
+    margin-top: 10px;
+    color: #10B981;
+    font-weight: 700;
+  ">
+    🎯 Completa 3 ofertas y gana BONUS
+  </p>
 
+</div>
+`;
       container.innerHTML = html;
 
       showToast("Ofertas cargadas 💰");
