@@ -14,6 +14,7 @@ import {
   onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
+
 // ============================================
 // 🔐 VARIABLES GLOBALES
 // ============================================
@@ -25,32 +26,85 @@ let taskCooldown = false;
 let step = 1 + Math.floor(Math.random() * 2);
 let completedOffers = 0;
 
-function trackOfferClick() {
-  if (completedOffers >= 3) return;
-
-  completedOffers++;
-
-  updateProgress();
-}
 
 // ============================================
-// 💰 CPA UNIVERSAL (PLAYABLEDOWNLOADS)
+// 💰 CPA CORE SYSTEM (OBLIGATORIO)
+// ============================================
+
+function openCPA(url, offerId = "unknown") {
+  if (!user || !user.uid) return;
+
+  const finalURL =
+    url +
+    (url.includes("?") ? "&" : "?") +
+    "tracking_id=" + encodeURIComponent(user.uid) +
+    "&offer_id=" + encodeURIComponent(offerId);
+
+  window.open(finalURL, "_blank");
+  showToast("💰 Completa la oferta para ganar dinero real");
+}
+
+
+// ============================================
+// 🎰 CPA ACTIONS (BOTONES)
+// ============================================
+
+window.startVideo = () => {
+  openCPA("https://omg10.com/4/10751693", "video_01");
+};
+
+window.playGame = () => {
+  openCPA("https://www.profitablecpmratenetwork.com/a97wfwyyb", "game_01");
+};
+
+window.spin = () => {
+  openCPA("https://omg10.com/4/10751693", "spin_01");
+};
+
+window.daily = () => {
+  openCPA("https://omg10.com/4/10751693", "daily_01");
+};
+
+window.openBox = () => {
+  openCPA("https://omg10.com/4/10751693", "box_01");
+};
+
+
+// ============================================
+// 🔒 CPA LOCKER (PLAYABLE DOWNLOADS)
 // ============================================
 
 function triggerCPA() {
-  if (!user) return;
+  if (!user || !user.uid) return;
 
-  // Evita duplicación
   if (document.getElementById("cpaLockerScript")) return;
 
   const s = document.createElement("script");
   s.id = "cpaLockerScript";
-  s.src = "https://playabledownloads.com/script_include.php?id=1889666&subid=" + user.uid;
+
+  s.src =
+    "https://playabledownloads.com/script_include.php" +
+    "?id=1889666" +
+    "&tracking_id=" + encodeURIComponent(user.uid) +
+    "&offer_id=locker_01";
+
   s.async = true;
 
   document.body.appendChild(s);
 
   showToast("💰 Completa la oferta para ganar dinero real");
+}
+
+
+// ============================================
+// 📊 PROGRESS SYSTEM
+// ============================================
+
+function trackOfferClick() {
+  if (completedOffers >= 3) return;
+
+  completedOffers++;
+  updateProgress();
 }
 
 function updateProgress() {
@@ -69,6 +123,11 @@ function updateProgress() {
   }
 }
 
+
+// ============================================
+// 🔄 DAILY RESET
+// ============================================
+
 function checkDailyReset() {
   const today = new Date().toDateString();
   const lastReset = localStorage.getItem("progressReset");
@@ -76,12 +135,15 @@ function checkDailyReset() {
   if (lastReset !== today) {
     completedOffers = 0;
     localStorage.setItem("progressReset", today);
-
     updateProgress();
-
-    console.log("🔄 Reset diario aplicado");
   }
 }
+
+
+// ============================================
+// 🧩 STEP SYSTEM (GAMIFICATION)
+// ============================================
+
 function updateSteps() {
   const s1 = document.getElementById("step1");
   const s2 = document.getElementById("step2");
@@ -105,10 +167,9 @@ function updateSteps() {
 }
 
 function nextStep() {
-  if (step < 3) {
-    step++;
-    updateSteps();
-  }
+  if (step < 3) step++;
+
+  updateSteps();
 
   if (step === 2) {
     showToast("⚠️ Completa el registro para ganar dinero");
@@ -118,24 +179,6 @@ function nextStep() {
     showToast("💰 Esperando confirmación de la oferta...");
   }
 }
-// ============================================
-// 🌍 AUTH STATE
-// ============================================
-
-auth.onAuthStateChanged(async (u) => {
-  if (!u) return location.href = "index.html";
-
-  user = u;
-
-  checkDailyReset(); // 🔥 reset diario
-
-  await initUser();
-  await loadUserData();
-  await generateRefLink();
-  realtimeBalance();
-
-  updateSteps(); // ✅ AQUÍ (AL FINAL)
-});
 
 // ============================================
 // 👤 CREAR USUARIO SI NO EXISTE
