@@ -2,124 +2,113 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EarnPro Dashboard - Gana Dinero Fácil</title>
-  
+<title>EarnPro</title>
 <link rel="stylesheet" href="/css/dashboard.css">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-
-
 </head>
 
-<body>
+<body class="dashboard">
 
-<div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-
-<!-- Header Hero -->
-<div class="header-hero">
-<div class="header-background">
-<img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663427137618/DZNVjeDi2TTeJHBF4drPLX/hero-dashboard-eXtDujZMPEtYity8XHWzjU.webp">
+<div class="nav">
+  <div class="logo">💰 EarnPro</div>
+  <div class="nav-right">
+    <div class="balance-mini">$0.00</div>
+    <button onclick="logout()">Salir</button>
+  </div>
 </div>
 
-<div class="header-content">
-<div class="header-text">
-<h1>EarnPro Dashboard</h1>
-<p>Bienvenido de vuelta, usuario</p>
+<div class="container">
+
+<div class="left">
+
+<h2>🔥 Gana dinero</h2>
+
+<div class="grid">
+
+<!-- 🎥 VIDEO PRO -->
+<div class="card hover">
+  <h3>🎥 Videos Pro</h3>
+
+  <!-- 🎬 VIDEO PREVIEW -->
+ <video id="videoPlayer" width="100%" height="150" controls muted style="border-radius:10px;"></video>
+    <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+  </video>
+
+  <p id="timerText">0/20</p>
+  <p id="videosLeft">Restantes: 6</p>
+
+  <button onclick="startVideo()">Iniciar</button>
 </div>
 
-<div class="header-badge">
-<span class="badge-icon">⚡</span>
-<span class="badge-text" id="today">+$0.00 hoy</span>
-</div>
-</div>
-</div>
+<!-- 🎰 RULETA -->
+<div class="card">
+  <h3>🎰 Ruleta</h3>
 
-<!-- MAIN -->
-<div class="main-container">
+  <div class="wheel-container">
+    <div id="wheel">🎡</div>
+  </div>
 
-<!-- STATS -->
-<div class="stats-grid">
+  <p id="spinStatus">Listo para girar</p>
 
-<div class="stat-card glass">
-<h3>Saldo</h3>
-<p id="balance">$0.00</p>
-</div>
+  <!-- 🔥 PROGRESO -->
+  <div class="spin-bar">
+    <div id="spinFill"></div>
+  </div>
+  <p id="spinCount">0 / 10 giros</p>
 
-<div class="stat-card glass">
-<h3>Referidos</h3>
-<p id="refCount">0</p>
+  <button onclick="spin()">Girar</button>
 </div>
 
-<div class="stat-card glass">
-<h3>Hoy</h3>
-<p id="todayEarnings">$0.00</p>
+<!-- 🎁 DAILY -->
+<div class="card">
+  <h3>🎁 Recompensa diaria</h3>
+  <button onclick="daily()">Reclamar</button>
 </div>
 
-<div class="stat-card glass">
-<h3>Videos</h3>
-<p id="videos">0</p>
-<p id="videosLeft">Restantes: 6</p>
+<!-- 📋 ENCUESTA -->
+<div class="card">
+  <h3>📋 Encuestas</h3>
+  <button onclick="survey()">Abrir</button>
 </div>
 
+<!-- 🎁 LOOTABLY -->
+<div class="card">
+  <h3>🎁 Ofertas PRO</h3>
+  <button onclick="lootably()">Abrir</button>
 </div>
 
-<!-- CPA -->
-<div class="cpa-section">
-<h2>💰 Ganar Dinero Real</h2>
-
-<button onclick="openOfferwall()">Offerwall</button>
-<button onclick="openLocker()">Locker</button>
-
-<iframe id="offerwallFrame" style="width:100%;height:500px;border:none;"></iframe>
-</div>
-
-<!-- JUEGOS -->
-<div class="section-card">
-<button onclick="playGame()">🎮 Juego</button>
-<button onclick="spin()">🎰 Ruleta</button>
-<button onclick="daily()">🎁 Daily</button>
-</div>
-
-<!-- VIDEOS -->
-<div class="section-card">
-<button onclick="startVideo()">🎥 Ver Video</button>
-</div>
-
-<!-- RETIRO -->
-<div class="section-card">
-
-<input type="email" id="email" placeholder="Tu email">
-<input type="number" id="amount" placeholder="Monto mínimo $5">
-
-<button onclick="withdraw()">💳 Retirar</button>
-
-</div>
-
-<!-- LOGOUT -->
-<div class="section-card">
-<button onclick="logout()">🚪 Cerrar Sesión</button>
+<!-- 🎮 JUEGO -->
+<div class="card">
+  <h3>🎮 Juegos</h3>
+  <button onclick="game()">Jugar</button>
 </div>
 
 </div>
+</div>
+
+<div class="right">
+
+<div class="card">
+  <h3>💰 Balance</h3>
+  <h1 id="balance">$0.00</h1>
+</div>
+
+<div class="card">
+  <h3>💸 Retirar</h3>
+  <input id="email" placeholder="PayPal">
+  <input id="amount" placeholder="Monto">
+  <button onclick="withdraw()">Retirar</button>
+</div>
+
+<div class="card">
+  <h3>📊 Referidos</h3>
+  <p>Invitados: <span id="refCount">0</span></p>
+  <p>Ganado: $<span id="refEarn">0.00</span></p>
+</div>
 
 </div>
 
-<!-- VIDEO PLAYER -->
-<video id="videoPlayer" style="display:none;"></video>
+</div>
 
-<!-- WHEEL -->
-<div id="wheel" style="display:none;width:200px;height:200px;border-radius:50%;background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red);"></div>
-
-<!-- JS PRINCIPAL -->
 <script type="module" src="/js/dashboard.js"></script>
-
 </body>
 </html>
-
-
-
-
