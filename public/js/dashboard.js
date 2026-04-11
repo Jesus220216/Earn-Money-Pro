@@ -314,9 +314,6 @@ window.logout = () => {
   auth.signOut().then(() => location.href = "index.html");
 };
 
-// ============================================
-// 💰 CPAGRIP RSS OFFERWALL (FIXED)
-// ============================================
 
 // ============================================
 // 💰 CPAGRIP JSON OFFERWALL (PRO)
@@ -342,32 +339,61 @@ window.loadOffers = () => {
         return;
       }
 
-      let html = "";
+     let html = "";
 
-      data.offers.slice(0, 6).forEach(offer => {
-        html += `
-          <div style="
-            background:#fff;
-            padding:12px;
-            margin-bottom:10px;
-            border-radius:10px;
-            box-shadow:0 2px 8px rgba(0,0,0,0.08);
-          ">
-            <h4 style="margin-bottom:6px;">💰 ${offer.title}</h4>
-            <a href="${offer.offerlink}" target="_blank" rel="noopener noreferrer">
-              style="
-                display:inline-block;
-                padding:8px 12px;
-                background:#10B981;
-                color:#fff;
-                border-radius:6px;
-                text-decoration:none;
-              ">
-              🔥 Ganar dinero ahora
-            </a>
-          </div>
-        `;
-      });
+data.offers.slice(0, 6).forEach(offer => {
+
+  const reward = (Math.random() * (3 - 0.5) + 0.5).toFixed(2);
+
+  html += `
+    <div style="
+      background:#fff;
+      padding:14px;
+      margin-bottom:12px;
+      border-radius:12px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.08);
+      border:1px solid #eee;
+    ">
+      
+      <h4 style="margin-bottom:5px;">💰 ${offer.title}</h4>
+
+      <p style="
+        font-size:13px;
+        color:#10B981;
+        font-weight:bold;
+        margin-bottom:10px;
+      ">
+        Gana hasta $${reward} 💸
+      </p>
+
+      <a href="${offer.offerlink}" 
+         target="_blank" 
+         rel="noopener noreferrer"
+         style="
+           display:block;
+           text-align:center;
+           padding:10px;
+           background:linear-gradient(90deg,#10B981,#059669);
+           color:#fff;
+           border-radius:8px;
+           text-decoration:none;
+           font-weight:bold;
+           transition:0.2s;
+         ">
+         🚀 Empezar ahora
+      </a>
+
+      <p style="
+        font-size:11px;
+        color:#999;
+        margin-top:8px;
+      ">
+        ⏳ Oferta limitada
+      </p>
+
+    </div>
+  `;
+});
 
       container.innerHTML = html;
 
@@ -375,3 +401,13 @@ window.loadOffers = () => {
     })
     .catch(() => showToast("Error cargando ofertas ❌"));
 };
+
+auth.onAuthStateChanged((u) => {
+  if (u) {
+    user = u;
+
+    setTimeout(() => {
+      loadOffers();
+    }, 1000);
+  }
+});
