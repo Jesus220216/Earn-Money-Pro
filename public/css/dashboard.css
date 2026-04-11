@@ -1,1013 +1,117 @@
-/* ============================================
-   EarnPro Dashboard CSS
-   Diseño: Corporativo Moderno Elevado
-   Colores: Navy (#0F172A), Verde Esmeralda (#10B981), Gris Plateado (#E5E7EB)
-   Tipografía: Poppins (títulos), Inter (contenido), IBM Plex Mono (números)
-   ============================================ */
-
-
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-:root {
-    /* Colores Corporativos */
-    --primary-navy: #0F172A;
-    --primary-emerald: #10B981;
-    --primary-blue: #3B82F6;
-    --primary-amber: #F59E0B;
-    --secondary-gray: #E5E7EB;
-    --slate-50: #F8FAFC;
-    --slate-100: #F1F5F9;
-    --slate-200: #E2E8F0;
-    --slate-500: #64748B;
-    --slate-600: #475569;
-    --slate-700: #334155;
-    --slate-900: #0F172A;
-    
-    /* Tipografía */
-    --font-display: 'Poppins', sans-serif;
-    --font-body: 'Inter', sans-serif;
-    --font-mono: 'IBM Plex Mono', monospace;
-    
-    /* Espaciado */
-    --spacing-xs: 0.25rem;
-    --spacing-sm: 0.5rem;
-    --spacing-md: 1rem;
-    --spacing-lg: 1.5rem;
-    --spacing-xl: 2rem;
-    --spacing-2xl: 3rem;
-    
-    /* Sombras */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-    
-    /* Radio */
-    --radius-sm: 0.375rem;
-    --radius-md: 0.5rem;
-    --radius-lg: 0.75rem;
-    --radius-xl: 1rem;
-}
-
 body {
-    font-family: var(--font-body);
-    background: linear-gradient(135deg, var(--slate-50) 0%, var(--slate-100) 100%);
-    color: var(--slate-900);
-    line-height: 1.6;
+  font-family: Poppins, sans-serif;
+  background: #0b1220;
+  color: #e5e7eb;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-display);
-    font-weight: 700;
-}
-
-/* ============================================
-   Utilidades Generales
-   ============================================ */
-
-.min-h-screen {
-    min-height: 100vh;
-}
-
-.bg-gradient-to-br {
-    background: linear-gradient(135deg, var(--slate-50) 0%, var(--slate-100) 100%);
-}
-
-.glass {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.gradient-emerald {
-    background: linear-gradient(135deg, var(--primary-emerald) 0%, #059669 100%);
-}
-
-.gradient-navy {
-    background: linear-gradient(135deg, var(--primary-navy) 0%, #1e3a5f 100%);
-}
-
-/* ============================================
-   Header Hero
-   ============================================ */
-
+/* HEADER */
 .header-hero {
-    position: relative;
-    overflow: hidden;
-    background: white;
-    border-bottom: 1px solid var(--slate-200);
+  padding: 25px;
+  background: #0f172a;
+  border-bottom: 1px solid #1f2937;
 }
 
-.header-background {
-    position: absolute;
-    inset: 0;
-    opacity: 0.05;
+.header-content h1 {
+  font-size: 22px;
+  font-weight: 800;
 }
 
-.header-background img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.header-content p {
+  font-size: 13px;
+  color: #94a3b8;
 }
 
-.header-content {
-    position: relative;
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 3rem 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 2rem;
-}
-
-.header-text h1 {
-    font-size: 2.25rem;
-    font-weight: 700;
-    color: var(--slate-900);
-    margin-bottom: 0.5rem;
-    line-height: 1.2;
-}
-
-@media (min-width: 768px) {
-    .header-text h1 {
-        font-size: 3rem;
-    }
-}
-
-.header-text p {
-    font-size: 1.125rem;
-    color: var(--slate-600);
-}
-
-.header-badge {
-    display: none;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid rgba(16, 185, 129, 0.3);
-    border-radius: var(--radius-md);
-}
-
-@media (min-width: 768px) {
-    .header-badge {
-        display: flex;
-    }
-}
-
-.badge-icon {
-    font-size: 1.25rem;
-}
-
-.badge-text {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #047857;
-}
-
-/* ============================================
-   Main Container
-   ============================================ */
-
+/* MAIN */
 .main-container {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 2rem 1rem;
+  padding: 15px;
 }
 
-/* ============================================
-   Stats Grid
-   ============================================ */
-
+/* STATS */
 .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 3rem;
-}
-
-@media (min-width: 768px) {
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (min-width: 1024px) {
-    .stats-grid {
-        grid-template-columns: repeat(4, 1fr);
-    }
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 10px;
+  margin-bottom: 15px;
 }
 
 .stat-card {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-lg);
-    overflow: hidden;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.stat-card:hover {
-    box-shadow: var(--shadow-xl);
-    transform: translateY(-2px);
-}
-
-.card-content {
-    padding: 1.5rem;
-}
-
-.card-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-}
-
-.card-icon {
-    width: 3rem;
-    height: 3rem;
-    border-radius: var(--radius-lg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    color: white;
-}
-
-.card-badge {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--primary-emerald);
-    background: rgba(16, 185, 129, 0.1);
-    padding: 0.25rem 0.5rem;
-    border-radius: var(--radius-sm);
-}
-
-.card-title {
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--slate-600);
-    margin-bottom: 0.25rem;
-}
-
-.card-value {
-    font-size: 1.875rem;
-    font-weight: 700;
-    color: var(--slate-900);
-    font-family: var(--font-mono);
-    margin-bottom: 0.25rem;
-}
-
-.card-subtitle {
-    font-size: 0.75rem;
-    color: var(--slate-500);
-}
-
-/* ============================================
-   Main Grid Layout
-   ============================================ */
-
-.main-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    margin-bottom: 3rem;
-}
-
-@media (min-width: 1024px) {
-    .main-grid {
-        grid-template-columns: 2fr 1fr;
-    }
-}
-
-.left-column {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-}
-
-.right-column {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-}
-
-/* ============================================
-   Section Cards
-   ============================================ */
-
-.section-card {
-    background: white;
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-lg);
-    overflow: hidden;
-    border: 1px solid var(--slate-200);
-    transition: all 0.3s ease;
-}
-
-.section-card:hover {
-    box-shadow: var(--shadow-xl);
-}
-
-.section-image {
-    position: relative;
-    height: 12rem;
-    overflow: hidden;
-}
-
-.section-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.section-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(15, 23, 42, 0.8), transparent);
-}
-
-.section-title-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 1.5rem;
-    color: white;
-}
-
-.section-title-overlay h2 {
-    font-size: 1.5rem;
-    margin-bottom: 0.25rem;
-}
-
-.section-title-overlay p {
-    font-size: 0.875rem;
-    color: #e2e8f0;
-}
-
-.section-content {
-    padding: 1.5rem;
-}
-
-/* ============================================
-   Games Grid
-   ============================================ */
-
-.games-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.game-item {
-    padding: 1rem;
-    background: var(--slate-50);
-    border-radius: var(--radius-lg);
-    text-align: center;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.game-item:hover {
-    background: rgba(16, 185, 129, 0.1);
-    transform: translateY(-2px);
-}
-
-.game-icon {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-}
-
-.game-name {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--slate-900);
-}
-
-.game-reward {
-    font-size: 0.75rem;
-    color: var(--primary-emerald);
-    font-weight: 700;
-    margin-top: 0.25rem;
-}
-
-/* ============================================
-   Surveys List
-   ============================================ */
-
-.surveys-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
-}
-
-.survey-item {
-    padding: 0.75rem;
-    background: var(--slate-50);
-    border-radius: var(--radius-lg);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.survey-item:hover {
-    background: rgba(59, 130, 246, 0.1);
-}
-
-.survey-title {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--slate-900);
-}
-
-.survey-time {
-    font-size: 0.75rem;
-    color: var(--slate-500);
-}
-
-.survey-reward {
-    color: var(--primary-blue);
-    font-weight: 700;
-}
-
-/* ============================================
-   Videos List
-   ============================================ */
-
-.videos-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.video-item {
-    padding: 0.5rem;
-    background: var(--slate-50);
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 0.875rem;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.video-item:hover {
-    background: rgba(16, 185, 129, 0.1);
-}
-
-.video-info {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.video-icon {
-    color: var(--slate-400);
-    font-size: 0.75rem;
-}
-
-.video-reward {
-    color: var(--primary-emerald);
-    font-weight: 700;
-}
-
-/* ============================================
-   Offers List
-   ============================================ */
-
-.offers-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.offer-item {
-    padding: 0.5rem;
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(249, 158, 11, 0.1));
-    border: 1px solid rgba(251, 191, 36, 0.2);
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 0.875rem;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.offer-item:hover {
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(249, 158, 11, 0.2));
-}
-
-.offer-info {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.offer-icon {
-    font-size: 1rem;
-}
-
-.offer-reward {
-    color: var(--primary-amber);
-    font-weight: 700;
-}
-
-/* ============================================
-   Quick Stats
-   ============================================ */
-
-.quick-stats {
-    background: linear-gradient(135deg, var(--slate-900) 0%, #1e293b 100%);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-lg);
-    padding: 1.5rem;
-    color: white;
-}
-
-.quick-stats h3 {
-    font-weight: 700;
-    margin-bottom: 1rem;
-}
-
-.stats-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.stat-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.875rem;
-}
-
-.stat-row span:first-child {
-    color: #cbd5e1;
-}
-
-.stat-value {
-    font-weight: 700;
-}
-
-/* ============================================
-   Buttons
-   ============================================ */
-
-.btn {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: none;
-    border-radius: var(--radius-lg);
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    transition: all 0.3s ease;
-    font-family: var(--font-display);
-}
-
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-}
-
-.btn-emerald {
-    background: linear-gradient(135deg, var(--primary-emerald) 0%, #059669 100%);
-    color: white;
-}
-
-.btn-emerald:hover {
-    background: linear-gradient(135deg, #059669 0%, #047857 100%);
-}
-
-.btn-blue {
-    background: linear-gradient(135deg, var(--primary-blue) 0%, #2563eb 100%);
-    color: white;
-}
-
-.btn-blue:hover {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-}
-
-.btn-amber {
-    background: linear-gradient(135deg, var(--primary-amber) 0%, #d97706 100%);
-    color: white;
-}
-
-.btn-amber:hover {
-    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
-}
-
-.btn-small {
-    width: 100%;
-}
-
-.btn-arrow {
-    margin-left: auto;
-}
-
-/* ============================================
-   Activity Section
-   ============================================ */
-
-.activity-section {
-    background: white;
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--slate-200);
-    overflow: hidden;
-}
-
-.activity-header {
-    padding: 1.5rem;
-    border-bottom: 1px solid var(--slate-200);
-}
-
-.activity-header h2 {
-    font-size: 1.5rem;
-    color: var(--slate-900);
-}
-
-.activity-list {
-    divide-y: 1px solid var(--slate-200);
-}
-
-.activity-item {
-    padding: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    transition: all 0.3s ease;
-}
-
-.activity-item:hover {
-    background: var(--slate-50);
-}
-
-.activity-dot {
-    width: 0.75rem;
-    height: 0.75rem;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-
-.activity-dot.completed {
-    background: var(--primary-emerald);
-}
-
-.activity-dot.pending {
-    background: var(--primary-amber);
-}
-
-.activity-info {
-    flex: 1;
-}
-
-.activity-type {
-    font-weight: 600;
-    color: var(--slate-900);
-    font-size: 0.875rem;
-}
-
-.activity-time {
-    font-size: 0.75rem;
-    color: var(--slate-500);
-}
-
-.activity-amount {
-    font-weight: 700;
-    color: var(--primary-emerald);
-    font-family: var(--font-mono);
-}
-
-/* ============================================
-   Responsive Design
-   ============================================ */
-
-@media (max-width: 768px) {
-    .main-container {
-        padding: 1rem 0.5rem;
-    }
-    
-    .header-content {
-        padding: 1.5rem 1rem;
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .header-text h1 {
-        font-size: 1.875rem;
-    }
-    
-    .section-image {
-        height: 10rem;
-    }
-    
-    .games-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-/* ============================================
-   Animaciones
-   ============================================ */
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.stat-card,
-.section-card,
-.activity-item {
-    animation: fadeIn 0.5s ease-out;
-}
-
-/* Transiciones suaves */
-* {
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-}
-
-/* ============================================
-   Accesibilidad
-   ============================================ */
-
-button:focus,
-a:focus {
-    outline: 2px solid var(--primary-emerald);
-    outline-offset: 2px;
-}
-
-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* ============================================
-   🔥 EARNPRO - UI BOOST (COMPATIBILIDAD DASHBOARD JS)
-   ============================================ */
-
-/* BODY DARK MODE PRO (para tu sistema CPA) */
-body {
-  background: #0b1220 !important;
-  color: #e5e7eb;
-}
-
-/* NUMEROS BALANCE MÁS PRO */
-#balance, #todayEarnings, #refCount, #videos, #videosLeft {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  color: #10B981;
-}
-
-/* FIX BOTONES JS (CPA ACTION BUTTONS) */
-button {
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-
-button:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.1);
-}
-
-/* BOTONES CPA QUE YA TIENES */
-.menu button,
-.btn {
-  backdrop-filter: blur(10px);
-}
-
-/* MEJORA TOAST (tu JS usa showToast) */
-div[style*="position:fixed"] {
-  font-family: Inter, sans-serif !important;
-  font-weight: 600;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-  border: 1px solid rgba(255,255,255,0.08);
-}
-
-/* PROGRESS BAR (si tienes progreso) */
-#progressBar {
-  background: linear-gradient(90deg, #10B981, #3B82F6);
-  height: 10px;
-  border-radius: 999px;
-  transition: width 0.4s ease;
-}
-
-/* TAB SYSTEM COMPATIBLE CON TU JS */
-.tab {
-  display: none;
-  animation: fadeIn 0.3s ease;
-}
-
-.tab.active {
-  display: block;
-}
-
-/* CPA OFFER CARDS (CPAGRIP) */
-#offers div {
-  background: rgba(255,255,255,0.03) !important;
-  border: 1px solid rgba(255,255,255,0.05) !important;
-  color: #e5e7eb !important;
-  transition: all 0.3s ease;
-}
-
-#offers div:hover {
-  transform: translateY(-3px);
-  border-color: #10B981 !important;
-}
-
-/* LINKS BOTÓN CPA */
-#offers a {
-  background: linear-gradient(135deg, #10B981, #059669) !important;
-  color: white !important;
-  border-radius: 10px !important;
-  font-weight: 700 !important;
-}
-
-/* SIDEBAR / MENU FIX */
-.menu button {
   background: rgba(255,255,255,0.05);
-  color: #e5e7eb;
+  padding: 15px;
+  border-radius: 14px;
   border: 1px solid rgba(255,255,255,0.08);
 }
 
-/* HOVER PREMIUM */
-.menu button:hover {
-  background: #10B981;
-  color: black;
-}
-
-/* GRID FIX PARA TU DASHBOARD */
-.grid, .stats-grid {
-  gap: 12px;
-}
-
-/* CARD SHADOW MÁS PREMIUM */
-.card, .stat-card, .section-card {
-  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-}
-
-/* SCROLLBAR PRO */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #10B981;
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: #0f172a;
-}
-
-/* MOBILE UPGRADE */
-@media (max-width: 768px) {
-  .menu {
-    flex-direction: column;
-  }
-
-  .grid {
-    grid-template-columns: 1fr !important;
-  }
-
-   /* ============================================
-   🔥 UI UPGRADE PRO (BOTONES + BONOS + UX)
-   ============================================ */
-
-/* BOTONES CPA MÁS PRO */
-.game-item {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 16px;
-  padding: 16px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.game-item:hover {
-  transform: translateY(-5px);
-  background: rgba(16,185,129,0.08);
-  border-color: #10B981;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-}
-
-.game-icon {
-  font-size: 28px;
-  margin-bottom: 6px;
-}
-
-.game-name {
-  font-weight: 700;
-  font-size: 14px;
-  color: #E5E7EB;
-}
-
-.game-reward {
-  font-size: 11px;
-  margin-top: 4px;
-  color: #10B981;
-  font-weight: 700;
-}
-
-/* BOTONES PRINCIPALES MÁS PREMIUM */
-button {
-  border-radius: 12px !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.3px;
-  transition: all 0.25s ease;
-}
-
-button:hover {
-  transform: scale(1.03);
-}
-
-/* PROGRESS BAR PREMIUM (BONO MEJORADO) */
-#progressBar {
-  height: 12px !important;
-  border-radius: 999px !important;
-  background: linear-gradient(90deg,#10B981,#3B82F6,#F59E0B);
-  box-shadow: 0 5px 15px rgba(16,185,129,0.3);
-}
-
-/* PROGRESS BOX CLEAN */
-.section-card h2 {
-  font-size: 18px;
-  font-weight: 800;
-  margin-bottom: 10px;
-}
-
-/* PROGRESS TEXT MÁS PRO */
-#progressText {
+.stat-card h3 {
   font-size: 12px;
-  font-weight: 600;
-  color: #94A3B8;
+  color: #94a3b8;
 }
 
-/* BOTONES CPA ACTION (VIDEO/JUEGO/ETC) */
-.games-grid {
-  gap: 14px;
+.stat-card p {
+  font-size: 20px;
+  font-weight: 800;
+  color: #10B981;
+  font-family: monospace;
 }
 
-.games-grid .game-item {
-  aspect-ratio: 1 / 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+/* SECTION */
+.section-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 15px;
+  margin-top: 10px;
 }
 
-/* BOTÓN RETIRO + REFERIDOS MÁS LIMPIO */
-.section-card input {
+/* INPUTS */
+input {
   width: 100%;
   padding: 12px;
-  margin: 8px 0;
+  margin-top: 8px;
   border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.08);
-  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.3);
   color: white;
 }
 
-/* BOTONES MÁS “APP STYLE” */
-.btn {
-  border-radius: 12px !important;
-  font-size: 14px !important;
+/* BOTONES PRO */
+.btn-pro {
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 13px;
 }
 
-/* EFFECT CLICK */
-.game-item:active {
-  transform: scale(0.96);
+.btn-pro:hover {
+  transform: scale(1.05);
 }
 
-  .stats-grid {
-    grid-template-columns: 1fr !important;
-  }
+/* VARIANTS */
+.btn-video { background:#10B981; color:white; }
+.btn-game { background:#3B82F6; color:white; }
+.btn-spin { background:#F59E0B; color:white; }
+.btn-daily { background:#8B5CF6; color:white; }
+
+/* OFFERS */
+#offers div {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+/* PROGRESS */
+#progressText {
+  font-size: 12px;
+  margin-top: 8px;
+  color: #94a3b8;
 }
