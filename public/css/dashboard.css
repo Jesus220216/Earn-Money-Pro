@@ -118,3 +118,125 @@ input {
 .card a:hover {
   transform: scale(1.05);
 }
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Poppins, sans-serif;
+  background: #0b1220;
+  color: #e5e7eb;
+}
+
+/* HEADER */
+.header-hero {
+  padding: 25px;
+  background: #0f172a;
+  border-bottom: 1px solid #1f2937;
+}
+
+.header-content h1 {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.header-content p {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+/* MAIN */
+.main-container {
+  padding: 15px;
+}
+
+/* STATS */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.stat-card {
+  background: rgba(255,255,255,0.05);
+  padding: 15px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.stat-card h3 {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.stat-card p {
+  font-size: 20px;
+  font-weight: 800;
+  color: #10B981;
+  font-family: monospace;
+}
+
+/* SECTION */
+.section-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 15px;
+  margin-top: 10px;
+}
+
+/* INPUTS */
+input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.3);
+  color: white;
+}
+
+/* BOTONES PRO */
+.btn-pro {
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 13px;
+}
+
+.btn-pro:hover {
+  transform: scale(1.05);
+}
+
+/* VARIANTS */
+.btn-video { background:#10B981; color:white; }
+.btn-game { background:#3B82F6; color:white; }
+.btn-spin { background:#F59E0B; color:white; }
+.btn-daily { background:#8B5CF6; color:white; }
+
+/* OFFERS */
+#offers div {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+/* PROGRESS */
+#progressText {
+  font-size: 12px;
+  margin-top: 8px;
+  color: #94a3b8;
+}
+.card a:hover {
+  transform: scale(1.05);
+}
+
