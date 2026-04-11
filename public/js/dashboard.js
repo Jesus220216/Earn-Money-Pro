@@ -49,6 +49,20 @@ function updateProgress() {
   }
 }
 
+function checkDailyReset() {
+  const today = new Date().toDateString();
+  const lastReset = localStorage.getItem("progressReset");
+
+  if (lastReset !== today) {
+    completedOffers = 0;
+    localStorage.setItem("progressReset", today);
+
+    updateProgress();
+
+    console.log("🔄 Reset diario aplicado");
+  }
+}
+
 // ============================================
 // 🌍 AUTH STATE
 // ============================================
@@ -57,6 +71,8 @@ auth.onAuthStateChanged(async (u) => {
   if (!u) return location.href = "index.html";
 
   user = u;
+
+  checkDailyReset(); // 🔥 AQUÍ
 
   await initUser();
   await loadUserData();
@@ -480,3 +496,7 @@ setInterval(() => {
   completedOffers = 0;
   updateProgress();
 }, 86400000);
+
+setInterval(() => {
+  checkDailyReset();
+}, 60000);
