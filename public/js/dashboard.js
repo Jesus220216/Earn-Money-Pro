@@ -22,7 +22,7 @@ let user;
 let balance = 0;
 let videosLeft = 0;
 let taskCooldown = false;
-let step = 1;
+let step = 1 + Math.floor(Math.random() * 2);
 let completedOffers = 0;
 
 function trackOfferClick() {
