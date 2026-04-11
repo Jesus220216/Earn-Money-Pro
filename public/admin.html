@@ -1,27 +1,47 @@
-app.get("/admin", (req, res) => {
-  res.send(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Admin Panel</title>
-      <style>
-        body { font-family: Arial; background: #111; color: white; padding: 20px; }
-        .card { background: #1f1f1f; padding: 15px; margin: 10px 0; border-radius: 10px; }
-        button { margin: 5px; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; }
-        .ok { background: #22c55e; }
-        .no { background: #ef4444; }
-      </style>
-    </head>
-    <body>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Panel EarnPro</title>
+</head>
+<body>
 
-    <h2>💳 Retiros</h2>
-    <div id="list">Cargando...</div>
+<h1>🏢 ADMIN PANEL</h1>
 
-    <script>
-      const SECRET = "EarnPro_SECURE_9xLk29@2026";
+<h3>📊 Total Revenue: <span id="rev">0</span></h3>
+<h3>👤 Users: <span id="users">0</span></h3>
+<h3>👆 Clicks: <span id="clicks">0</span></h3>
 
-      async function load() {
-        const res = await fetch('/admin/withdrawals?secret=' + SECRET);
+<script type="module">
+import { db } from "./firebase.js";
+import {
+  collection, getDocs
+} from "firebase/firestore";
+
+async function load() {
+  const usersSnap = await getDocs(collection(db, "users"));
+  const trackSnap = await getDocs(collection(db, "tracking"));
+
+  let revenue = 0;
+  let clicks = 0;
+
+  usersSnap.forEach(u => {
+    revenue += u.data().revenue || 0;
+  });
+
+  trackSnap.forEach(t => {
+    if (t.data().event === "click") clicks++;
+  });
+
+  document.getElementById("rev").innerText = revenue;
+  document.getElementById("users").innerText = usersSnap.size;
+  document.getElementById("clicks").innerText = clicks;
+}
+
+load();
+</script>
+
+</body>
+</html>n/withdrawals?secret=' + SECRET);
         const data = await res.json();
 
         const div = document.getElementById("list");
