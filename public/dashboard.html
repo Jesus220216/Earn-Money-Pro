@@ -3,23 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>EarnPro Dashboard - Gana Dinero Fácil</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <!-- ✅ CSS CORRECTO -->
     <link rel="stylesheet" href="/css/dashboard.css">
-
-    <meta name="monetag" content="139886b3940e2e0ab7082d178476fe5b">
 </head>
 
 <body>
 
 <div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
 
-    <!-- HEADER -->
+    <!-- HEADER ORIGINAL -->
     <div class="header-hero">
         <div class="header-background">
             <img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663427137618/DZNVjeDi2TTeJHBF4drPLX/hero-dashboard-eXtDujZMPEtYity8XHWzjU.webp">
@@ -28,7 +27,7 @@
         <div class="header-content">
             <div class="header-text">
                 <h1>EarnPro Dashboard</h1>
-                <p>Bienvenido de vuelta, sigue ganando dinero fácil</p>
+                <p>Bienvenido de vuelta, usuario. Sigue ganando dinero fácil.</p>
             </div>
 
             <div class="header-badge">
@@ -41,11 +40,11 @@
     <!-- MAIN -->
     <div class="main-container">
 
-        <!-- STATS -->
+        <!-- STATS GRID ORIGINAL -->
         <div class="stats-grid">
 
             <div class="stat-card glass">
-                <h3>Saldo</h3>
+                <h3>Saldo Actual</h3>
                 <p id="balance">$0.00</p>
             </div>
 
@@ -55,159 +54,86 @@
             </div>
 
             <div class="stat-card glass">
-                <h3>Hoy</h3>
+                <h3>Ganancias Hoy</h3>
                 <p id="todayEarnings">$0.00</p>
             </div>
 
             <div class="stat-card glass">
                 <h3>Videos</h3>
                 <p id="videos">0</p>
-                <p id="videosLeft">Restantes: 6</p>
+                <small id="videosLeft">Restantes: 6</small>
             </div>
 
         </div>
 
-        <!-- 💼 SAAS ANALYTICS -->
-        <div class="activity-section">
-            <h2>🏢 SaaS Analytics</h2>
-
-            <p>💰 Ads: <span id="adsRev">$0.00</span></p>
-            <p>🔥 CPA: <span id="cpaRev">$0.00</span></p>
-            <p>🎁 Offers: <span id="offerRev">$0.00</span></p>
-
-            <hr>
-
-            <p>👆 Clicks: <span id="globalClicks">0</span></p>
-            <p>🚀 Sessions: <span id="globalSessions">0</span></p>
-        </div>
-
-        <!-- JUEGOS -->
+        <!-- JUEGOS ORIGINAL -->
         <div class="section-card">
-            <h2>🎮 Juegos</h2>
 
-            <button onclick="playGame()">Juego $0.05</button>
-            <button onclick="spin()">Ruleta</button>
-            <button onclick="daily()">Daily $0.20</button>
+            <h2>Juega y Gana</h2>
+
+            <div class="games-grid">
+                <div onclick="playGame()">🎮 Juego</div>
+                <div onclick="spin()">🎰 Ruleta</div>
+                <div onclick="daily()">🎁 Daily</div>
+            </div>
+
+            <button onclick="playGame()">Jugar Ahora</button>
+
         </div>
 
-        <!-- CPA -->
+        <!-- CPA ORIGINAL -->
         <div class="cpa-section">
-            <h2>💰 CPA</h2>
+
+            <h2>💰 Ganar Dinero Real</h2>
 
             <button onclick="openOfferwall()">Offerwall</button>
             <button onclick="openLocker()">Locker</button>
 
-            <iframe id="offerwallFrame" style="width:100%;height:400px;border:0;"></iframe>
+            <iframe id="offerwallFrame"></iframe>
+
+        </div>
+
+        <!-- ENCUESTAS -->
+        <div class="section-card">
+            <h2>Encuestas</h2>
+            <button onclick="openBox()">Ver Encuestas</button>
         </div>
 
         <!-- VIDEOS -->
         <div class="section-card">
-            <h2>🎥 Videos</h2>
+            <h2>Ver Videos</h2>
 
-            <button onclick="startVideo()">Ver Videos</button>
+            <button onclick="startVideo()">Ver Video</button>
+        </div>
+
+        <!-- OFERTAS -->
+        <div class="section-card">
+            <h2>Ofertas</h2>
+
+            <button onclick="openBox()">Ver Ofertas</button>
         </div>
 
         <!-- REFERIDOS -->
-        <div class="section-card">
-            <h2>🔗 Referidos</h2>
-
+        <div>
             <input id="refLink" readonly>
-            <button onclick="copyRef()">Copiar</button>
+            <button onclick="copyRef()">Copiar Link</button>
         </div>
 
         <!-- RETIRO -->
-        <div class="section-card">
-            <h2>💳 Retiro</h2>
-
+        <div>
             <input id="email" placeholder="Email">
-            <input id="amount" placeholder="Monto">
-
-            <button onclick="withdraw()">Solicitar</button>
+            <input id="amount" placeholder="Monto mínimo 5$">
+            <button onclick="withdraw()">Retirar</button>
         </div>
 
         <!-- LOGOUT -->
-        <div class="section-card">
-            <button onclick="logout()">🚪 Salir</button>
-        </div>
+        <button onclick="logout()">Cerrar Sesión</button>
 
     </div>
 </div>
 
-<!-- FIREBASE LOGIC -->
+<!-- SOLO TU JS REAL -->
 <script type="module" src="/js/dashboard.js"></script>
-
-<!-- 💼 SAAS ENGINE (SEPARADO, LIMPIO) -->
-<script type="module">
-import { auth, db } from "/js/firebase.js";
-import {
-    collection,
-    onSnapshot,
-    doc
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-let user = null;
-
-auth.onAuthStateChanged((u) => {
-    if (!u) return location.href = "index.html";
-    user = u;
-
-    load();
-});
-
-function load() {
-    onSnapshot(doc(db, "users", user.uid), (snap) => {
-        const d = snap.data() || {};
-
-        set("balance", d.balance);
-        set("todayEarnings", d.todayEarnings);
-        set("refCount", d.referrals);
-        set("videosLeft", d.videosLeft);
-    });
-
-    onSnapshot(collection(db, "tracking"), (snap) => {
-        let clicks = 0;
-        let sessions = 0;
-
-        snap.forEach(d => {
-            const x = d.data();
-            if (x.event === "click") clicks++;
-            if (x.event === "session_start") sessions++;
-        });
-
-        set("globalClicks", clicks);
-        set("globalSessions", sessions);
-    });
-
-    onSnapshot(collection(db, "revenue_logs"), (snap) => {
-        let ads = 0, cpa = 0, offer = 0;
-
-        snap.forEach(d => {
-            const x = d.data();
-            if (x.source === "video") ads += x.amount || 0;
-            if (x.source === "cpa") cpa += x.amount || 0;
-            if (x.source === "offerwall") offer += x.amount || 0;
-        });
-
-        set("adsRev", ads);
-        set("cpaRev", cpa);
-        set("offerRev", offer);
-    });
-}
-
-function set(id, value) {
-    const el = document.getElementById(id);
-    if (!el) return;
-
-    el.innerText =
-        typeof value === "number"
-            ? "$" + value.toFixed(2)
-            : value || 0;
-}
-
-window.addEventListener("error", e => {
-    console.log("SAFE MODE:", e.message);
-});
-</script>
 
 </body>
 </html>
