@@ -116,40 +116,68 @@ function getRewardAmount(type) {
 // ============================================
 // 🎯 POSTBACK CPA (REAL + BONUS)
 // ============================================
-app.get("/postback", async (req, res) => {
-  try {
-    const { uid, amount, secret } = req.query;
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-    if (!uid || !amount || !secret)
+app.all("/postback", async (req, res) => {
+  try {
+    // 👇 SOPORTA GET Y POST
+    const data = req.method === "POST" ? req.body : req.query;
+
+    const subid = data.subid || data.tracking_id;
+    const payout = data.payout;
+    const password = data.password;
+
+    // 🔐 (OPCIONAL PERO RECOMENDADO)
+    if (password && password !== "EarnPro2026") {
+      return res.send("denied");
+    }
+
+    if (!subid || !payout)
       return res.send("invalid");
 
-    if (secret !== SECRET)
-      return res.send("denied");
-
-    const value = parseFloat(amount);
+    const value = parseFloat(payout);
     if (isNaN(value)) return res.send("invalid amount");
 
     // 🛑 PROTECCIÓN
     if (value > 10) return res.send("blocked");
 
-    const userRef = db.collection("users").doc(uid);
+    const userRef = db.collection("users").doc(subid);
     const userDoc = await userRef.get();
 
     if (!userDoc.exists) return res.send("no user");
 
     const userData = userDoc.data();
 
-    // 🛑 ANTI DUPLICADO
-    if (userData.lastCPA === value) {
+    // 🛑 ANTI DUPLICADO PRO
+    if (
+      userData.lastCPA === value &&
+      Date.now() - (userData.lastUpdate || 0) < 60000
+    ) {
       return res.send("duplicate");
     }
 
-    // 🎁 BONUS LOOT BOX
+    // 🎁 BONUS
     const type = getRewardType();
     const bonus = getRewardAmount(type);
-
-    // 💰 TOTAL
     const total = value + bonus;
+
+    const offer_id = data.offer_id || "unknown";
+
+// 📊 LOG DE CONVERSIÓN
+const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+const ua = req.headers["user-agent"] || "";
+
+await db.collection("conversions").add({
+  uid: subid,
+  payout: value,
+  offer: offer_id,
+  bonus,
+  total,
+  ip,
+  ua,
+  date: Date.now()
+});
 
     await userRef.update({
       balance: admin.firestore.FieldValue.increment(total),
@@ -160,7 +188,7 @@ app.get("/postback", async (req, res) => {
       lastUpdate: Date.now()
     });
 
-    console.log(`💰 CPA: ${value} + 🎁 ${type} (${bonus}) = ${total}`);
+    console.log("💰 POSTBACK OK:", subid, total);
 
     res.send("ok");
 
@@ -169,7 +197,6 @@ app.get("/postback", async (req, res) => {
     res.send("error");
   }
 });
-
 
 // ============================================
 // 💳 VER RETIROS
