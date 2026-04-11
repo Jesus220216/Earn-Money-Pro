@@ -897,6 +897,116 @@ div[style*="position:fixed"] {
     grid-template-columns: 1fr !important;
   }
 
+   /* ============================================
+   🔥 UI UPGRADE PRO (BOTONES + BONOS + UX)
+   ============================================ */
+
+/* BOTONES CPA MÁS PRO */
+.game-item {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.game-item:hover {
+  transform: translateY(-5px);
+  background: rgba(16,185,129,0.08);
+  border-color: #10B981;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.game-icon {
+  font-size: 28px;
+  margin-bottom: 6px;
+}
+
+.game-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: #E5E7EB;
+}
+
+.game-reward {
+  font-size: 11px;
+  margin-top: 4px;
+  color: #10B981;
+  font-weight: 700;
+}
+
+/* BOTONES PRINCIPALES MÁS PREMIUM */
+button {
+  border-radius: 12px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.3px;
+  transition: all 0.25s ease;
+}
+
+button:hover {
+  transform: scale(1.03);
+}
+
+/* PROGRESS BAR PREMIUM (BONO MEJORADO) */
+#progressBar {
+  height: 12px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(90deg,#10B981,#3B82F6,#F59E0B);
+  box-shadow: 0 5px 15px rgba(16,185,129,0.3);
+}
+
+/* PROGRESS BOX CLEAN */
+.section-card h2 {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+/* PROGRESS TEXT MÁS PRO */
+#progressText {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94A3B8;
+}
+
+/* BOTONES CPA ACTION (VIDEO/JUEGO/ETC) */
+.games-grid {
+  gap: 14px;
+}
+
+.games-grid .game-item {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* BOTÓN RETIRO + REFERIDOS MÁS LIMPIO */
+.section-card input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.2);
+  color: white;
+}
+
+/* BOTONES MÁS “APP STYLE” */
+.btn {
+  border-radius: 12px !important;
+  font-size: 14px !important;
+}
+
+/* EFFECT CLICK */
+.game-item:active {
+  transform: scale(0.96);
+}
+
   .stats-grid {
     grid-template-columns: 1fr !important;
   }
