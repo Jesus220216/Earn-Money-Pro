@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EarnPro Dashboard - Gana Dinero Fácil</title>
+<title>EarnPro Dashboard</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,10 +15,11 @@
 
 <body>
 
-<div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+<div class="min-h-screen">
 
 <!-- HEADER -->
 <div class="header-hero">
+
   <div class="header-background">
     <img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663427137618/DZNVjeDi2TTeJHBF4drPLX/hero-dashboard-eXtDujZMPEtYity8XHWzjU.webp">
   </div>
@@ -26,12 +27,14 @@
   <div class="header-content">
     <div>
       <h1>EarnPro Dashboard</h1>
-      <p>Bienvenido de vuelta, usuario. Sigue ganando dinero fácil.</p>
+      <p>Gana dinero completando ofertas CPA</p>
     </div>
+
     <div>
-      ⚡ <span id="today">+$0.00 hoy</span>
+      ⚡ <span id="today">$0.00 hoy</span>
     </div>
   </div>
+
 </div>
 
 <!-- MAIN -->
@@ -40,141 +43,158 @@
 <!-- STATS -->
 <div class="stats-grid">
 
-<div class="stat-card">
-<h3>Saldo</h3>
-<p id="balance">$0.00</p>
-</div>
-
-  <div id="progressBox" style="
-  background:#fff;
-  padding:12px;
-  border-radius:10px;
-  margin-bottom:15px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.08);
-">
-  <p style="font-size:13px;font-weight:bold;margin-bottom:6px;">
-    🎯 Progreso de Bonus
-  </p>
-
-  <div style="
-    width:100%;
-    background:#eee;
-    border-radius:8px;
-    overflow:hidden;
-  ">
-    <div id="progressBar" style="
-      width:0%;
-      height:10px;
-      background:linear-gradient(90deg,#10B981,#059669);
-      transition:0.3s;
-    "></div>
+  <div class="stat-card">
+    <div class="card-content">
+      <h3>💰 Saldo</h3>
+      <p id="balance">$0.00</p>
+    </div>
   </div>
 
-  <p id="progressText" style="
-    font-size:11px;
-    margin-top:6px;
-    color:#555;
-  ">
-    0/3 ofertas completadas
-  </p>
-</div>
+  <div class="stat-card">
+    <div class="card-content">
+      <h3>👥 Referidos</h3>
+      <p id="refCount">0</p>
+    </div>
+  </div>
 
-  <!-- 💰 ZONA GANANCIAS REALES -->
-<div style="margin-top:20px; display:flex; gap:10px; flex-wrap:wrap;">
+  <div class="stat-card">
+    <div class="card-content">
+      <h3>📈 Hoy</h3>
+      <p id="todayEarnings">$0.00</p>
+    </div>
+  </div>
 
-  <button onclick="startVideo()" style="padding:10px 15px; border:none; border-radius:8px; background:#10B981; color:#fff;">
-    🎥 Ver Video + CPA
-  </button>
-
-  <button onclick="playGame()" style="padding:10px 15px; border:none; border-radius:8px; background:#3B82F6; color:#fff;">
-    🎮 Jugar + CPA
-  </button>
-
-  <button onclick="spin()" style="padding:10px 15px; border:none; border-radius:8px; background:#F59E0B; color:#fff;">
-    🎰 Ruleta + CPA
-  </button>
-
-  <button onclick="daily()" style="padding:10px 15px; border:none; border-radius:8px; background:#8B5CF6; color:#fff;">
-    🎁 Daily + CPA
-  </button>
+  <div class="stat-card">
+    <div class="card-content">
+      <h3>🎥 Videos</h3>
+      <p id="videos">0</p>
+    </div>
+  </div>
 
 </div>
 
-<div class="stat-card">
-<h3>Referidos</h3>
-<p id="refCount">0</p>
+<!-- PROGRESS -->
+<div class="section-card">
+  <div class="section-content">
+
+    <h2>🎯 Progreso de Bonus</h2>
+
+    <div style="margin-top:10px;">
+      <div style="width:100%; background:#1e293b; border-radius:10px; overflow:hidden;">
+        <div id="progressBar" style="
+          width:0%;
+          height:10px;
+          background:linear-gradient(90deg,#10B981,#3B82F6);
+          transition:0.3s;
+        "></div>
+      </div>
+
+      <p id="progressText" style="margin-top:8px;font-size:12px;">
+        0/3 ofertas completadas
+      </p>
+
+    </div>
+
+  </div>
 </div>
 
-<div class="stat-card">
-<h3>Hoy</h3>
-<p id="todayEarnings">$0.00</p>
+<!-- CPA ACTIONS -->
+<div class="section-card">
+  <div class="section-content">
+
+    <h2>🚀 Gana dinero</h2>
+
+    <div class="games-grid">
+
+      <div class="game-item" onclick="startVideo()">
+        <div class="game-icon">🎥</div>
+        <div class="game-name">Video</div>
+        <div class="game-reward">+CPA</div>
+      </div>
+
+      <div class="game-item" onclick="playGame()">
+        <div class="game-icon">🎮</div>
+        <div class="game-name">Juego</div>
+        <div class="game-reward">+CPA</div>
+      </div>
+
+      <div class="game-item" onclick="spin()">
+        <div class="game-icon">🎰</div>
+        <div class="game-name">Ruleta</div>
+        <div class="game-reward">+CPA</div>
+      </div>
+
+      <div class="game-item" onclick="daily()">
+        <div class="game-icon">🎁</div>
+        <div class="game-name">Daily</div>
+        <div class="game-reward">+CPA</div>
+      </div>
+
+    </div>
+
+  </div>
 </div>
 
-<div class="stat-card">
-<h3>Videos</h3>
-<p id="videos">0</p>
+<!-- REFERIDOS -->
+<div class="section-card">
+  <div class="section-content">
+
+    <h2>👥 Referidos</h2>
+
+    <input id="refLink" type="text" placeholder="Tu link de referido" />
+
+    <button class="btn btn-emerald" onclick="generateRefLink()">
+      🔗 Generar link
+    </button>
+
+    <button class="btn btn-blue" onclick="copyRef()">
+      📋 Copiar link
+    </button>
+
+  </div>
 </div>
 
-</div>
+<!-- OFERTAS -->
+<div class="section-card">
+  <div class="section-content">
 
-<!-- 💰 CPA SECTION (ARREGLADO PRO) -->
-<div class="cpa-section">
+    <h2>🔥 Offerwall</h2>
 
-<h2>🚀 Gana dinero ahora </h2>
+    <button class="btn btn-amber" onclick="loadOffers()">
+      Cargar ofertas CPA
+    </button>
 
-<div class="cpa-buttons">
-<button onclick="loadOffers()">🔥 Offerwall (PRO)</button>
-<button onclick="openLocker()">🎁 Desbloquear recompensa</button>
-</div>
+    <div id="offers" style="margin-top:15px;"></div>
 
-  <div id="stepsBox" style="
-  background:#fff;
-  padding:12px;
-  border-radius:10px;
-  margin-bottom:15px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.08);
-">
-
-  <p style="font-weight:bold;font-size:14px;margin-bottom:8px;">
-    💸 Cómo ganar dinero:
-  </p>
-
-  <p id="step1">🔴 Paso 1: Haz clic en una oferta</p>
-  <p id="step2">⚪ Paso 2: Completa el registro</p>
-  <p id="step3">⚪ Paso 3: Recibe tu dinero</p>
-
-</div>
-
-<!-- OFERTAS DINÁMICAS -->
-<div id="offers" style="margin-top:20px;"></div>
-
-<!-- OPCIONAL iframe -->
-<div style="margin-top:20px;">
-<iframe id="offerwallFrame" style="width:100%; height:500px; border:none; border-radius:10px;"></iframe>
-</div>
-
+  </div>
 </div>
 
 <!-- RETIRO -->
-<div class="activity-section">
+<div class="section-card">
+  <div class="section-content">
 
-<h2>Solicitar Retiro</h2>
+    <h2>💸 Retiro</h2>
 
-<input type="email" id="email" placeholder="Tu email">
-<input type="number" id="amount" placeholder="Monto">
+    <input type="email" id="email" placeholder="Tu email" />
+    <input type="number" id="amount" placeholder="Monto mínimo $5" />
 
-<button onclick="withdraw()">💳 Retirar</button>
+    <button class="btn btn-emerald" onclick="withdraw()">
+      Solicitar retiro
+    </button>
 
+  </div>
 </div>
 
 <!-- LOGOUT -->
 <div style="text-align:center;margin-top:20px;">
-<button onclick="logout()">🚪 Cerrar sesión</button>
+  <button class="btn btn-amber" onclick="logout()">
+    🚪 Cerrar sesión
+  </button>
 </div>
 
 </div>
 
-<!-- SCRIPTS -->
+<!-- SCRIPT -->
 <script type="module" src="/js/dashboard.js"></script>
 
 </body>
