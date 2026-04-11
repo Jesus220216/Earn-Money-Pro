@@ -512,3 +512,63 @@ window.logout = function () {
       showToast("Error al cerrar sesión ❌");
     });
 };
+
+// ============================================
+// 💰 CPA REAL (OFFERWALL + LOCKER)
+// ============================================
+
+// 🔒 Anti spam acciones
+let taskCooldown = false;
+
+function lockTask(time = 15000) {
+  taskCooldown = true;
+  setTimeout(() => taskCooldown = false, time);
+}
+
+// ============================================
+// 🔥 OFFERWALL (ADGATE)
+// ============================================
+window.openOfferwall = () => {
+  if (taskCooldown) {
+    showToast("Espera ⏳");
+    return;
+  }
+
+  if (!user) return;
+
+  lockTask(15000);
+
+  const frame = document.getElementById("offerwallFrame");
+
+  if (frame) {
+    frame.src = `https://wall.adgatemedium.com/?aff_id=TU_ID&user_id=${user.uid}`;
+  }
+
+  showToast("Explora ofertas y gana dinero 💰");
+};
+
+// ============================================
+// 🔥 CPA LOCKER DINÁMICO (PLAYABLEDOWNLOADS)
+// ============================================
+
+window.openCPAOffer = () => {
+  if (!user) return;
+
+  if (taskCooldown) {
+    showToast("Espera ⏳");
+    return;
+  }
+
+  lockTask(20000);
+
+  if (document.getElementById("cpaScript")) return;
+
+  const s = document.createElement("script");
+  s.id = "cpaScript";
+  s.src = `https://playabledownloads.com/script_include.php?id=1889035&subid=${user.uid}`;
+  s.async = true;
+
+  document.body.appendChild(s);
+
+  showToast("Completa la oferta para continuar 💰");
+};
