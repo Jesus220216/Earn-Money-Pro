@@ -26,10 +26,26 @@ let taskCooldown = false;
 let completedOffers = 0;
 
 function trackOfferClick() {
+  if (completedOffers >= 3) return;
+
   completedOffers++;
 
+  updateProgress();
+}
+
+function updateProgress() {
+  const bar = document.getElementById("progressBar");
+  const text = document.getElementById("progressText");
+
+  if (!bar || !text) return;
+
+  const percent = (completedOffers / 3) * 100;
+
+  bar.style.width = percent + "%";
+  text.innerText = `${completedOffers}/3 ofertas completadas`;
+
   if (completedOffers === 3) {
-    showToast("🎁 Bonus desbloqueado +$0.50");
+    showToast("🎁 BONUS desbloqueado +$0.50");
   }
 }
 
