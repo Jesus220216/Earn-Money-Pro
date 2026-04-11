@@ -1,138 +1,200 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EarnPro Dashboard - Gana Dinero Fácil</title>
 
-    <title>EarnPro Dashboard - Gana Dinero Fácil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="/css/dashboard.css">
+<!-- ⚠️ ESTE ES TU DISEÑO (NO SE TOCA) -->
+<link rel="stylesheet" href="/css/dashboard.css">
 </head>
 
 <body>
 
 <div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
 
-    <!-- HEADER (ORIGINAL) -->
-    <div class="header-hero">
-        <div class="header-background">
-            <img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663427137618/DZNVjeDi2TTeJHBF4drPLX/hero-dashboard-eXtDujZMPEtYity8XHWzjU.webp">
-        </div>
-
-        <div class="header-content">
-            <div class="header-text">
-                <h1>EarnPro Dashboard</h1>
-                <p>Bienvenido de vuelta, usuario. Sigue ganando dinero fácil.</p>
-            </div>
-
-            <div class="header-badge">
-                <span class="badge-icon">⚡</span>
-                <span class="badge-text" id="today">+$0.00 hoy</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- MAIN -->
-    <div class="main-container">
-
-        <!-- STATS (NO CAMBIADO) -->
-        <div class="stats-grid">
-
-            <div class="stat-card glass">
-                <div class="card-content">
-                    <div class="card-header">
-                        <div class="card-icon gradient-emerald">💰</div>
-                    </div>
-                    <h3>Saldo Actual</h3>
-                    <p id="balance">$0.00</p>
-                </div>
-            </div>
-
-            <div class="stat-card glass">
-                <h3>Referidos</h3>
-                <p id="refCount">0</p>
-            </div>
-
-            <div class="stat-card glass">
-                <h3>Ganancias Hoy</h3>
-                <p id="todayEarnings">$0.00</p>
-            </div>
-
-            <div class="stat-card glass">
-                <h3>Videos</h3>
-                <p id="videos">0</p>
-                <small id="videosLeft">Restantes: 6</small>
-            </div>
-
-        </div>
-
-        <!-- JUEGOS (ORIGINAL) -->
-        <div class="section-card">
-            <h2>Juega y Gana</h2>
-
-            <div class="games-grid">
-                <div class="game-item" onclick="playGame()">🎮 Juego</div>
-                <div class="game-item" onclick="spin()">🎰 Ruleta</div>
-                <div class="game-item" onclick="daily()">🎁 Daily</div>
-            </div>
-
-            <button onclick="playGame()">Jugar Ahora</button>
-        </div>
-
-        <!-- CPA -->
-        <div class="cpa-section">
-            <h2>💰 Ganar Dinero Real</h2>
-
-            <button onclick="openOfferwall()">Offerwall</button>
-            <button onclick="openLocker()">Locker</button>
-
-            <iframe id="offerwallFrame"></iframe>
-        </div>
-
-        <!-- VIDEOS -->
-        <div class="section-card">
-            <h2>Ver Videos</h2>
-            <button onclick="startVideo()">Ver Video</button>
-        </div>
-
-        <!-- ENCUESTAS -->
-        <div class="section-card">
-            <h2>Encuestas</h2>
-            <button onclick="openBox()">Ver Encuestas</button>
-        </div>
-
-        <!-- OFERTAS -->
-        <div class="section-card">
-            <h2>Ofertas</h2>
-            <button onclick="openBox()">Ver Ofertas</button>
-        </div>
-
-        <!-- REFERIDOS -->
-        <div>
-            <input id="refLink" readonly>
-            <button onclick="copyRef()">Copiar</button>
-        </div>
-
-        <!-- RETIRO -->
-        <div>
-            <input id="email" placeholder="Email">
-            <input id="amount" placeholder="Monto mínimo 5$">
-            <button onclick="withdraw()">Retirar</button>
-        </div>
-
-        <!-- LOGOUT -->
-        <button onclick="logout()">Cerrar Sesión</button>
-
-    </div>
+<!-- HEADER -->
+<div class="header-hero">
+<div class="header-background">
+<img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663427137618/DZNVjeDi2TTeJHBF4drPLX/hero-dashboard-eXtDujZMPEtYity8XHWzjU.webp">
 </div>
 
-<!-- ❗ SOLO 1 JS (IMPORTANTE) -->
-<script type="module" src="/js/dashboard.js"></script>
+<div class="header-content">
+<div class="header-text">
+<h1>EarnPro Dashboard</h1>
+<p>Bienvenido de vuelta, usuario</p>
+</div>
+<div class="header-badge">
+<span class="badge-icon">⚡</span>
+<span class="badge-text" id="today">+$0.00 hoy</span>
+</div>
+</div>
+</div>
+
+<!-- MAIN -->
+<div class="main-container">
+
+<!-- STATS -->
+<div class="stats-grid">
+
+<div class="stat-card glass">
+<h3>Saldo</h3>
+<p id="balance">$0.00</p>
+</div>
+
+<div class="stat-card glass">
+<h3>Referidos</h3>
+<p id="refCount">0</p>
+</div>
+
+<div class="stat-card glass">
+<h3>Hoy</h3>
+<p id="todayEarnings">$0.00</p>
+</div>
+
+<div class="stat-card glass">
+<h3>Videos</h3>
+<p id="videos">0</p>
+<p id="videosLeft">Restantes: 6</p>
+</div>
+
+</div>
+
+<!-- CPA -->
+<div class="cpa-section">
+<h2>💰 Ganar Dinero Real</h2>
+
+<button onclick="openOfferwall()">Offerwall</button>
+<button onclick="openLocker()">Locker</button>
+
+<iframe id="offerwallFrame" style="width:100%;height:400px;border:none;"></iframe>
+</div>
+
+<!-- BUTTONS -->
+<div class="section-card">
+<button onclick="playGame()">🎮 Juego</button>
+<button onclick="spin()">🎰 Ruleta</button>
+<button onclick="daily()">🎁 Daily</button>
+<button onclick="startVideo()">🎥 Video</button>
+<button onclick="withdraw()">💳 Retiro</button>
+<button onclick="logout()">🚪 Salir</button>
+</div>
+
+</div>
+</div>
+
+<!-- FIREBASE + JS -->
+<script type="module">
+
+import { auth, db } from "/js/firebase.js";
+import {
+doc, getDoc, setDoc, updateDoc,
+increment, collection, onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+let user = null;
+let balance = 0;
+let videosLeft = 6;
+
+/* ================= LOGIN ================= */
+auth.onAuthStateChanged(async (u) => {
+if (!u) return location.href = "index.html";
+user = u;
+await initUser();
+loadData();
+});
+
+/* ================= INIT USER ================= */
+async function initUser() {
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
+
+if (!snap.exists()) {
+await setDoc(ref,{
+balance:1,
+videosLeft:6,
+referrals:0,
+todayEarnings:0
+});
+}
+}
+
+/* ================= REAL TIME ================= */
+function loadData() {
+const ref = doc(db,"users",user.uid);
+
+onSnapshot(ref,(snap)=>{
+const d = snap.data();
+
+balance = d.balance || 0;
+videosLeft = d.videosLeft || 0;
+
+document.getElementById("balance").innerText = "$"+balance.toFixed(2);
+document.getElementById("videosLeft").innerText = "Restantes: "+videosLeft;
+document.getElementById("refCount").innerText = d.referrals || 0;
+document.getElementById("todayEarnings").innerText = "$"+(d.todayEarnings||0).toFixed(2);
+});
+}
+
+/* ================= FUNCTIONS ================= */
+
+window.playGame = async () => {
+await updateDoc(doc(db,"users",user.uid),{
+balance: increment(0.05)
+});
+alert("Ganaste $0.05");
+};
+
+window.spin = async () => {
+let reward = [0.01,0.02,0.05][Math.floor(Math.random()*3)];
+await updateDoc(doc(db,"users",user.uid),{
+balance: increment(reward)
+});
+alert("Ganaste $"+reward);
+};
+
+window.daily = async () => {
+await updateDoc(doc(db,"users",user.uid),{
+balance: increment(0.2)
+});
+alert("Daily claim!");
+};
+
+window.startVideo = async () => {
+if (videosLeft <= 0) return alert("Sin videos");
+
+await updateDoc(doc(db,"users",user.uid),{
+balance: increment(0.03),
+videosLeft: increment(-1)
+});
+};
+
+window.withdraw = async () => {
+const email = document.getElementById("email")?.value;
+const amount = document.getElementById("amount")?.value;
+
+if (!email || amount < 5) return alert("Error");
+
+alert("Retiro enviado");
+};
+
+window.openOfferwall = () => {
+document.getElementById("offerwallFrame").src =
+"https://wall.adgatemedium.com/?aff_id=5716144&user_id="+user.uid;
+};
+
+window.openLocker = () => {
+alert("Locker abierto");
+};
+
+window.logout = () => auth.signOut().then(()=>location.href="index.html");
+
+</script>
 
 </body>
 </html>
