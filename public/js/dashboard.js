@@ -404,7 +404,7 @@ window.loadOffers = () => {
     return;
   }
 
- const url = `https://www.cpagrip.com/common/offer_feed_json.php?user_id=2515689&pubkey=34053872c6552fb19c9838ebb8b56138&tracking_id=${user.uid}&offer_type=Submit Email/Zip&showmobile=1`;
+ const url = `https://www.cpagrip.com/common/offer_feed_json.php?user_id=2515689&pubkey=34053872c6552fb19c9838ebb8b56138&tracking_id=${user.uid}&offer_type=Submit Email/Zip`;
 
   fetch(url)
     .then(res => res.json())
