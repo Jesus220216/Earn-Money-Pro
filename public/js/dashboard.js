@@ -26,6 +26,28 @@ let taskCooldown = false;
 let step = 1 + Math.floor(Math.random() * 2);
 let completedOffers = 0;
 
+// 🎥 NUEVO: control de videos diarios
+let videosToday = 0;
+const MAX_VIDEOS = 6;
+function resetDailyVideos() {
+  const lastReset = localStorage.getItem("lastVideoReset");
+  const today = new Date().toDateString();
+
+  if (lastReset !== today) {
+    videosToday = 0;
+    localStorage.setItem("lastVideoReset", today);
+  }
+}
+
+function lockUI() {
+  document.body.style.pointerEvents = "none";
+}
+
+function unlockUI() {
+  document.body.style.pointerEvents = "auto";
+}
+
+resetDailyVideos();
 
 // ============================================
 // 💰 CPA CORE SYSTEM (OBLIGATORIO)
@@ -233,27 +255,39 @@ function updateUI(d) {
 // ============================================
 
 window.startVideo = async () => {
-  if (taskCooldown) return showToast("Espera ⏳");
-  if (videosLeft <= 0) return showToast("Sin videos ❌");
+  if (taskCooldown || videoCooldown) return showToast("Espera ⏳");
+
+  if (videosToday >= MAX_VIDEOS) {
+    return showToast("Sin videos hoy ❌");
+  }
 
   taskCooldown = true;
+  videoCooldown = true;
 
-  triggerCPA(); // 🔥 CPA
-
+  triggerCPA(); 
   trackOfferClick();
   nextStep();
 
-  setTimeout(async () => {
+  showToast("🎥 Reproduciendo video... 20s");
+
+  // 🔥 Simulación de video real
+  const timer = setTimeout(async () => {
+
     await updateDoc(doc(db, "users", user.uid), {
       balance: increment(0.02),
       videosLeft: increment(-1),
-      todayEarnings: increment(0.02)
+      todayEarnings: increment(0.02),
+      videosToday: increment(1)
     });
 
-    videosLeft--;
-    showToast("🎥 Video completado + posible recompensa CPA");
+    videosToday++;
+
+    showToast("✅ Video completado + recompensa CPA");
+
     taskCooldown = false;
-  }, 8000);
+    videoCooldown = false;
+
+  }, VIDEO_TIME);
 };
 
 // ============================================
