@@ -568,8 +568,9 @@ html += `
   ">
     🎯 Completa 3 ofertas y gana BONUS
   </p>
+  
 </div>
-`;
+;
       container.innerHTML = html;
 
       showToast("Ofertas cargadas 💰");
