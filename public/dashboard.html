@@ -18,7 +18,7 @@
 
 <div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
 
-    <!-- HEADER ORIGINAL -->
+    <!-- HEADER (ORIGINAL) -->
     <div class="header-hero">
         <div class="header-background">
             <img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663427137618/DZNVjeDi2TTeJHBF4drPLX/hero-dashboard-eXtDujZMPEtYity8XHWzjU.webp">
@@ -31,8 +31,8 @@
             </div>
 
             <div class="header-badge">
-                <span>⚡</span>
-                <span id="today">+$0.00 hoy</span>
+                <span class="badge-icon">⚡</span>
+                <span class="badge-text" id="today">+$0.00 hoy</span>
             </div>
         </div>
     </div>
@@ -40,12 +40,17 @@
     <!-- MAIN -->
     <div class="main-container">
 
-        <!-- STATS GRID ORIGINAL -->
+        <!-- STATS (NO CAMBIADO) -->
         <div class="stats-grid">
 
             <div class="stat-card glass">
-                <h3>Saldo Actual</h3>
-                <p id="balance">$0.00</p>
+                <div class="card-content">
+                    <div class="card-header">
+                        <div class="card-icon gradient-emerald">💰</div>
+                    </div>
+                    <h3>Saldo Actual</h3>
+                    <p id="balance">$0.00</p>
+                </div>
             </div>
 
             <div class="stat-card glass">
@@ -66,31 +71,33 @@
 
         </div>
 
-        <!-- JUEGOS ORIGINAL -->
+        <!-- JUEGOS (ORIGINAL) -->
         <div class="section-card">
-
             <h2>Juega y Gana</h2>
 
             <div class="games-grid">
-                <div onclick="playGame()">🎮 Juego</div>
-                <div onclick="spin()">🎰 Ruleta</div>
-                <div onclick="daily()">🎁 Daily</div>
+                <div class="game-item" onclick="playGame()">🎮 Juego</div>
+                <div class="game-item" onclick="spin()">🎰 Ruleta</div>
+                <div class="game-item" onclick="daily()">🎁 Daily</div>
             </div>
 
             <button onclick="playGame()">Jugar Ahora</button>
-
         </div>
 
-        <!-- CPA ORIGINAL -->
+        <!-- CPA -->
         <div class="cpa-section">
-
             <h2>💰 Ganar Dinero Real</h2>
 
             <button onclick="openOfferwall()">Offerwall</button>
             <button onclick="openLocker()">Locker</button>
 
             <iframe id="offerwallFrame"></iframe>
+        </div>
 
+        <!-- VIDEOS -->
+        <div class="section-card">
+            <h2>Ver Videos</h2>
+            <button onclick="startVideo()">Ver Video</button>
         </div>
 
         <!-- ENCUESTAS -->
@@ -99,24 +106,16 @@
             <button onclick="openBox()">Ver Encuestas</button>
         </div>
 
-        <!-- VIDEOS -->
-        <div class="section-card">
-            <h2>Ver Videos</h2>
-
-            <button onclick="startVideo()">Ver Video</button>
-        </div>
-
         <!-- OFERTAS -->
         <div class="section-card">
             <h2>Ofertas</h2>
-
             <button onclick="openBox()">Ver Ofertas</button>
         </div>
 
         <!-- REFERIDOS -->
         <div>
             <input id="refLink" readonly>
-            <button onclick="copyRef()">Copiar Link</button>
+            <button onclick="copyRef()">Copiar</button>
         </div>
 
         <!-- RETIRO -->
@@ -132,7 +131,7 @@
     </div>
 </div>
 
-<!-- SOLO TU JS REAL -->
+<!-- ❗ SOLO 1 JS (IMPORTANTE) -->
 <script type="module" src="/js/dashboard.js"></script>
 
 </body>
