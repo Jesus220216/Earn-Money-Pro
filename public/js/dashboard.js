@@ -466,7 +466,7 @@ window.loadOffers = () => {
       <a href="${offer.offerlink}" 
          target="_blank" 
          rel="noopener noreferrer"
-        onclick="trackOfferClick(); nextStep();"
+       onclick="trackOfferClick(); nextStep(); saveClick();"
          style="
            display:block;
            text-align:center;
@@ -504,9 +504,10 @@ auth.onAuthStateChanged((u) => {
   if (u) {
     user = u;
 
-    setTimeout(() => {
-      loadOffers();
-    }, 1000);
+   setTimeout(() => {
+  loadOffers();
+  showToast("🔥 Nuevas ofertas disponibles");
+}, 1000);
   }
 });
 
@@ -537,3 +538,21 @@ setInterval(() => {
 setInterval(() => {
   checkDailyReset();
 }, 60000);
+
+// 🔥 AUTO LOAD OFERTAS
+setTimeout(() => {
+  if (user) {
+    loadOffers();
+  }
+}, 2000);
+
+async function saveClick() {
+  try {
+    await addDoc(collection(db, "clicks"), {
+      uid: user.uid,
+      date: Date.now()
+    });
+  } catch (e) {
+    console.error("click error", e);
+  }
+}
