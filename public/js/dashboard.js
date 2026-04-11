@@ -23,6 +23,16 @@ let balance = 0;
 let videosLeft = 0;
 let taskCooldown = false;
 
+let completedOffers = 0;
+
+function trackOfferClick() {
+  completedOffers++;
+
+  if (completedOffers === 3) {
+    showToast("🎁 Bonus desbloqueado +$0.50");
+  }
+}
+
 // ============================================
 // 🌍 AUTH STATE
 // ============================================
@@ -341,9 +351,11 @@ window.loadOffers = () => {
 
      let html = "";
 
-data.offers.slice(0, 6).forEach(offer => {
+ data.offers.slice(0, 6).forEach(offer => {
 
   const reward = (Math.random() * (3 - 0.5) + 0.5).toFixed(2);
+  const people = Math.floor(Math.random() * 20) + 5;
+  const timer = Math.floor(Math.random() * 10) + 5;
 
   html += `
     <div style="
@@ -361,34 +373,51 @@ data.offers.slice(0, 6).forEach(offer => {
         font-size:13px;
         color:#10B981;
         font-weight:bold;
-        margin-bottom:10px;
+        margin-bottom:6px;
       ">
         Gana hasta $${reward} 💸
+      </p>
+
+      <p style="
+        font-size:11px;
+        color:#ff3b3b;
+        font-weight:bold;
+      ">
+        🔥 ${people} personas haciéndolo ahora
+      </p>
+
+      <p style="
+        font-size:11px;
+        color:#999;
+        margin-bottom:10px;
+      ">
+        ⏳ Expira en ${timer} min
       </p>
 
       <a href="${offer.offerlink}" 
          target="_blank" 
          rel="noopener noreferrer"
+         onclick="trackOfferClick()"
          style="
            display:block;
            text-align:center;
-           padding:10px;
+           padding:12px;
            background:linear-gradient(90deg,#10B981,#059669);
            color:#fff;
            border-radius:8px;
            text-decoration:none;
            font-weight:bold;
-           transition:0.2s;
          ">
-         🚀 Empezar ahora
+         💸 Completar y ganar dinero
       </a>
 
       <p style="
         font-size:11px;
-        color:#999;
+        color:#10B981;
+        font-weight:bold;
         margin-top:8px;
       ">
-        ⏳ Oferta limitada
+        🎯 Completa 3 ofertas y gana BONUS
       </p>
 
     </div>
@@ -411,3 +440,21 @@ auth.onAuthStateChanged((u) => {
     }, 1000);
   }
 });
+
+// ============================================
+// 🔥 EFECTO GANANCIAS EN VIVO
+// ============================================
+setInterval(() => {
+  const names = ["Carlos", "Ana", "Luis", "Maria", "Jose", "Elena"];
+  const name = names[Math.floor(Math.random() * names.length)];
+  const amount = (Math.random() * 3 + 0.5).toFixed(2);
+
+  showToast(`💰 ${name} ganó $${amount}`);
+}, 8000);
+
+// ============================================
+// 🔄 AUTO RECARGA OFERTAS
+// ============================================
+setInterval(() => {
+  if (user) loadOffers();
+}, 30000);
