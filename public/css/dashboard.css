@@ -768,3 +768,136 @@ button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+/* ============================================
+   🔥 EARNPRO - UI BOOST (COMPATIBILIDAD DASHBOARD JS)
+   ============================================ */
+
+/* BODY DARK MODE PRO (para tu sistema CPA) */
+body {
+  background: #0b1220 !important;
+  color: #e5e7eb;
+}
+
+/* NUMEROS BALANCE MÁS PRO */
+#balance, #todayEarnings, #refCount, #videos, #videosLeft {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: #10B981;
+}
+
+/* FIX BOTONES JS (CPA ACTION BUTTONS) */
+button {
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+/* BOTONES CPA QUE YA TIENES */
+.menu button,
+.btn {
+  backdrop-filter: blur(10px);
+}
+
+/* MEJORA TOAST (tu JS usa showToast) */
+div[style*="position:fixed"] {
+  font-family: Inter, sans-serif !important;
+  font-weight: 600;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* PROGRESS BAR (si tienes progreso) */
+#progressBar {
+  background: linear-gradient(90deg, #10B981, #3B82F6);
+  height: 10px;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+/* TAB SYSTEM COMPATIBLE CON TU JS */
+.tab {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.tab.active {
+  display: block;
+}
+
+/* CPA OFFER CARDS (CPAGRIP) */
+#offers div {
+  background: rgba(255,255,255,0.03) !important;
+  border: 1px solid rgba(255,255,255,0.05) !important;
+  color: #e5e7eb !important;
+  transition: all 0.3s ease;
+}
+
+#offers div:hover {
+  transform: translateY(-3px);
+  border-color: #10B981 !important;
+}
+
+/* LINKS BOTÓN CPA */
+#offers a {
+  background: linear-gradient(135deg, #10B981, #059669) !important;
+  color: white !important;
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+}
+
+/* SIDEBAR / MENU FIX */
+.menu button {
+  background: rgba(255,255,255,0.05);
+  color: #e5e7eb;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* HOVER PREMIUM */
+.menu button:hover {
+  background: #10B981;
+  color: black;
+}
+
+/* GRID FIX PARA TU DASHBOARD */
+.grid, .stats-grid {
+  gap: 12px;
+}
+
+/* CARD SHADOW MÁS PREMIUM */
+.card, .stat-card, .section-card {
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+/* SCROLLBAR PRO */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #10B981;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+/* MOBILE UPGRADE */
+@media (max-width: 768px) {
+  .menu {
+    flex-direction: column;
+  }
+
+  .grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
