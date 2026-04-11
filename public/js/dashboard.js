@@ -22,7 +22,7 @@ let user;
 let balance = 0;
 let videosLeft = 0;
 let taskCooldown = false;
-
+let step = 1;
 let completedOffers = 0;
 
 function trackOfferClick() {
@@ -62,7 +62,42 @@ function checkDailyReset() {
     console.log("🔄 Reset diario aplicado");
   }
 }
+function updateSteps() {
+  const s1 = document.getElementById("step1");
+  const s2 = document.getElementById("step2");
+  const s3 = document.getElementById("step3");
 
+  if (!s1 || !s2 || !s3) return;
+
+  if (step === 1) {
+    s1.innerHTML = "🟡 Paso 1: Haz clic en una oferta";
+  }
+
+  if (step === 2) {
+    s1.innerHTML = "✅ Paso 1 completado";
+    s2.innerHTML = "🟡 Paso 2: Completa el registro";
+  }
+
+  if (step === 3) {
+    s2.innerHTML = "✅ Paso 2 completado";
+    s3.innerHTML = "🟡 Paso 3: Recibe tu dinero";
+  }
+}
+
+function nextStep() {
+  if (step < 3) {
+    step++;
+    updateSteps();
+  }
+
+  if (step === 2) {
+    showToast("⚠️ Completa el registro para ganar dinero");
+  }
+
+  if (step === 3) {
+    showToast("💰 Esperando confirmación de la oferta...");
+  }
+}
 // ============================================
 // 🌍 AUTH STATE
 // ============================================
@@ -72,12 +107,14 @@ auth.onAuthStateChanged(async (u) => {
 
   user = u;
 
-  checkDailyReset(); // 🔥 AQUÍ
+  checkDailyReset(); // 🔥 reset diario
 
   await initUser();
   await loadUserData();
   await generateRefLink();
   realtimeBalance();
+
+  updateSteps(); // ✅ AQUÍ (AL FINAL)
 });
 
 // ============================================
@@ -429,7 +466,7 @@ window.loadOffers = () => {
       <a href="${offer.offerlink}" 
          target="_blank" 
          rel="noopener noreferrer"
-         onclick="trackOfferClick()"
+        onclick="trackOfferClick(); nextStep();"
          style="
            display:block;
            text-align:center;
