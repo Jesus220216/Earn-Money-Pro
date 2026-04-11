@@ -115,3 +115,6 @@ input {
   margin-top: 8px;
   color: #94a3b8;
 }
+.card a:hover {
+  transform: scale(1.05);
+}
