@@ -474,3 +474,9 @@ setInterval(() => {
 setInterval(() => {
   if (user) loadOffers();
 }, 30000);
+
+// 🔄 RESET PROGRESO CADA 24H
+setInterval(() => {
+  completedOffers = 0;
+  updateProgress();
+}, 86400000);
