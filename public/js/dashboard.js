@@ -466,7 +466,7 @@ const url = `https://www.cpagrip.com/common/offer_feed_json.php?user_id=2515689&
       <a href="${offer.offerlink}" 
          target="_blank" 
          rel="noopener noreferrer"
-       onclick="trackOfferClick(); nextStep(); saveClick();"
+       onclick="trackOfferClick(); nextStep();
          style="
            display:block;
            text-align:center;
