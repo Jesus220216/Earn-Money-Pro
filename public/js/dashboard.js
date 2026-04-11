@@ -315,85 +315,63 @@ window.logout = () => {
 };
 
 // ============================================
-// 💰 CPAGRIP RSS OFFERWALL PRO
+// 💰 CPAGRIP RSS OFFERWALL (FIXED)
 // ============================================
 
-const RSS_URL = `https://www.cpagrip.com/common/offer_feed_rss.php`;
+// ============================================
+// 💰 CPAGRIP JSON OFFERWALL (PRO)
+// ============================================
 
-window.loadOfferwallRSS = async () => {
-  if (!user) return;
-
-  const url =
-    `${RSS_URL}?user_id=2515689` +
-    `&clave=565232f8cde467b0105511e1c1dd2f4a` +
-    `&tracking_id=${user.uid}` +
-    `&ip=` +
-    `&ua=${encodeURIComponent(navigator.userAgent)}` +
-    `&limite=10`;
-
-  try {
-    const res = await fetch(url);
-    const text = await res.text();
-
-    const parser = new DOMParser();
-    const xml = parser.parseFromString(text, "text/xml");
-
-    const items = xml.querySelectorAll("item");
-
-    const container = document.getElementById("offerwallFrame");
-    if (!container) return;
-
-    container.innerHTML = ""; // limpiamos iframe si existe
-
-    const wrapper = document.createElement("div");
-    wrapper.style.padding = "10px";
-
-    items.forEach((item) => {
-      const title = item.querySelector("title")?.textContent;
-      const link = item.querySelector("link")?.textContent;
-      const desc = item.querySelector("description")?.textContent;
-
-      const card = document.createElement("div");
-      card.style = `
-        background:#fff;
-        padding:12px;
-        margin-bottom:10px;
-        border-radius:10px;
-        box-shadow:0 2px 8px rgba(0,0,0,0.08);
-        cursor:pointer;
-      `;
-
-      card.innerHTML = `
-        <h4 style="margin:0 0 5px 0;">💰 ${title}</h4>
-        <p style="font-size:12px;color:#555;">${desc || ""}</p>
-        <button style="
-          margin-top:8px;
-          padding:8px 12px;
-          border:none;
-          background:#10B981;
-          color:white;
-          border-radius:6px;
-          cursor:pointer;
-        ">Ganar dinero</button>
-      `;
-
-      card.onclick = () => {
-        if (!link) return;
-
-        // 🔥 ESTE ES EL CLICK QUE PAGA
-        window.open(link + "&subid=" + user.uid, "_blank");
-
-        showToast("🔗 Oferta abierta");
-      };
-
-      wrapper.appendChild(card);
-    });
-
-    // mostrar en tu sección CPA
-    document.querySelector(".cpa-section").appendChild(wrapper);
-
-  } catch (err) {
-    console.error("Error RSS:", err);
-    showToast("Error cargando ofertas ❌");
+window.loadOffers = () => {
+  if (!user || !user.uid) {
+    showToast("Usuario no listo ❌");
+    return;
   }
+
+  const url = `https://www.cpagrip.com/common/offer_feed_json.php?user_id=2515689&pubkey=34053872c6552fb19c9838ebb8b56138&tracking_id=${user.uid}`;
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+
+      const container = document.getElementById("offers");
+      if (!container) return;
+
+      if (!data.offers || data.offers.length === 0) {
+        container.innerHTML = "<p>No hay ofertas disponibles 😕</p>";
+        return;
+      }
+
+      let html = "";
+
+      data.offers.slice(0, 6).forEach(offer => {
+        html += `
+          <div style="
+            background:#fff;
+            padding:12px;
+            margin-bottom:10px;
+            border-radius:10px;
+            box-shadow:0 2px 8px rgba(0,0,0,0.08);
+          ">
+            <h4 style="margin-bottom:6px;">💰 ${offer.title}</h4>
+            <a href="${offer.offerlink}" target="_blank" rel="noopener noreferrer">
+              style="
+                display:inline-block;
+                padding:8px 12px;
+                background:#10B981;
+                color:#fff;
+                border-radius:6px;
+                text-decoration:none;
+              ">
+              🔥 Ganar dinero ahora
+            </a>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+
+      showToast("Ofertas cargadas 💰");
+    })
+    .catch(() => showToast("Error cargando ofertas ❌"));
 };
