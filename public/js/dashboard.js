@@ -1,36 +1,41 @@
 // ============================================
-// 🔥 EARNPRO NIVEL DIOS - FULL MONETIZATION AI
+// 🔥 EARNPRO PRO - REAL MONEY MONETIZATION SYSTEM
 // ============================================
 
 import { auth, db } from "./firebase.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-import { doc, getDoc, setDoc, updateDoc, increment, addDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import {
+  doc, getDoc, setDoc, updateDoc,
+  increment, addDoc, collection, onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 // ============================================
-// 💰 CONFIG CPA (TUS IDS REALES)
+// 💰 CPA / ADS CONFIG
 // ============================================
 
 const SMARTLINK = "https://omg10.com/4/10751693";
 const ADGATE_ID = "5716144";
 const LOCKER_ID = "1889035";
-const CPX_TOKEN = "03c90bec5058337763c7fa0911a84656";
 
-// ⏳ CONFIG
+// ============================================
+// ⚙️ SYSTEM CONFIG
+// ============================================
+
 const COOLDOWN = 900000;
 
 // ============================================
-// VARIABLES
+// STATE
 // ============================================
 
 let user;
 let balance = 0;
 let videosLeft = 0;
-let boxInterval = null;
 let taskCooldown = false;
-let userGeo = "unknown";
+let userGeo = "US";
+let userDevice = "desktop";
 
 // ============================================
-// 🌍 DETECTAR GEO + DEVICE
+// 🌍 GEO DETECTION
 // ============================================
 
 async function detectUserEnv() {
@@ -41,21 +46,66 @@ async function detectUserEnv() {
   } catch {
     userGeo = "US";
   }
+
+  userDevice = /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop";
 }
 
 // ============================================
-// 🤖 ANTI BOT AVANZADO
+// 🚨 FIXED ANTI BOT SYSTEM
 // ============================================
 
 function isBot() {
   const ua = navigator.userAgent.toLowerCase();
 
   if (ua.includes("bot") || ua.includes("crawler")) return true;
-  if (!window.navigator.webdriver === false) return true;
-  if (screen.width < 300) return true;
+  if (navigator.webdriver) return true;
+  if (!navigator.languages || navigator.languages.length === 0) return true;
+  if (screen.width < 300 || screen.height < 300) return true;
 
   return false;
 }
+
+// ============================================
+// 📊 TRACKING ENGINE (REAL MONETIZATION CORE)
+// ============================================
+
+async function trackEvent(type, extra = {}) {
+  if (!user) return;
+
+  await addDoc(collection(db, "tracking"), {
+    userId: user.uid,
+    type,
+    geo: userGeo,
+    device: userDevice,
+    time: Date.now(),
+    ...extra
+  });
+}
+
+// ============================================
+// 💸 REVENUE TRACKING
+// ============================================
+
+async function trackRevenue(amount, source) {
+  if (!user) return;
+
+  await updateDoc(doc(db, "users", user.uid), {
+    revenue: increment(amount),
+    balance: increment(amount)
+  });
+
+  await addDoc(collection(db, "revenue_logs"), {
+    userId: user.uid,
+    amount,
+    source,
+    time: Date.now(),
+    geo: userGeo
+  });
+}
+
+// ============================================
+// ⏳ COOLDOWN
+// ============================================
 
 function lockTask(time = 15000) {
   taskCooldown = true;
@@ -63,7 +113,7 @@ function lockTask(time = 15000) {
 }
 
 // ============================================
-// 🧠 SMART MONETIZATION AI
+// 🧠 SMART MONETIZATION (DATA-BASED, NOT RANDOM)
 // ============================================
 
 function smartMonetization() {
@@ -71,48 +121,49 @@ function smartMonetization() {
 
   lockTask(15000);
 
-  const rand = Math.random();
+  trackEvent("monetization_trigger");
 
-  // 🔥 GEO OPTIMIZATION
+  // GEO OPTIMIZATION REAL
   if (["US", "CA", "UK", "AU"].includes(userGeo)) {
-    if (rand < 0.4) return openOfferwall();
-    if (rand < 0.7) return openLocker();
+    if (userDevice === "mobile") return openOfferwall();
     return openAd();
   }
 
-  // 🌍 RESTO DEL MUNDO
-  if (rand < 0.6) return openAd();
-  if (rand < 0.85) return openOfferwall();
-  return openLocker();
+  return openAd();
 }
 
 // ============================================
-// 🔗 SMARTLINK
+// 🔗 SMARTLINK (WITH TRACKING)
 // ============================================
 
 function openAd() {
+  trackEvent("smartlink_click");
   window.open(`${SMARTLINK}?uid=${user?.uid}`, "_blank");
 }
 
 // ============================================
-// 🔥 OFFERWALL ADGATE
+// 🔥 OFFERWALL
 // ============================================
 
 window.openOfferwall = () => {
+  trackEvent("offerwall_open");
+
   const frame = document.getElementById("offerwallFrame");
 
   if (frame) {
     frame.src = `https://wall.adgatemedium.com/?aff_id=${ADGATE_ID}&user_id=${user.uid}`;
   }
 
-  showToast("💰 Ofertas premium cargadas");
+  showToast("💰 Offerwall cargado");
 };
 
 // ============================================
-// 🔒 CPA LOCKER
+// 🔒 LOCKER
 // ============================================
 
 window.openLocker = () => {
+  trackEvent("locker_open");
+
   if (document.getElementById("lockerScript")) return;
 
   const s = document.createElement("script");
@@ -122,46 +173,54 @@ window.openLocker = () => {
 
   document.body.appendChild(s);
 
-  showToast("🔒 Desbloquea la recompensa");
+  showToast("🔒 Desbloquea recompensa");
 };
 
 // ============================================
-// 🎥 VIDEO
+// 🎥 VIDEO (REAL TRACKED EARNINGS)
 // ============================================
 
 window.startVideo = async () => {
   if (videosLeft <= 0) return showToast("Sin videos ❌");
 
   smartMonetization();
+  await trackEvent("video_start");
 
   setTimeout(async () => {
+    const earn = 0.03;
+
+    await trackRevenue(earn, "video");
+
     await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(0.03),
       videosLeft: increment(-1),
-      todayEarnings: increment(0.03)
+      todayEarnings: increment(earn)
     });
 
     videosLeft--;
-    document.getElementById("videosLeft").innerText = "Restantes: " + videosLeft;
 
-    showToast("Ganaste $0.03 🎥");
+    document.getElementById("videosLeft").innerText =
+      "Restantes: " + videosLeft;
+
+    showToast("Ganaste $" + earn);
   }, 8000);
 };
 
 // ============================================
-// 🎰 RULETA
+// 🎰 SPIN (TRACKED)
 // ============================================
 
 window.spin = async () => {
   smartMonetization();
+  await trackEvent("spin");
 
   const rewards = [0.01, 0.02, 0.05, 0.1, 0];
   const reward = rewards[Math.floor(Math.random() * rewards.length)];
 
   setTimeout(async () => {
     if (reward > 0) {
+      await trackRevenue(reward, "spin");
+
       await updateDoc(doc(db, "users", user.uid), {
-        balance: increment(reward),
         todayEarnings: increment(reward)
       });
 
@@ -171,7 +230,7 @@ window.spin = async () => {
 };
 
 // ============================================
-// 🎁 DAILY
+// 🎁 DAILY BONUS
 // ============================================
 
 window.daily = async () => {
@@ -182,12 +241,16 @@ window.daily = async () => {
   if (Date.now() - last < 86400000) return showToast("Ya reclamado ❌");
 
   smartMonetization();
+  await trackEvent("daily_claim");
+
+  const earn = 0.2;
 
   setTimeout(async () => {
+    await trackRevenue(earn, "daily");
+
     await updateDoc(ref, {
-      balance: increment(0.2),
       lastDaily: Date.now(),
-      todayEarnings: increment(0.2)
+      todayEarnings: increment(earn)
     });
 
     showToast("Ganaste $0.20 🎁");
@@ -195,16 +258,20 @@ window.daily = async () => {
 };
 
 // ============================================
-// 🎮 JUEGO
+// 🎮 GAME
 // ============================================
 
 window.playGame = async () => {
   smartMonetization();
+  await trackEvent("game_play");
+
+  const earn = 0.05;
 
   setTimeout(async () => {
+    await trackRevenue(earn, "game");
+
     await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(0.05),
-      todayEarnings: increment(0.05)
+      todayEarnings: increment(earn)
     });
 
     showToast("Ganaste $0.05 🎮");
@@ -212,17 +279,7 @@ window.playGame = async () => {
 };
 
 // ============================================
-// 🎁 CAJA
-// ============================================
-
-window.openBox = async () => {
-  if (taskCooldown) return showToast("Espera ⏳");
-
-  smartMonetization();
-};
-
-// ============================================
-// 💳 RETIRO
+// 💳 WITHDRAW
 // ============================================
 
 window.withdraw = async () => {
@@ -238,18 +295,20 @@ window.withdraw = async () => {
     amount,
     email,
     status: "pending",
-    date: Date.now()
+    time: Date.now()
   });
 
   await updateDoc(doc(db, "users", user.uid), {
     balance: increment(-amount)
   });
 
+  await trackEvent("withdraw_request", { amount });
+
   showToast("Retiro enviado 🚀");
 };
 
 // ============================================
-// 🔥 FIREBASE INIT
+// 🔥 INIT
 // ============================================
 
 onAuthStateChanged(auth, async (u) => {
@@ -264,11 +323,10 @@ onAuthStateChanged(auth, async (u) => {
   realtimeBalance();
   loadWithdrawals();
   generateRefLink();
-  initBoxTimer();
 });
 
 // ============================================
-// RESTO (NO TOCAR)
+// USER INIT
 // ============================================
 
 async function initUser() {
@@ -279,71 +337,32 @@ async function initUser() {
     await setDoc(refDoc, {
       balance: 1,
       videosLeft: 6,
-      spins: 0,
-      lastDaily: 0,
-      lastReset: new Date().toDateString(),
       todayEarnings: 0,
-      todayDate: new Date().toDateString(),
-      lastBox: 0
+      revenue: 0,
+      lastDaily: 0,
+      createdAt: Date.now()
     });
   }
 }
 
-async function resetDaily() {
-  const ref = doc(db, "users", user.uid);
-  const snap = await getDoc(ref);
-  const data = snap.data();
-  const today = new Date().toDateString();
-
-  if (data.lastReset !== today) {
-    await updateDoc(ref, {
-      videosLeft: 6,
-      spins: 0,
-      lastReset: today,
-      todayEarnings: 0
-    });
-    videosLeft = 6;
-  } else {
-    videosLeft = data.videosLeft || 0;
-  }
-
-  document.getElementById("videosLeft").innerText = "Restantes: " + videosLeft;
-}
+// ============================================
+// BALANCE REALTIME
+// ============================================
 
 function realtimeBalance() {
   onSnapshot(doc(db, "users", user.uid), (snap) => {
     const data = snap.data() || {};
 
     balance = data.balance || 0;
+
     document.getElementById("balance").innerText = "$" + balance.toFixed(2);
-    document.getElementById("refCount").innerText = data.referrals || 0;
     document.getElementById("todayEarnings").innerText = "$" + (data.todayEarnings || 0).toFixed(2);
-
-    document.getElementById("videos").innerText = 6 - (data.videosLeft || 0);
   });
 }
 
-function loadWithdrawals() {
-  onSnapshot(collection(db, "withdrawals"), (snap) => {
-    const div = document.getElementById("withdrawList");
-    div.innerHTML = "";
-
-    snap.forEach(d => {
-      const w = d.data();
-      if (w.userId !== user.uid) return;
-      div.innerHTML += `<p>-$${w.amount}</p>`;
-    });
-  });
-}
-
-function generateRefLink() {
-  document.getElementById("refLink").value = `${window.location.origin}?ref=${user.uid}`;
-}
-
-window.copyRef = async () => {
-  await navigator.clipboard.writeText(document.getElementById("refLink").value);
-  showToast("Copiado ✅");
-};
+// ============================================
+// UTILS
+// ============================================
 
 function showToast(msg) {
   const t = document.createElement("div");
@@ -356,3 +375,216 @@ function showToast(msg) {
 window.logout = () => {
   signOut(auth).then(() => location.href = "index.html");
 };
+
+// ============================================
+// 🏢 EARNPRO ENTERPRISE LAYER (ADD-ON)
+// ============================================
+
+// 📊 ENTERPRISE METRICS STRUCTURE
+const enterprise = {
+  sessions: 0,
+  clicks: 0,
+  conversions: 0,
+  revenue: 0,
+  botBlocks: 0
+};
+
+// ============================================
+// 📈 KPI TRACKER (REAL BUSINESS METRICS)
+// ============================================
+
+async function logKPI(type, value = 1) {
+  if (!user) return;
+
+  const ref = doc(db, "enterprise_kpi", "global");
+
+  await updateDoc(ref, {
+    [type]: increment(value),
+    lastUpdate: Date.now()
+  }).catch(async () => {
+    await setDoc(ref, {
+      [type]: value,
+      createdAt: Date.now()
+    });
+  });
+}
+
+// ============================================
+// 🧾 USER AUDIT LOG (ENTERPRISE TRACKING)
+// ============================================
+
+async function auditLog(action, data = {}) {
+  if (!user) return;
+
+  await addDoc(collection(db, "audit_logs"), {
+    userId: user.uid,
+    action,
+    data,
+    geo: userGeo,
+    device: userDevice,
+    time: Date.now()
+  });
+}
+
+// ============================================
+// 💰 ENTERPRISE REVENUE ENGINE
+// ============================================
+
+async function enterpriseRevenue(amount, source) {
+  await logKPI("revenue", amount);
+
+  await addDoc(collection(db, "enterprise_revenue"), {
+    userId: user.uid,
+    amount,
+    source,
+    geo: userGeo,
+    time: Date.now()
+  });
+
+  enterprise.revenue += amount;
+}
+
+// ============================================
+// 👆 CLICK TRACKING PRO (MONETIZATION CORE)
+// ============================================
+
+async function trackClick(type) {
+  enterprise.clicks++;
+
+  await logKPI("clicks", 1);
+
+  await addDoc(collection(db, "click_events"), {
+    userId: user.uid,
+    type,
+    geo: userGeo,
+    device: userDevice,
+    time: Date.now()
+  });
+}
+
+// ============================================
+// 🚨 FRAUD DETECTION ENTERPRISE
+// ============================================
+
+function enterpriseAntiFraud() {
+  const suspicious =
+    navigator.webdriver ||
+    screen.width < 320 ||
+    !navigator.languages ||
+    navigator.hardwareConcurrency < 2;
+
+  if (suspicious) {
+    enterprise.botBlocks++;
+
+    auditLog("bot_blocked", {
+      reason: "suspicious_device"
+    });
+
+    return true;
+  }
+
+  return false;
+}
+
+// ============================================
+// 🔗 OVERRIDE SMARTLINK (ENTERPRISE TRACKING)
+// ============================================
+
+function openAd() {
+  if (enterpriseAntiFraud()) return;
+
+  trackClick("smartlink");
+
+  auditLog("smartlink_open");
+
+  window.open(`${SMARTLINK}?uid=${user?.uid}`, "_blank");
+}
+
+// ============================================
+// 🔥 OVERRIDE OFFERWALL (ENTERPRISE)
+// ============================================
+
+window.openOfferwall = () => {
+  if (enterpriseAntiFraud()) return;
+
+  trackClick("offerwall");
+
+  auditLog("offerwall_open");
+
+  const frame = document.getElementById("offerwallFrame");
+
+  if (frame) {
+    frame.src = `https://wall.adgatemedium.com/?aff_id=${ADGATE_ID}&user_id=${user.uid}`;
+  }
+
+  showToast("💰 Offerwall activo");
+};
+
+// ============================================
+// 🔒 OVERRIDE LOCKER (ENTERPRISE)
+// ============================================
+
+window.openLocker = () => {
+  if (enterpriseAntiFraud()) return;
+
+  trackClick("locker");
+
+  auditLog("locker_open");
+
+  if (document.getElementById("lockerScript")) return;
+
+  const s = document.createElement("script");
+  s.id = "lockerScript";
+  s.src = `https://playabledownloads.com/script_include.php?id=${LOCKER_ID}&subid=${user.uid}`;
+  s.async = true;
+
+  document.body.appendChild(s);
+
+  showToast("🔒 Recompensa bloqueada");
+};
+
+// ============================================
+// 📊 ENTERPRISE DASHBOARD DATA EXPORT
+// ============================================
+
+window.getEnterpriseStats = async () => {
+  const ref = doc(db, "enterprise_kpi", "global");
+  const snap = await getDoc(ref);
+
+  const data = snap.data() || {};
+
+  console.log("📊 ENTERPRISE STATS:", {
+    clicks: data.clicks || 0,
+    revenue: data.revenue || 0,
+    conversions: data.conversions || 0,
+    botBlocks: enterprise.botBlocks
+  });
+
+  return data;
+};
+
+// ============================================
+// 🔥 AUTO SESSION TRACKING
+// ============================================
+
+async function startSession() {
+  enterprise.sessions++;
+
+  await logKPI("sessions", 1);
+
+  await auditLog("session_start", {
+    page: location.href
+  });
+}
+
+// ============================================
+// 🚀 INIT ENTERPRISE LAYER
+// ============================================
+
+onAuthStateChanged(auth, async (u) => {
+  if (!u) return;
+
+  user = u;
+
+  await startSession();
+});
