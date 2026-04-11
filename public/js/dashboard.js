@@ -554,6 +554,12 @@ data.offers.slice(0, 6).forEach(offer => {
     </div>
   `;
 });
+ container.innerHTML = html;
+
+ showToast("Ofertas cargadas 💰");
+ })
+    .catch(() => showToast("Error cargando ofertas ❌"));
+};
       
 auth.onAuthStateChanged((u) => {
   if (u) {
