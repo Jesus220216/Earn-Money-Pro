@@ -1,18 +1,105 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+// =====================================
+// 💼 EARNPRO SAAS CORE ENGINE
+// =====================================
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBklJc4WZjOsE7XroizPn73hTryR3lXwhY",
-  authDomain: "earn-money-pro-626e6.firebaseapp.com",
-  projectId: "earn-money-pro-626e6",
-  storageBucket: "earn-money-pro-626e6.firebasestorage.app",
-  messagingSenderId: "403991623859",
-  appId: "1:403991623859:web:dfbf6a8f7f4b4562b058c6",
-  measurementId: "G-DJ3LWJEBW6"
+import { auth, db } from "./firebase.js";
+import {
+  doc, getDoc, setDoc, updateDoc,
+  increment, addDoc, collection, onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+// =====================
+// STATE
+// =====================
+
+let user;
+let balance = 0;
+let geo = "US";
+
+// =====================
+// INIT USER (SAAS)
+// =====================
+
+async function initUser() {
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) {
+    await setDoc(ref, {
+      balance: 1,
+      revenue: 0,
+      clicks: 0,
+      sessions: 1,
+      createdAt: Date.now()
+    });
+  }
+}
+
+// =====================
+// TRACK EVENT (SAAS CORE)
+// =====================
+
+async function track(event, data = {}) {
+  if (!user) return;
+
+  await addDoc(collection(db, "tracking"), {
+    userId: user.uid,
+    event,
+    geo,
+    data,
+    time: Date.now()
+  });
+}
+
+// =====================
+// REVENUE ENGINE
+// =====================
+
+async function revenue(amount, source) {
+  await updateDoc(doc(db, "users", user.uid), {
+    revenue: increment(amount),
+    balance: increment(amount)
+  });
+
+  await addDoc(collection(db, "revenue_logs"), {
+    userId: user.uid,
+    amount,
+    source,
+    time: Date.now()
+  });
+}
+
+// =====================
+// CLICK TRACKING
+// =====================
+
+window.trackClick = async (type) => {
+  await track("click", { type });
+
+  await updateDoc(doc(db, "users", user.uid), {
+    clicks: increment(1)
+  });
 };
 
-const app = initializeApp(firebaseConfig);
+// =====================
+// SMART LINK
+// =====================
 
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+window.openAd = () => {
+  trackClick("smartlink");
+  window.open("https://omg10.com/4/10751693", "_blank");
+};
+
+// =====================
+// AUTH SYSTEM
+// =====================
+
+auth.onAuthStateChanged(async (u) => {
+  if (!u) return location.href = "index.html";
+
+  user = u;
+
+  await initUser();
+
+  track("session_start");
+});
