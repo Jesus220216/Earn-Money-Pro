@@ -499,9 +499,9 @@ window.loadOffers = () => {
         return;
       }
 
-      let html = "";
+    let html = "";
 
-      data.offers.slice(0, 6).forEach(offer => {
+data.offers.slice(0, 6).forEach(offer => {
 
   const reward = (Math.random() * (3 - 0.5) + 0.5).toFixed(2);
 
@@ -554,7 +554,7 @@ window.loadOffers = () => {
     </div>
   `;
 });
-
+      
 auth.onAuthStateChanged((u) => {
   if (u) {
     user = u;
