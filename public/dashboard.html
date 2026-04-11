@@ -1,123 +1,120 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EarnPro Dashboard - Gana Dinero Fácil</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-
-    <!-- 🎨 TU CSS ORIGINAL (NO SE TOCA) -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EarnPro Dashboard - Gana Dinero Fácil</title>
+  
     <link rel="stylesheet" href="/css/dashboard.css">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+
 </head>
 
 <body>
 
 <div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
 
-    <!-- HEADER -->
-    <div class="header-hero">
-        <div class="header-background">
-            <img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663427137618/DZNVjeDi2TTeJHBF4drPLX/hero-dashboard-eXtDujZMPEtYity8XHWzjU.webp" alt="background">
-        </div>
+<!-- Header Hero -->
+<div class="header-hero">
+<div class="header-background">
+<img src="https://d2xsxph8kpxj0f.cloudfront.net/310519663427137618/DZNVjeDi2TTeJHBF4drPLX/hero-dashboard-eXtDujZMPEtYity8XHWzjU.webp">
+</div>
 
-        <div class="header-content">
-            <div class="header-text">
-                <h1>EarnPro Dashboard</h1>
-                <p>Bienvenido de vuelta, usuario. Sigue ganando dinero fácil.</p>
-            </div>
+<div class="header-content">
+<div class="header-text">
+<h1>EarnPro Dashboard</h1>
+<p>Bienvenido de vuelta, usuario</p>
+</div>
 
-            <div class="header-badge">
-                <span class="badge-icon">⚡</span>
-                <span class="badge-text" id="today">+$0.00 hoy</span>
-            </div>
-        </div>
-    </div>
+<div class="header-badge">
+<span class="badge-icon">⚡</span>
+<span class="badge-text" id="today">+$0.00 hoy</span>
+</div>
+</div>
+</div>
 
-    <!-- MAIN -->
-    <div class="main-container">
+<!-- MAIN -->
+<div class="main-container">
 
-        <!-- STATS -->
-        <div class="stats-grid">
+<!-- STATS -->
+<div class="stats-grid">
 
-            <div class="stat-card glass">
-                <div class="card-content">
-                    <h3>Saldo Actual</h3>
-                    <p class="card-value" id="balance">$0.00</p>
-                </div>
-            </div>
+<div class="stat-card glass">
+<h3>Saldo</h3>
+<p id="balance">$0.00</p>
+</div>
 
-            <div class="stat-card glass">
-                <div class="card-content">
-                    <h3>Referidos</h3>
-                    <p class="card-value" id="refCount">0</p>
-                </div>
-            </div>
+<div class="stat-card glass">
+<h3>Referidos</h3>
+<p id="refCount">0</p>
+</div>
 
-            <div class="stat-card glass">
-                <div class="card-content">
-                    <h3>Ganancias Hoy</h3>
-                    <p class="card-value" id="todayEarnings">$0.00</p>
-                </div>
-            </div>
+<div class="stat-card glass">
+<h3>Hoy</h3>
+<p id="todayEarnings">$0.00</p>
+</div>
 
-            <div class="stat-card glass">
-                <div class="card-content">
-                    <h3>Videos</h3>
-                    <p class="card-value" id="videos">0</p>
-                    <p id="videosLeft">Restantes: 6</p>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- CPA ZONE -->
-        <div class="cpa-section">
-            <h2>💰 Ganar Dinero Real</h2>
-
-            <div class="cpa-buttons">
-                <button onclick="openOfferwall()">🔥 Offerwall</button>
-                <button onclick="openLocker()">🎁 Locker</button>
-            </div>
-
-            <iframe id="offerwallFrame" style="width:100%; height:500px; border:none;"></iframe>
-        </div>
-
-        <!-- JUEGOS -->
-        <div class="section-card">
-            <button onclick="playGame()">🎮 Juego</button>
-            <button onclick="spin()">🎰 Ruleta</button>
-            <button onclick="daily()">🎁 Daily</button>
-        </div>
-
-        <!-- VIDEOS -->
-        <div class="section-card">
-            <button onclick="startVideo()">🎥 Ver Video</button>
-        </div>
-
-        <!-- RETIRO -->
-        <div class="section-card">
-
-            <input type="email" id="email" placeholder="Tu email">
-            <input type="number" id="amount" placeholder="Monto mínimo $5">
-
-            <button onclick="withdraw()">💳 Retirar</button>
-
-        </div>
-
-        <!-- LOGOUT -->
-        <div class="section-card">
-            <button onclick="logout()">🚪 Cerrar Sesión</button>
-        </div>
-
-    </div>
+<div class="stat-card glass">
+<h3>Videos</h3>
+<p id="videos">0</p>
+<p id="videosLeft">Restantes: 6</p>
+</div>
 
 </div>
 
-<!-- 🚀 SOLO TU JS EXTERNO -->
+<!-- CPA -->
+<div class="cpa-section">
+<h2>💰 Ganar Dinero Real</h2>
+
+<button onclick="openOfferwall()">Offerwall</button>
+<button onclick="openLocker()">Locker</button>
+
+<iframe id="offerwallFrame" style="width:100%;height:500px;border:none;"></iframe>
+</div>
+
+<!-- JUEGOS -->
+<div class="section-card">
+<button onclick="playGame()">🎮 Juego</button>
+<button onclick="spin()">🎰 Ruleta</button>
+<button onclick="daily()">🎁 Daily</button>
+</div>
+
+<!-- VIDEOS -->
+<div class="section-card">
+<button onclick="startVideo()">🎥 Ver Video</button>
+</div>
+
+<!-- RETIRO -->
+<div class="section-card">
+
+<input type="email" id="email" placeholder="Tu email">
+<input type="number" id="amount" placeholder="Monto mínimo $5">
+
+<button onclick="withdraw()">💳 Retirar</button>
+
+</div>
+
+<!-- LOGOUT -->
+<div class="section-card">
+<button onclick="logout()">🚪 Cerrar Sesión</button>
+</div>
+
+</div>
+
+</div>
+
+<!-- VIDEO PLAYER -->
+<video id="videoPlayer" style="display:none;"></video>
+
+<!-- WHEEL -->
+<div id="wheel" style="display:none;width:200px;height:200px;border-radius:50%;background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red);"></div>
+
+<!-- JS PRINCIPAL -->
 <script type="module" src="/js/dashboard.js"></script>
 
 </body>
