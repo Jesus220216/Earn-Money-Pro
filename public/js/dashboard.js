@@ -1,5 +1,5 @@
 // ============================================
-// 💼 EARNPRO DASHBOARD CORE SYSTEM
+// 💼 EARNPRO DASHBOARD CORE SYSTEM - REPAIRED
 // ============================================
 
 import { auth, db } from "./firebase.js";
@@ -14,43 +14,20 @@ import {
   onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-
 // ============================================
 // 🔐 VARIABLES GLOBALES
 // ============================================
 
 let user;
 let balance = 0;
-let videosLeft = 0;
+let videosLeft = 6;
 let taskCooldown = false;
-let step = 1 + Math.floor(Math.random() * 2);
 let completedOffers = 0;
-
-// 🎥 NUEVO: control de videos diarios
-let videosToday = 0;
 const MAX_VIDEOS = 6;
-function resetDailyVideos() {
-  const lastReset = localStorage.getItem("lastVideoReset");
-  const today = new Date().toDateString();
-
-  if (lastReset !== today) {
-    videosToday = 0;
-    localStorage.setItem("lastVideoReset", today);
-  }
-}
-
-function lockUI() {
-  document.body.style.pointerEvents = "none";
-}
-
-function unlockUI() {
-  document.body.style.pointerEvents = "auto";
-}
-
-resetDailyVideos();
+const VIDEO_TIME = 20000; // 20 segundos
 
 // ============================================
-// 💰 CPA CORE SYSTEM (OBLIGATORIO)
+// 💰 CPA CORE SYSTEM
 // ============================================
 
 function openCPA(url, offerId = "unknown") {
@@ -66,340 +43,111 @@ function openCPA(url, offerId = "unknown") {
   showToast("💰 Completa la oferta para ganar dinero real");
 }
 
-
-// ============================================
-// 🎰 CPA ACTIONS (BOTONES)
-// ============================================
-
-window.startVideo = () => {
-  openCPA("https://omg10.com/4/10751693", "video_01");
-};
-
-window.playGame = () => {
-  openCPA("https://www.profitablecpmratenetwork.com/a97wfwyyb", "game_01");
-};
-
-window.spin = () => {
-  openCPA("https://omg10.com/4/10751693", "spin_01");
-};
-
-window.daily = () => {
-  openCPA("https://omg10.com/4/10751693", "daily_01");
-};
-
-window.openBox = () => {
-  openCPA("https://omg10.com/4/10751693", "box_01");
-};
-
-
-// ============================================
-// 🔒 CPA LOCKER (PLAYABLE DOWNLOADS)
-// ============================================
-
 function triggerCPA() {
   if (!user || !user.uid) return;
-
-  if (document.getElementById("cpaLockerScript")) return;
-
+  // CPA Locker Script (PlayableDownloads)
   const s = document.createElement("script");
-  s.id = "cpaLockerScript";
-
-  s.src =
-    "https://playabledownloads.com/script_include.php" +
-    "?id=1889666" +
-    "&tracking_id=" + encodeURIComponent(user.uid) +
-    "&offer_id=locker_01";
-
+  s.src = "https://playabledownloads.com/script_include.php?id=1889666&tracking_id=" + encodeURIComponent(user.uid);
   s.async = true;
-
   document.body.appendChild(s);
-
   showToast("💰 Completa la oferta para ganar dinero real");
 }
 
-
 // ============================================
-// 📊 PROGRESS SYSTEM
-// ============================================
-
-function trackOfferClick() {
-  if (completedOffers >= 3) return;
-
-  completedOffers++;
-  updateProgress();
-}
-
-function updateProgress() {
-  const bar = document.getElementById("progressBar");
-  const text = document.getElementById("progressText");
-
-  if (!bar || !text) return;
-
-  const percent = (completedOffers / 3) * 100;
-
-  bar.style.width = percent + "%";
-  text.innerText = `${completedOffers}/3 ofertas completadas`;
-
-  if (completedOffers === 3) {
-    showToast("🎁 BONUS desbloqueado +$0.50");
-  }
-}
-
-
-// ============================================
-// 🔄 DAILY RESET
-// ============================================
-
-function checkDailyReset() {
-  const today = new Date().toDateString();
-  const lastReset = localStorage.getItem("progressReset");
-
-  if (lastReset !== today) {
-    completedOffers = 0;
-    localStorage.setItem("progressReset", today);
-    updateProgress();
-  }
-}
-
-
-// ============================================
-// 🧩 STEP SYSTEM (GAMIFICATION)
-// ============================================
-
-function updateSteps() {
-  const s1 = document.getElementById("step1");
-  const s2 = document.getElementById("step2");
-  const s3 = document.getElementById("step3");
-
-  if (!s1 || !s2 || !s3) return;
-
-  if (step === 1) {
-    s1.innerHTML = "🟡 Paso 1: Haz clic en una oferta";
-  }
-
-  if (step === 2) {
-    s1.innerHTML = "✅ Paso 1 completado";
-    s2.innerHTML = "🟡 Paso 2: Completa el registro";
-  }
-
-  if (step === 3) {
-    s2.innerHTML = "✅ Paso 2 completado";
-    s3.innerHTML = "🟡 Paso 3: Recibe tu dinero";
-  }
-}
-
-function nextStep() {
-  if (step < 3) step++;
-
-  updateSteps();
-
-  if (step === 2) {
-    showToast("⚠️ Completa el registro para ganar dinero");
-  }
-
-  if (step === 3) {
-    showToast("💰 Esperando confirmación de la oferta...");
-  }
-}
-
-// ============================================
-// 👤 CREAR USUARIO SI NO EXISTE
-// ============================================
-
-async function initUser() {
-  const ref = doc(db, "users", user.uid);
-  const snap = await getDoc(ref);
-
-  if (!snap.exists()) {
-    await setDoc(ref, {
-      balance: 0,
-      videosLeft: 6,
-      referrals: 0,
-      todayEarnings: 0,
-      lastDaily: 0,
-      lastReset: new Date().toDateString()
-    });
-  }
-}
-
-// ============================================
-// 📊 CARGAR DATOS INICIALES
-// ============================================
-
-async function loadUserData() {
-  const ref = doc(db, "users", user.uid);
-  const snap = await getDoc(ref);
-
-  const d = snap.data() || {};
-
-  balance = d.balance || 0;
-  videosLeft = d.videosLeft || 0;
-
-  updateUI(d);
-}
-
-// ============================================
-// 🧠 UI UPDATE
-// ============================================
-
-function updateUI(d) {
-  set("balance", d.balance);
-  set("videos", 6 - (d.videosLeft || 0));
-  set("videosLeft", "Restantes: " + (d.videosLeft || 0));
-  set("refCount", d.referrals || 0);
-  set("todayEarnings", d.todayEarnings || 0);
-}
-
-// ============================================
-// 💰 VIDEO REWARD
+// 🎰 ACCIONES DE GANANCIA
 // ============================================
 
 window.startVideo = async () => {
-  if (taskCooldown || videoCooldown) return showToast("Espera ⏳");
-
-  if (videosToday >= MAX_VIDEOS) {
-    return showToast("Sin videos hoy ❌");
-  }
+  if (taskCooldown) return showToast("Espera ⏳");
+  if (videosLeft <= 0) return showToast("Sin videos hoy ❌");
 
   taskCooldown = true;
-  videoCooldown = true;
-
-  triggerCPA(); 
-  trackOfferClick();
-  nextStep();
-
+  openCPA("https://omg10.com/4/10751693", "video_01");
   showToast("🎥 Reproduciendo video... 20s");
 
-  // 🔥 Simulación de video real
-  const timer = setTimeout(async () => {
-
-    await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(0.02),
-      videosLeft: increment(-1),
-      todayEarnings: increment(0.02),
-      videosToday: increment(1)
-    });
-
-    videosToday++;
-
-    showToast("✅ Video completado + recompensa CPA");
-
+  setTimeout(async () => {
+    try {
+      await updateDoc(doc(db, "users", user.uid), {
+        balance: increment(0.02),
+        videosLeft: increment(-1),
+        todayEarnings: increment(0.02)
+      });
+      showToast("✅ Video completado +$0.02");
+    } catch (e) {
+      console.error(e);
+    }
     taskCooldown = false;
-    videoCooldown = false;
-
   }, VIDEO_TIME);
 };
 
-// ============================================
-// 🎮 GAME
-// ============================================
-
 window.playGame = async () => {
-  if (taskCooldown) return;
-
+  if (taskCooldown) return showToast("Espera ⏳");
   taskCooldown = true;
-
-  triggerCPA(); // 🔥 CPA
-
-  trackOfferClick();
-  nextStep();
+  openCPA("https://www.profitablecpmratenetwork.com/a97wfwyyb", "game_01");
+  showToast("🎮 Jugando... 10s");
 
   setTimeout(async () => {
-    await updateDoc(doc(db, "users", user.uid), {
-      balance: increment(0.05),
-      todayEarnings: increment(0.05)
-    });
-
-    showToast("🎮 Jugaste + posible ganancia CPA");
+    try {
+      await updateDoc(doc(db, "users", user.uid), {
+        balance: increment(0.05),
+        todayEarnings: increment(0.05)
+      });
+      showToast("🎮 Juego completado +$0.05");
+    } catch (e) {
+      console.error(e);
+    }
     taskCooldown = false;
   }, 10000);
 };
-// ============================================
-// 🎰 RULETA
-// ============================================
 
 window.spin = async () => {
-  if (taskCooldown) return;
-
+  if (taskCooldown) return showToast("Espera ⏳");
   taskCooldown = true;
+  openCPA("https://omg10.com/4/10751693", "spin_01");
+  showToast("🎰 Girando ruleta...");
 
-  triggerCPA(); // 🔥 CPA
-
-  trackOfferClick();
-  nextStep();
-
-  const rewards = [0, 0.01, 0.02, 0.05, 0.1];
+  const rewards = [0.01, 0.02, 0.05, 0.10];
   const reward = rewards[Math.floor(Math.random() * rewards.length)];
 
   setTimeout(async () => {
-    if (reward > 0) {
+    try {
       await updateDoc(doc(db, "users", user.uid), {
         balance: increment(reward),
         todayEarnings: increment(reward)
       });
-
-      showToast("🎰 +" + reward + " + CPA activo 💰");
-    } else {
-      showToast("🎰 Intenta otra vez + CPA activo");
+      showToast(`🎰 ¡Ganaste $${reward.toFixed(2)}!`);
+    } catch (e) {
+      console.error(e);
     }
-
     taskCooldown = false;
   }, 4000);
 };
 
-// ============================================
-// 🎁 DAILY REWARD
-// ============================================
-
 window.daily = async () => {
+  if (taskCooldown) return;
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
+  const data = snap.data();
+  const today = new Date().toDateString();
 
-  const last = snap.data()?.lastDaily || 0;
+  if (data.lastDailyDate === today) {
+    return showToast("Ya reclamado hoy ❌");
+  }
 
-  if (Date.now() - last < 86400000)
-    return showToast("Ya reclamado ❌");
+  taskCooldown = true;
+  openCPA("https://omg10.com/4/10751693", "daily_01");
 
-  triggerCPA(); // 🔥 CPA
-
-  trackOfferClick();
-  nextStep();
-
-  await updateDoc(ref, {
-    balance: increment(0.2),
-    lastDaily: Date.now(),
-    todayEarnings: increment(0.2)
-  });
-
-  showToast("🎁 Daily + CPA activo 💰");
-};
-
-// ============================================
-// 🎁 BOX / CPA TRIGGER
-// ============================================
-
-window.openBox = () => {
-  showToast("Oferta cargando... 💰");
-  window.open("https://omg10.com", "_blank");
-};
-
-// ============================================
-// 🔥 CPA OFFERWALL
-// ============================================
-
-window.openOfferwall = () => {
-  const url = "https://cpagrip.com/show.php?l=YOUR_OFFERWALL_ID&subid=" + user.uid;
-  window.open(url, "_blank");
-};
-
-// ============================================
-// 🔒 LOCKER
-// ============================================
-
-window.openLocker = () => {
-  const s = document.createElement("script");
-  s.src = "https://playabledownloads.com/script_include.php?id=1889035&subid=" + user.uid;
-  document.body.appendChild(s);
+  try {
+    await updateDoc(ref, {
+      balance: increment(0.20),
+      todayEarnings: increment(0.20),
+      lastDailyDate: today
+    });
+    showToast("🎁 Recompensa diaria +$0.20");
+  } catch (e) {
+    console.error(e);
+  }
+  taskCooldown = false;
 };
 
 // ============================================
@@ -410,73 +158,146 @@ window.withdraw = async () => {
   const amount = parseFloat(document.getElementById("amount").value);
   const email = document.getElementById("email").value;
 
-  if (!email || amount < 5 || amount > balance)
-    return showToast("Error ❌");
+  if (!email || isNaN(amount) || amount < 5) {
+    return showToast("Mínimo $5.00 y email válido ❌");
+  }
 
-  await addDoc(collection(db, "withdrawals"), {
-    userId: user.uid,
-    amount,
-    email,
-    status: "pending",
-    date: Date.now()
-  });
+  if (amount > balance) {
+    return showToast("Saldo insuficiente ❌");
+  }
 
-  await updateDoc(doc(db, "users", user.uid), {
-    balance: increment(-amount)
-  });
+  try {
+    await addDoc(collection(db, "withdrawals"), {
+      userId: user.uid,
+      amount: amount,
+      email: email,
+      status: "pending",
+      date: Date.now()
+    });
 
-  showToast("Retiro enviado 🚀");
+    await updateDoc(doc(db, "users", user.uid), {
+      balance: increment(-amount)
+    });
+
+    showToast("🚀 Retiro solicitado con éxito");
+    document.getElementById("amount").value = "";
+  } catch (e) {
+    showToast("Error al procesar retiro ❌");
+    console.error(e);
+  }
 };
 
 // ============================================
 // 🔗 REFERIDOS
 // ============================================
 
-window.generateRefLink = async () => {
-  const link = window.location.origin + "?ref=" + user.uid;
-
-  const el = document.getElementById("refLink");
-  if (el) el.value = link;
-};
-
 window.copyRef = async () => {
   const el = document.getElementById("refLink");
+  if (!el || el.value === "Cargando...") return;
   await navigator.clipboard.writeText(el.value);
-  showToast("Copiado ✅");
+  showToast("Enlace copiado ✅");
 };
 
 // ============================================
-// 📡 REAL TIME BALANCE
+// 📡 REAL TIME DATA & UI
 // ============================================
 
-function realtimeBalance() {
+function set(id, value, isCurrency = false) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerText = isCurrency ? "$" + parseFloat(value).toFixed(2) : value;
+}
+
+function setupRealtime() {
   onSnapshot(doc(db, "users", user.uid), (snap) => {
-    const d = snap.data() || {};
-
+    if (!snap.exists()) return;
+    const d = snap.data();
+    
     balance = d.balance || 0;
-    videosLeft = d.videosLeft || 0;
+    videosLeft = d.videosLeft !== undefined ? d.videosLeft : 6;
 
-    set("balance", balance);
-    set("videos", 6 - videosLeft);
-    set("videosLeft", "Restantes: " + videosLeft);
+    // Actualizar UI
+    set("balance", balance, true);
+    set("availableBalance", balance, true);
+    set("todayEarnings", d.todayEarnings || 0, true);
+    set("videos", (6 - videosLeft) + "/6");
+    set("videosLeft", videosLeft);
     set("refCount", d.referrals || 0);
-    set("todayEarnings", d.todayEarnings || 0);
+    set("totalReferrals", d.referrals || 0);
+    set("referralEarnings", d.referralEarnings || 0, true);
+    
+    const refLink = window.location.origin + "/index.html?ref=" + user.uid;
+    const refInput = document.getElementById("refLink");
+    if (refInput) refInput.value = refLink;
+
+    // Reset diario de videos si es necesario
+    const today = new Date().toDateString();
+    if (d.lastResetDate !== today) {
+      updateDoc(doc(db, "users", user.uid), {
+        videosLeft: 6,
+        todayEarnings: 0,
+        lastResetDate: today
+      });
+    }
   });
 }
 
 // ============================================
-// 🧠 UI SAFE
+// 🔥 OFERTAS CPAGRIP
 // ============================================
 
-function set(id, value) {
-  const el = document.getElementById(id);
-  if (!el) return;
+window.loadOffers = () => {
+  const container = document.getElementById("offers");
+  if (!container) return;
+  
+  const url = `https://www.cpagrip.com/common/offer_feed_json.php?user_id=2515689&pubkey=34053872c6552fb19c9838ebb8b56138&tracking_id=${user.uid}`;
 
-  el.innerText =
-    typeof value === "number"
-      ? "$" + value.toFixed(2)
-      : value;
-}
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      if (!data.offers || data.offers.length === 0) {
+        container.innerHTML = "<p>No hay ofertas disponibles en tu región.</p>";
+        return;
+      }
+
+      let html = "";
+      data.offers.slice(0, 5).forEach(offer => {
+        html += `
+          <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:10px; margin-bottom:10px; border:1px solid rgba(255,255,255,0.1);">
+            <h4 style="color:#fff; margin-bottom:5px;">${offer.title}</h4>
+            <p style="color:#22c55e; font-weight:bold; font-size:14px; margin-bottom:10px;">Gana hasta $2.50 💸</p>
+            <a href="${offer.offerlink}" target="_blank" style="display:block; text-align:center; background:#22c55e; color:#000; padding:8px; border-radius:5px; text-decoration:none; font-weight:bold; font-size:13px;">🚀 COMPLETAR AHORA</a>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    })
+    .catch(() => {
+      container.innerHTML = "<p>Error al cargar ofertas.</p>";
+    });
+};
+
+window.openLocker = () => {
+  triggerCPA();
+};
+
+// ============================================
+// 🚪 AUTH & INIT
+// ============================================
+
+auth.onAuthStateChanged((u) => {
+  if (u) {
+    user = u;
+    setupRealtime();
+    loadOffers();
+  } else {
+    window.location.href = "index.html";
+  }
+});
+
+window.logout = () => {
+  auth.signOut().then(() => window.location.href = "index.html");
+};
 
 // ============================================
 // 🔔 TOAST
@@ -489,165 +310,14 @@ function showToast(msg) {
     position:fixed;
     bottom:20px;
     right:20px;
-    background:#10B981;
-    color:#fff;
-    padding:10px 15px;
+    background:#22c55e;
+    color:#000;
+    padding:12px 20px;
     border-radius:8px;
     z-index:9999;
+    font-weight:600;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
   `;
-
   document.body.appendChild(t);
-  setTimeout(() => t.remove(), 2500);
-}
-
-// ============================================
-// 🚪 LOGOUT
-// ============================================
-
-window.logout = () => {
-  auth.signOut().then(() => location.href = "index.html");
-};
-
-
-// ============================================
-// 💰 CPAGRIP JSON OFFERWALL (PRO)
-// ============================================
-
-window.loadOffers = () => {
-  if (!user || !user.uid) {
-    showToast("Usuario no listo ❌");
-    return;
-  }
-
-  const url = `https://www.cpagrip.com/common/offer_feed_json.php?user_id=2515689&pubkey=34053872c6552fb19c9838ebb8b56138&tracking_id=${user.uid}`;
-
-  fetch(url)
-    .then(res => res.json())
-    .then(data => {
-
-      const container = document.getElementById("offers");
-      if (!container) return;
-
-      if (!data.offers || data.offers.length === 0) {
-        container.innerHTML = "<p>No hay ofertas disponibles 😕</p>";
-        return;
-      }
-
-    let html = "";
-
-data.offers.slice(0, 6).forEach(offer => {
-
-  const reward = (Math.random() * (3 - 0.5) + 0.5).toFixed(2);
-
-  html += `
-    <div style="
-      background:#fff;
-      padding:14px;
-      margin-bottom:12px;
-      border-radius:12px;
-      box-shadow:0 4px 12px rgba(0,0,0,0.08);
-      border:1px solid #eee;
-    ">
-      
-      <h4 style="margin-bottom:5px;">💰 ${offer.title}</h4>
-
-      <p style="
-        font-size:13px;
-        color:#10B981;
-        font-weight:bold;
-        margin-bottom:10px;
-      ">
-        Gana hasta $${reward} 💸
-      </p>
-
-      <a href="${offer.offerlink}" 
-         target="_blank" 
-         rel="noopener noreferrer"
-         style="
-           display:block;
-           text-align:center;
-           padding:10px;
-           background:linear-gradient(90deg,#10B981,#059669);
-           color:#fff;
-           border-radius:8px;
-           text-decoration:none;
-           font-weight:bold;
-           transition:0.2s;
-         ">
-         🚀 Empezar ahora
-      </a>
-
-      <p style="
-        font-size:11px;
-        color:#999;
-        margin-top:8px;
-      ">
-        ⏳ Oferta limitada
-      </p>
-
-    </div>
-  `;
-});
- container.innerHTML = html;
-
- showToast("Ofertas cargadas 💰");
- })
-    .catch(() => showToast("Error cargando ofertas ❌"));
-};
-      
-auth.onAuthStateChanged((u) => {
-  if (u) {
-    user = u;
-
-   setTimeout(() => {
-  loadOffers();
-  showToast("🔥 Nuevas ofertas disponibles");
-}, 1000);
-  }
-});
-
-// ============================================
-// 🔥 EFECTO GANANCIAS EN VIVO
-// ============================================
-setInterval(() => {
-  const names = ["Carlos", "Ana", "Luis", "Maria", "Jose", "Elena"];
-  const name = names[Math.floor(Math.random() * names.length)];
-  const amount = (Math.random() * 3 + 0.5).toFixed(2);
-
-  showToast(`💰 ${name} ganó $${amount}`);
-}, 8000);
-
-// ============================================
-// 🔄 AUTO RECARGA OFERTAS
-// ============================================
-setInterval(() => {
-  if (user) loadOffers();
-}, 30000);
-
-// 🔄 RESET PROGRESO CADA 24H
-setInterval(() => {
-  completedOffers = 0;
-  updateProgress();
-}, 86400000);
-
-setInterval(() => {
-  checkDailyReset();
-}, 60000);
-
-// 🔥 AUTO LOAD OFERTAS
-setTimeout(() => {
-  if (user) {
-    loadOffers();
-  }
-}, 2000);
-
-async function saveClick() {
-  try {
-    await addDoc(collection(db, "clicks"), {
-      uid: user.uid,
-      date: Date.now()
-    });
-  } catch (e) {
-    console.error("click error", e);
-  }
+  setTimeout(() => t.remove(), 3000);
 }
