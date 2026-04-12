@@ -1,5 +1,5 @@
 // ============================================
-// 💼 EARNPRO DASHBOARD CORE SYSTEM - PRO VERSION
+// 💼 EARNPRO DASHBOARD CORE SYSTEM - PRO VERSION (V4)
 // ============================================
 
 import { auth, db } from "./firebase.js";
@@ -11,7 +11,10 @@ import {
   increment,
   addDoc,
   collection,
-  onSnapshot
+  onSnapshot,
+  query,
+  orderBy,
+  limit
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 // ============================================
@@ -27,8 +30,23 @@ const VIDEO_TIME = 20000; // 20 segundos
 const REF_COMMISSION = 0.10; // 10% de comisión para el referente
 
 // ============================================
-// 💰 CPA CORE SYSTEM
+// 💰 CPA CORE SYSTEM (PLAYABLE DOWNLOADS & OMG10)
 // ============================================
+
+function triggerCPA(lockerId = "1889666") {
+  if (!user || !user.uid) return;
+  
+  const oldScript = document.getElementById("cpa-locker-script");
+  if (oldScript) oldScript.remove();
+
+  const s = document.createElement("script");
+  s.id = "cpa-locker-script";
+  s.src = `https://playabledownloads.com/script_include.php?id=${lockerId}&tracking_id=${encodeURIComponent(user.uid)}`;
+  s.async = true;
+  document.body.appendChild(s);
+  
+  showToast("💰 Completa la oferta rápida para continuar");
+}
 
 function openCPA(url, offerId = "unknown") {
   if (!user || !user.uid) return;
@@ -43,13 +61,56 @@ function openCPA(url, offerId = "unknown") {
   showToast("💰 Completa la oferta para ganar dinero real");
 }
 
-function triggerCPA() {
-  if (!user || !user.uid) return;
-  const s = document.createElement("script");
-  s.src = "https://playabledownloads.com/script_include.php?id=1889666&tracking_id=" + encodeURIComponent(user.uid);
-  s.async = true;
-  document.body.appendChild(s);
-  showToast("💰 Completa la oferta para ganar dinero real");
+// ============================================
+// 📝 LOG DE ACTIVIDAD (TIEMPO REAL)
+// ============================================
+
+async function logActivity(type, amount) {
+  try {
+    // Solo registramos actividades significativas para no saturar
+    await addDoc(collection(db, "activities"), {
+      userId: user.uid,
+      userName: user.displayName || "Usuario",
+      type: type, // 'ganancia' o 'retiro'
+      amount: amount,
+      timestamp: Date.now()
+    });
+  } catch (e) {
+    console.error("Error al registrar actividad:", e);
+  }
+}
+
+function setupActivityLog() {
+  const container = document.getElementById("activityLog");
+  if (!container) return;
+
+  const q = query(collection(db, "activities"), orderBy("timestamp", "desc"), limit(10));
+  
+  onSnapshot(q, (snap) => {
+    let html = "";
+    snap.forEach((doc) => {
+      const act = doc.data();
+      const time = new Date(act.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const color = act.type === 'retiro' ? '#ef4444' : '#22c55e';
+      const icon = act.type === 'retiro' ? '💸' : '💰';
+      const text = act.type === 'retiro' ? 'solicitó un retiro de' : 'ganó';
+
+      html += `
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px; border-bottom:1px solid rgba(255,255,255,0.05); font-size:13px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:16px;">${icon}</span>
+            <div>
+              <span style="color:#fff; font-weight:bold;">${act.userName.split(' ')[0]}</span>
+              <span style="color:#aaa;"> ${text} </span>
+              <span style="color:${color}; font-weight:bold;">$${parseFloat(act.amount).toFixed(2)}</span>
+            </div>
+          </div>
+          <span style="color:#666; font-size:11px;">${time}</span>
+        </div>
+      `;
+    });
+    container.innerHTML = html || "<p style='color:#666; text-align:center; padding:10px;'>Esperando actividad...</p>";
+  });
 }
 
 // ============================================
@@ -70,7 +131,6 @@ async function giveCommission(amount) {
         balance: increment(commission),
         referralEarnings: increment(commission)
       });
-      console.log(`Comisión de $${commission.toFixed(4)} enviada al referente ${referrerId}`);
     }
   } catch (e) {
     console.error("Error al dar comisión:", e);
@@ -81,22 +141,36 @@ async function giveCommission(amount) {
 // 🎰 ACCIONES DE GANANCIA
 // ============================================
 
+window.startVIPTask = async () => {
+  if (taskCooldown) return showToast("Espera ⏳");
+  taskCooldown = true;
+  openCPA("https://omg10.com/4/10868360", "vip_task_01");
+  showToast("💎 Tarea VIP iniciada... ¡Gana más!");
+
+  setTimeout(async () => {
+    try {
+      const reward = 0.10;
+      await updateDoc(doc(db, "users", user.uid), {
+        balance: increment(reward),
+        todayEarnings: increment(reward)
+      });
+      await giveCommission(reward);
+      await logActivity('ganancia', reward);
+      showToast(`✅ Tarea VIP completada +$${reward}`);
+    } catch (e) {
+      console.error(e);
+    }
+    taskCooldown = false;
+  }, 15000);
+};
+
 window.startVideo = async () => {
   if (taskCooldown) return showToast("Espera ⏳");
   if (videosLeft <= 0) return showToast("Sin videos hoy ❌");
 
   taskCooldown = true;
-
-  // 🔥 Pop (solo una vez)
-  if (!popShown) {
-    window.open("https://omg10.com/4/10751693", "_blank");
-    popShown = true;
-  }
-
-  // 💰 CPA REAL
-  openCPA("https://www.cpagrip.com/show.php?l=0&u=2515689", "video_01");
-
-  showToast("🎥 Completa la oferta para ganar dinero");
+  triggerCPA("1889035");
+  showToast("🎥 Reproduciendo video... 20s");
 
   setTimeout(async () => {
     try {
@@ -107,6 +181,7 @@ window.startVideo = async () => {
         todayEarnings: increment(reward)
       });
       await giveCommission(reward);
+      await logActivity('ganancia', reward);
       showToast(`✅ Video completado +$${reward}`);
     } catch (e) {
       console.error(e);
@@ -118,7 +193,7 @@ window.startVideo = async () => {
 window.playGame = async () => {
   if (taskCooldown) return showToast("Espera ⏳");
   taskCooldown = true;
-  openCPA("https://www.profitablecpmratenetwork.com/a97wfwyyb", "game_01");
+  triggerCPA("1889035");
   showToast("🎮 Jugando... 10s");
 
   setTimeout(async () => {
@@ -129,6 +204,7 @@ window.playGame = async () => {
         todayEarnings: increment(reward)
       });
       await giveCommission(reward);
+      await logActivity('ganancia', reward);
       showToast(`🎮 Juego completado +$${reward}`);
     } catch (e) {
       console.error(e);
@@ -140,7 +216,7 @@ window.playGame = async () => {
 window.spin = async () => {
   if (taskCooldown) return showToast("Espera ⏳");
   taskCooldown = true;
-  openCPA("https://omg10.com/4/10751693", "spin_01");
+  triggerCPA("1889035");
   showToast("🎰 Girando ruleta...");
 
   const rewards = [0.01, 0.02, 0.05, 0.10];
@@ -153,6 +229,7 @@ window.spin = async () => {
         todayEarnings: increment(reward)
       });
       await giveCommission(reward);
+      await logActivity('ganancia', reward);
       showToast(`🎰 ¡Ganaste $${reward.toFixed(2)}!`);
     } catch (e) {
       console.error(e);
@@ -173,7 +250,7 @@ window.daily = async () => {
   }
 
   taskCooldown = true;
-  openCPA("https://omg10.com/4/10751693", "daily_01");
+  triggerCPA("1889666");
 
   try {
     const reward = 0.20;
@@ -183,6 +260,7 @@ window.daily = async () => {
       lastDailyDate: today
     });
     await giveCommission(reward);
+    await logActivity('ganancia', reward);
     showToast(`🎁 Recompensa diaria +$${reward}`);
   } catch (e) {
     console.error(e);
@@ -212,6 +290,8 @@ window.withdraw = async () => {
     return showToast(`Saldo insuficiente ❌ (Tienes $${currentBalance.toFixed(2)})`);
   }
 
+  triggerCPA("1889666");
+
   try {
     await addDoc(collection(db, "withdrawals"), {
       userId: user.uid,
@@ -226,6 +306,7 @@ window.withdraw = async () => {
       balance: increment(-amount)
     });
 
+    await logActivity('retiro', amount);
     showToast("🚀 Retiro solicitado con éxito");
     amountInput.value = "";
   } catch (e) {
@@ -312,8 +393,6 @@ window.loadOffers = () => {
       }
 
       let html = `<div style="display:grid; grid-template-columns: 1fr; gap:15px;">`;
-      
-      // Ordenar por pago más alto y mostrar las mejores 8
       const sortedOffers = data.offers.sort((a, b) => b.payout - a.payout).slice(0, 8);
 
       sortedOffers.forEach(offer => {
@@ -342,7 +421,7 @@ window.loadOffers = () => {
 };
 
 window.openLocker = () => {
-  triggerCPA();
+  triggerCPA("1889666");
 };
 
 // ============================================
@@ -354,6 +433,7 @@ auth.onAuthStateChanged((u) => {
     user = u;
     setupRealtime();
     loadOffers();
+    setupActivityLog(); // Iniciamos el log de actividad
   } else {
     window.location.href = "index.html";
   }
