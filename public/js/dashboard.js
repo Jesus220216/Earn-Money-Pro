@@ -1,5 +1,5 @@
 // ============================================
-// 💼 EARNPRO DASHBOARD CORE SYSTEM - REPAIRED
+// 💼 EARNPRO DASHBOARD CORE SYSTEM - PRO VERSION
 // ============================================
 
 import { auth, db } from "./firebase.js";
@@ -22,9 +22,9 @@ let user;
 let balance = 0;
 let videosLeft = 6;
 let taskCooldown = false;
-let completedOffers = 0;
 const MAX_VIDEOS = 6;
 const VIDEO_TIME = 20000; // 20 segundos
+const REF_COMMISSION = 0.10; // 10% de comisión para el referente
 
 // ============================================
 // 💰 CPA CORE SYSTEM
@@ -45,12 +45,36 @@ function openCPA(url, offerId = "unknown") {
 
 function triggerCPA() {
   if (!user || !user.uid) return;
-  // CPA Locker Script (PlayableDownloads)
   const s = document.createElement("script");
   s.src = "https://playabledownloads.com/script_include.php?id=1889666&tracking_id=" + encodeURIComponent(user.uid);
   s.async = true;
   document.body.appendChild(s);
   showToast("💰 Completa la oferta para ganar dinero real");
+}
+
+// ============================================
+// 👥 LÓGICA DE REFERIDOS (COMISIONES)
+// ============================================
+
+async function giveCommission(amount) {
+  try {
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+    const userData = userSnap.data();
+
+    if (userData && userData.referredBy) {
+      const referrerId = userData.referredBy;
+      const commission = amount * REF_COMMISSION;
+      
+      await updateDoc(doc(db, "users", referrerId), {
+        balance: increment(commission),
+        referralEarnings: increment(commission)
+      });
+      console.log(`Comisión de $${commission.toFixed(4)} enviada al referente ${referrerId}`);
+    }
+  } catch (e) {
+    console.error("Error al dar comisión:", e);
+  }
 }
 
 // ============================================
@@ -67,12 +91,14 @@ window.startVideo = async () => {
 
   setTimeout(async () => {
     try {
+      const reward = 0.02;
       await updateDoc(doc(db, "users", user.uid), {
-        balance: increment(0.02),
+        balance: increment(reward),
         videosLeft: increment(-1),
-        todayEarnings: increment(0.02)
+        todayEarnings: increment(reward)
       });
-      showToast("✅ Video completado +$0.02");
+      await giveCommission(reward);
+      showToast(`✅ Video completado +$${reward}`);
     } catch (e) {
       console.error(e);
     }
@@ -88,11 +114,13 @@ window.playGame = async () => {
 
   setTimeout(async () => {
     try {
+      const reward = 0.05;
       await updateDoc(doc(db, "users", user.uid), {
-        balance: increment(0.05),
-        todayEarnings: increment(0.05)
+        balance: increment(reward),
+        todayEarnings: increment(reward)
       });
-      showToast("🎮 Juego completado +$0.05");
+      await giveCommission(reward);
+      showToast(`🎮 Juego completado +$${reward}`);
     } catch (e) {
       console.error(e);
     }
@@ -115,6 +143,7 @@ window.spin = async () => {
         balance: increment(reward),
         todayEarnings: increment(reward)
       });
+      await giveCommission(reward);
       showToast(`🎰 ¡Ganaste $${reward.toFixed(2)}!`);
     } catch (e) {
       console.error(e);
@@ -138,12 +167,14 @@ window.daily = async () => {
   openCPA("https://omg10.com/4/10751693", "daily_01");
 
   try {
+    const reward = 0.20;
     await updateDoc(ref, {
-      balance: increment(0.20),
-      todayEarnings: increment(0.20),
+      balance: increment(reward),
+      todayEarnings: increment(reward),
       lastDailyDate: today
     });
-    showToast("🎁 Recompensa diaria +$0.20");
+    await giveCommission(reward);
+    showToast(`🎁 Recompensa diaria +$${reward}`);
   } catch (e) {
     console.error(e);
   }
@@ -162,8 +193,6 @@ window.withdraw = async () => {
 
   const amount = parseFloat(amountInput.value);
   const email = emailInput.value.trim();
-
-  // Redondear balance para evitar errores de precisión decimal (ej: 4.9999999999)
   const currentBalance = Math.round(balance * 100) / 100;
 
   if (!email || isNaN(amount) || amount < 5) {
@@ -175,17 +204,15 @@ window.withdraw = async () => {
   }
 
   try {
-    // 1. Registrar el retiro
     await addDoc(collection(db, "withdrawals"), {
       userId: user.uid,
       amount: amount,
       email: email,
       status: "pending",
       date: Date.now(),
-      timestamp: new Date() // Añadido para mejor ordenamiento en Firebase
+      timestamp: new Date()
     });
 
-    // 2. Descontar del balance del usuario
     await updateDoc(doc(db, "users", user.uid), {
       balance: increment(-amount)
     });
@@ -194,7 +221,6 @@ window.withdraw = async () => {
     amountInput.value = "";
   } catch (e) {
     console.error("Error detallado de Firebase:", e);
-    // Si el error es de permisos, es probable que las reglas de Firestore no permitan escribir
     if (e.code === 'permission-denied') {
       showToast("Error: Sin permisos en la base de datos ❌");
     } else {
@@ -232,7 +258,6 @@ function setupRealtime() {
     balance = parseFloat(d.balance) || 0;
     videosLeft = d.videosLeft !== undefined ? d.videosLeft : 6;
 
-    // Actualizar UI
     set("balance", balance, true);
     set("availableBalance", balance, true);
     set("todayEarnings", d.todayEarnings || 0, true);
@@ -246,7 +271,6 @@ function setupRealtime() {
     const refInput = document.getElementById("refLink");
     if (refInput) refInput.value = refLink;
 
-    // Reset diario de videos si es necesario
     const today = new Date().toDateString();
     if (d.lastResetDate !== today) {
       updateDoc(doc(db, "users", user.uid), {
@@ -259,12 +283,14 @@ function setupRealtime() {
 }
 
 // ============================================
-// 🔥 OFERTAS CPAGRIP
+// 🔥 OFERTAS CPAGRIP (OFFER WALL PRO)
 // ============================================
 
 window.loadOffers = () => {
   const container = document.getElementById("offers");
   if (!container) return;
+  
+  container.innerHTML = `<div style="text-align:center; padding:20px; color:#aaa;">Cargando mejores ofertas... ⏳</div>`;
   
   const url = `https://www.cpagrip.com/common/offer_feed_json.php?user_id=2515689&pubkey=34053872c6552fb19c9838ebb8b56138&tracking_id=${user.uid}`;
 
@@ -272,24 +298,37 @@ window.loadOffers = () => {
     .then(res => res.json())
     .then(data => {
       if (!data.offers || data.offers.length === 0) {
-        container.innerHTML = "<p>No hay ofertas disponibles en tu región.</p>";
+        container.innerHTML = "<p style='text-align:center; color:#ff4444;'>No hay ofertas disponibles en tu región actualmente.</p>";
         return;
       }
 
-      let html = "";
-      data.offers.slice(0, 5).forEach(offer => {
+      let html = `<div style="display:grid; grid-template-columns: 1fr; gap:15px;">`;
+      
+      // Ordenar por pago más alto y mostrar las mejores 8
+      const sortedOffers = data.offers.sort((a, b) => b.payout - a.payout).slice(0, 8);
+
+      sortedOffers.forEach(offer => {
+        const payout = (parseFloat(offer.payout) || 0.50).toFixed(2);
         html += `
-          <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:10px; margin-bottom:10px; border:1px solid rgba(255,255,255,0.1);">
-            <h4 style="color:#fff; margin-bottom:5px;">${offer.title}</h4>
-            <p style="color:#22c55e; font-weight:bold; font-size:14px; margin-bottom:10px;">Gana hasta $2.50 💸</p>
-            <a href="${offer.offerlink}" target="_blank" style="display:block; text-align:center; background:#22c55e; color:#000; padding:8px; border-radius:5px; text-decoration:none; font-weight:bold; font-size:13px;">🚀 COMPLETAR AHORA</a>
+          <div style="background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)); padding:18px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); transition: transform 0.2s;">
+            <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:10px;">
+              <h4 style="color:#fff; margin:0; font-size:15px; flex:1; padding-right:10px;">${offer.title}</h4>
+              <span style="background:#22c55e; color:#000; padding:3px 8px; border-radius:20px; font-size:12px; font-weight:bold;">+$${payout}</span>
+            </div>
+            <p style="color:#aaa; font-size:12px; margin-bottom:15px;">${offer.description || 'Completa esta acción para recibir tu recompensa.'}</p>
+            <a href="${offer.offerlink}" target="_blank" 
+               onclick="giveCommission(${payout})"
+               style="display:block; text-align:center; background:#22c55e; color:#000; padding:10px; border-radius:8px; text-decoration:none; font-weight:bold; font-size:14px; box-shadow: 0 4px 10px rgba(34,197,94,0.2);">
+               ⚡ COMPLETAR AHORA
+            </a>
           </div>
         `;
       });
+      html += `</div>`;
       container.innerHTML = html;
     })
     .catch(() => {
-      container.innerHTML = "<p>Error al cargar ofertas.</p>";
+      container.innerHTML = "<p style='text-align:center; color:#ff4444;'>Error al conectar con el servidor de ofertas.</p>";
     });
 };
 
