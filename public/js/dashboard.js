@@ -155,35 +155,51 @@ window.daily = async () => {
 // ============================================
 
 window.withdraw = async () => {
-  const amount = parseFloat(document.getElementById("amount").value);
-  const email = document.getElementById("email").value;
+  const amountInput = document.getElementById("amount");
+  const emailInput = document.getElementById("email");
+  
+  if (!amountInput || !emailInput) return;
+
+  const amount = parseFloat(amountInput.value);
+  const email = emailInput.value.trim();
+
+  // Redondear balance para evitar errores de precisión decimal (ej: 4.9999999999)
+  const currentBalance = Math.round(balance * 100) / 100;
 
   if (!email || isNaN(amount) || amount < 5) {
     return showToast("Mínimo $5.00 y email válido ❌");
   }
 
-  if (amount > balance) {
-    return showToast("Saldo insuficiente ❌");
+  if (amount > currentBalance) {
+    return showToast(`Saldo insuficiente ❌ (Tienes $${currentBalance.toFixed(2)})`);
   }
 
   try {
+    // 1. Registrar el retiro
     await addDoc(collection(db, "withdrawals"), {
       userId: user.uid,
       amount: amount,
       email: email,
       status: "pending",
-      date: Date.now()
+      date: Date.now(),
+      timestamp: new Date() // Añadido para mejor ordenamiento en Firebase
     });
 
+    // 2. Descontar del balance del usuario
     await updateDoc(doc(db, "users", user.uid), {
       balance: increment(-amount)
     });
 
     showToast("🚀 Retiro solicitado con éxito");
-    document.getElementById("amount").value = "";
+    amountInput.value = "";
   } catch (e) {
-    showToast("Error al procesar retiro ❌");
-    console.error(e);
+    console.error("Error detallado de Firebase:", e);
+    // Si el error es de permisos, es probable que las reglas de Firestore no permitan escribir
+    if (e.code === 'permission-denied') {
+      showToast("Error: Sin permisos en la base de datos ❌");
+    } else {
+      showToast("Error al procesar retiro ❌");
+    }
   }
 };
 
@@ -213,7 +229,7 @@ function setupRealtime() {
     if (!snap.exists()) return;
     const d = snap.data();
     
-    balance = d.balance || 0;
+    balance = parseFloat(d.balance) || 0;
     videosLeft = d.videosLeft !== undefined ? d.videosLeft : 6;
 
     // Actualizar UI
