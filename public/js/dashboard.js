@@ -1,5 +1,5 @@
 // ============================================
-// 💼 EARNPRO DASHBOARD CORE SYSTEM - PRO VERSION (V4)
+// 💼 EARNPRO DASHBOARD CORE SYSTEM - PRO VERSION (V3)
 // ============================================
 
 import { auth, db } from "./firebase.js";
@@ -11,10 +11,7 @@ import {
   increment,
   addDoc,
   collection,
-  onSnapshot,
-  query,
-  orderBy,
-  limit
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 // ============================================
@@ -33,6 +30,11 @@ const REF_COMMISSION = 0.10; // 10% de comisión para el referente
 // 💰 CPA CORE SYSTEM (PLAYABLE DOWNLOADS & OMG10)
 // ============================================
 
+/**
+ * Lógica de Selección Inteligente de Lockers:
+ * - ID 1889035: Alta Conversión (Ofertas Rápidas). Ideal para Ruleta y Juegos.
+ * - ID 1889666: Mayor Pago (Ofertas Premium). Ideal para Bono Diario y Retiros.
+ */
 function triggerCPA(lockerId = "1889666") {
   if (!user || !user.uid) return;
   
@@ -62,58 +64,6 @@ function openCPA(url, offerId = "unknown") {
 }
 
 // ============================================
-// 📝 LOG DE ACTIVIDAD (TIEMPO REAL)
-// ============================================
-
-async function logActivity(type, amount) {
-  try {
-    // Solo registramos actividades significativas para no saturar
-    await addDoc(collection(db, "activities"), {
-      userId: user.uid,
-      userName: user.displayName || "Usuario",
-      type: type, // 'ganancia' o 'retiro'
-      amount: amount,
-      timestamp: Date.now()
-    });
-  } catch (e) {
-    console.error("Error al registrar actividad:", e);
-  }
-}
-
-function setupActivityLog() {
-  const container = document.getElementById("activityLog");
-  if (!container) return;
-
-  const q = query(collection(db, "activities"), orderBy("timestamp", "desc"), limit(10));
-  
-  onSnapshot(q, (snap) => {
-    let html = "";
-    snap.forEach((doc) => {
-      const act = doc.data();
-      const time = new Date(act.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const color = act.type === 'retiro' ? '#ef4444' : '#22c55e';
-      const icon = act.type === 'retiro' ? '💸' : '💰';
-      const text = act.type === 'retiro' ? 'solicitó un retiro de' : 'ganó';
-
-      html += `
-        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px; border-bottom:1px solid rgba(255,255,255,0.05); font-size:13px;">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <span style="font-size:16px;">${icon}</span>
-            <div>
-              <span style="color:#fff; font-weight:bold;">${act.userName.split(' ')[0]}</span>
-              <span style="color:#aaa;"> ${text} </span>
-              <span style="color:${color}; font-weight:bold;">$${parseFloat(act.amount).toFixed(2)}</span>
-            </div>
-          </div>
-          <span style="color:#666; font-size:11px;">${time}</span>
-        </div>
-      `;
-    });
-    container.innerHTML = html || "<p style='color:#666; text-align:center; padding:10px;'>Esperando actividad...</p>";
-  });
-}
-
-// ============================================
 // 👥 LÓGICA DE REFERIDOS (COMISIONES)
 // ============================================
 
@@ -131,6 +81,7 @@ async function giveCommission(amount) {
         balance: increment(commission),
         referralEarnings: increment(commission)
       });
+      console.log(`Comisión de $${commission.toFixed(4)} enviada al referente ${referrerId}`);
     }
   } catch (e) {
     console.error("Error al dar comisión:", e);
@@ -141,27 +92,30 @@ async function giveCommission(amount) {
 // 🎰 ACCIONES DE GANANCIA
 // ============================================
 
+// --- NUEVA TAREA VIP (OMG10) ---
 window.startVIPTask = async () => {
   if (taskCooldown) return showToast("Espera ⏳");
+  
   taskCooldown = true;
+  // Usamos el nuevo enlace de OMG10
   openCPA("https://omg10.com/4/10868360", "vip_task_01");
   showToast("💎 Tarea VIP iniciada... ¡Gana más!");
 
+  // Como es una tarea VIP, le damos una recompensa mayor
   setTimeout(async () => {
     try {
-      const reward = 0.10;
+      const reward = 0.10; // Recompensa alta para motivar
       await updateDoc(doc(db, "users", user.uid), {
         balance: increment(reward),
         todayEarnings: increment(reward)
       });
       await giveCommission(reward);
-      await logActivity('ganancia', reward);
       showToast(`✅ Tarea VIP completada +$${reward}`);
     } catch (e) {
       console.error(e);
     }
     taskCooldown = false;
-  }, 15000);
+  }, 15000); // Tiempo de espera para validar
 };
 
 window.startVideo = async () => {
@@ -181,7 +135,6 @@ window.startVideo = async () => {
         todayEarnings: increment(reward)
       });
       await giveCommission(reward);
-      await logActivity('ganancia', reward);
       showToast(`✅ Video completado +$${reward}`);
     } catch (e) {
       console.error(e);
@@ -204,7 +157,6 @@ window.playGame = async () => {
         todayEarnings: increment(reward)
       });
       await giveCommission(reward);
-      await logActivity('ganancia', reward);
       showToast(`🎮 Juego completado +$${reward}`);
     } catch (e) {
       console.error(e);
@@ -229,7 +181,6 @@ window.spin = async () => {
         todayEarnings: increment(reward)
       });
       await giveCommission(reward);
-      await logActivity('ganancia', reward);
       showToast(`🎰 ¡Ganaste $${reward.toFixed(2)}!`);
     } catch (e) {
       console.error(e);
@@ -260,7 +211,6 @@ window.daily = async () => {
       lastDailyDate: today
     });
     await giveCommission(reward);
-    await logActivity('ganancia', reward);
     showToast(`🎁 Recompensa diaria +$${reward}`);
   } catch (e) {
     console.error(e);
@@ -306,7 +256,6 @@ window.withdraw = async () => {
       balance: increment(-amount)
     });
 
-    await logActivity('retiro', amount);
     showToast("🚀 Retiro solicitado con éxito");
     amountInput.value = "";
   } catch (e) {
@@ -433,7 +382,6 @@ auth.onAuthStateChanged((u) => {
     user = u;
     setupRealtime();
     loadOffers();
-    setupActivityLog(); // Iniciamos el log de actividad
   } else {
     window.location.href = "index.html";
   }
