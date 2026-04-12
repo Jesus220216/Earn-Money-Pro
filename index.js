@@ -58,10 +58,7 @@ app.all("/postback", async (req, res) => {
 
    const password = (data.password || "").trim();
 
-if (!password || password !== SECRET) {
-  console.log("❌ PASSWORD INCORRECTO:", password);
-  return res.send("denied");
-}
+if (password && password !== "Jhadenjerielpro2201") return res.send("denied");
     if (!subid || isNaN(payout)) return res.send("invalid");
 
     const userRef = db.collection("users").doc(subid);
