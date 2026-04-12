@@ -88,6 +88,20 @@
         </div>
       </div>
 
+      <!-- Contenedor del Log de Actividad -->
+<div style="background: rgba(255,255,255,0.05); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; margin-top: 20px;">
+    <div style="background: rgba(255,255,255,0.05); padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <h3 style="color: #fff; font-size: 14px; margin: 0; display: flex; align-items: center; gap: 8px;">
+            <span style="color: #22c55e;">●</span> Actividad en Vivo
+        </h3>
+    </div>
+    <div id="activityLog" style="max-height: 300px; overflow-y: auto;">
+        <!-- Aquí aparecerán las actividades automáticamente -->
+        <p style="color: #666; text-align: center; padding: 20px; font-size: 13px;">Cargando actividad...</p>
+    </div>
+</div>
+
+
       <!-- QUICK ACTIONS -->
       <div class="section-card">
         <h2>⚡ Acciones Rápidas</h2>
@@ -333,16 +347,6 @@
         </div>
 
       </div>
-
-      <!-- Botón para la Tarea VIP -->
-<div style="background: linear-gradient(135deg, #6366f1, #a855f7); padding: 20px; border-radius: 15px; text-align: center; margin: 20px 0; border: 1px solid rgba(255,255,255,0.2);">
-    <h3 style="color: white; margin-bottom: 10px;">💎 Tarea VIP Especial</h3>
-    <p style="color: #e0e7ff; font-size: 14px; margin-bottom: 15px;">Completa esta oferta especial y gana $0.10 al instante.</p>
-    <button onclick="startVIPTask()" style="background: white; color: #6366f1; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-        🚀 EMPEZAR TAREA VIP
-    </button>
-</div>
-
 
     </section>
 
