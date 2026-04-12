@@ -30,7 +30,7 @@ if (serviceAccount) {
 const db = admin.apps.length ? admin.firestore() : null;
 
 // 🔐 SECRET para Admin
-const SECRET = "EarnPro_SECURE_9xLk29@2026";
+const SECRET = "Jhadenjerielpro2201;
 
 // 🌐 STATIC
 app.use(express.static(path.join(__dirname, "public")));
