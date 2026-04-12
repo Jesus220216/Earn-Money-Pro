@@ -1,85 +1,102 @@
-<!DOCTYPE html>
-<html>
+!DOCTYPE html>
+<html lang="es">
 <head>
-  <title>Admin Panel EarnPro</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - EarnPro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; padding: 20px; }
+    .container { max-width: 900px; margin: 0 auto; }
+    h1 { color: #22c55e; margin-bottom: 20px; }
+    .card { background: #121212; border: 1px solid #262626; border-radius: 12px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+    .info { flex: 1; }
+    .info p { margin: 5px 0; font-size: 14px; color: #9ca3af; }
+    .info strong { color: #fff; font-size: 16px; }
+    .status { padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+    .pending { background: #f59e0b; color: #000; }
+    .approved { background: #22c55e; color: #000; }
+    .rejected { background: #ef4444; color: #fff; }
+    .actions { display: flex; gap: 10px; }
+    button { padding: 8px 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+    .btn-approve { background: #22c55e; color: #000; }
+    .btn-reject { background: #ef4444; color: #fff; }
+    button:hover { opacity: 0.8; }
+    .secret-input { margin-bottom: 20px; }
+    input { background: #1a1a1a; border: 1px solid #262626; color: #fff; padding: 10px; border-radius: 8px; width: 300px; }
+  </style>
 </head>
 <body>
+  <div class="container">
+    <h1>Admin Panel - Retiros</h1>
+    <div class="secret-input">
+      <input type="password" id="adminSecret" placeholder="Introduce el Secret Key" onchange="loadWithdrawals()">
+    </div>
+    <div id="withdrawalsList">
+      <p>Introduce el Secret Key para ver los retiros.</p>
+    </div>
+  </div>
 
-<h1>🏢 ADMIN PANEL</h1>
+  <script>
+    async function loadWithdrawals() {
+      const secret = document.getElementById('adminSecret').value;
+      if (!secret) return;
 
-<h3>📊 Total Revenue: <span id="rev">0</span></h3>
-<h3>👤 Users: <span id="users">0</span></h3>
-<h3>👆 Clicks: <span id="clicks">0</span></h3>
-
-<script type="module">
-import { db } from "./firebase.js";
-import {
-  collection, getDocs
-} from "firebase/firestore";
-
-async function load() {
-  const usersSnap = await getDocs(collection(db, "users"));
-  const trackSnap = await getDocs(collection(db, "tracking"));
-
-  let revenue = 0;
-  let clicks = 0;
-
-  usersSnap.forEach(u => {
-    revenue += u.data().revenue || 0;
-  });
-
-  trackSnap.forEach(t => {
-    if (t.data().event === "click") clicks++;
-  });
-
-  document.getElementById("rev").innerText = revenue;
-  document.getElementById("users").innerText = usersSnap.size;
-  document.getElementById("clicks").innerText = clicks;
-}
-
-load();
-</script>
-
-</body>
-</html>n/withdrawals?secret=' + SECRET);
+      try {
+        const res = await fetch(`/admin/withdrawals?secret=${secret}`);
         const data = await res.json();
+        
+        if (data === "denied") return alert("Acceso denegado");
 
-        const div = document.getElementById("list");
-        div.innerHTML = "";
-
-        if (!data.length) {
-          div.innerHTML = "No hay retiros";
+        const list = document.getElementById('withdrawalsList');
+        if (data.length === 0) {
+          list.innerHTML = "<p>No hay retiros pendientes.</p>";
           return;
         }
 
+        let html = "";
         data.forEach(w => {
-          div.innerHTML += \`
+          const date = new Date(w.date).toLocaleString();
+          html += `
             <div class="card">
-              👤 \${w.userId}<br>
-              💰 $\${w.amount}<br>
-              📊 \${w.status || "pending"}<br>
-              <button class="ok" onclick="approve('\${w.id}')">Aprobar</button>
-              <button class="no" onclick="reject('\${w.id}')">Rechazar</button>
+              <div class="info">
+                <p><strong>${w.email}</strong> - $${w.amount.toFixed(2)}</p>
+                <p>ID Usuario: ${w.userId}</p>
+                <p>Fecha: ${date}</p>
+                <span class="status ${w.status}">${w.status}</span>
+              </div>
+              <div class="actions">
+                ${w.status === 'pending' ? `
+                  <button class="btn-approve" onclick="process('${w.id}', 'approve')">Aprobar</button>
+                  <button class="btn-reject" onclick="process('${w.id}', 'reject')">Rechazar</button>
+                ` : ''}
+              </div>
             </div>
-          \`;
+          `;
         });
+        list.innerHTML = html;
+      } catch (e) {
+        console.error(e);
       }
+    }
 
-      function approve(id){
-        fetch('/admin/approve?id=' + id + '&secret=' + SECRET)
-        .then(()=> location.reload());
+    async function process(id, action) {
+      const secret = document.getElementById('adminSecret').value;
+      if (!confirm(`¿Estás seguro de ${action} este retiro?`)) return;
+
+      try {
+        const res = await fetch(`/admin/${action}?secret=${secret}&id=${id}`);
+        const text = await res.text();
+        if (text === "ok") {
+          alert("Procesado con éxito");
+          loadWithdrawals();
+        } else {
+          alert("Error: " + text);
+        }
+      } catch (e) {
+        alert("Error de conexión");
       }
-
-      function reject(id){
-        fetch('/admin/reject?id=' + id + '&secret=' + SECRET)
-        .then(()=> location.reload());
-      }
-
-      load();
-    </script>
-
-    </body>
-    </html>
-  `);
-});
-
+    }
+  </script>
+</body>
+</html>
