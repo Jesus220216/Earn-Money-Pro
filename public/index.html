@@ -3,187 +3,403 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EarnPro - Gana dinero real completando tareas simples</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #0a0a0a;
+      --card-bg: #121212;
+      --input-bg: #1a1a1a;
+      --primary-green: #22c55e;
+      --primary-hover: #16a34a;
+      --text-main: #ffffff;
+      --text-muted: #9ca3af;
+      --border-color: #262626;
+    }
 
-  <title>EarnPro - Gana Dinero Online</title>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
 
-  <meta name="monetag" content="139886b3940e2e0ab7082d178476fe5b">
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
 
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
 
-  <!-- ✅ VIGOROUS TAG -->
-  <script>
-    (function () {
-      function loadTag() {
-        if (window.__tag_loaded) return;
-        window.__tag_loaded = true;
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
 
-        try {
-          const s = document.createElement("script");
-          s.dataset.zone = "10860349";
-          s.src = "https://al5sm.com/tag.min.js";
-          s.async = true;
-          document.head.appendChild(s);
-        } catch (e) {
-          console.warn("Ad tag error:", e);
-        }
+    .logo-icon {
+      background-color: #f59e0b;
+      padding: 8px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-text {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .logo-text span {
+      color: var(--primary-green);
+    }
+
+    .headline {
+      font-size: 24px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .login-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 32px;
+      width: 100%;
+      max-width: 450px;
+      margin-bottom: 40px;
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+
+    .card-title span {
+      color: #f59e0b;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    input {
+      width: 100%;
+      background-color: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 14px 16px;
+      color: var(--text-main);
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus {
+      border-color: var(--primary-green);
+    }
+
+    .btn-login {
+      width: 100%;
+      background-color: var(--primary-green);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background-color 0.2s;
+    }
+
+    .btn-login:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .switch-auth {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .switch-auth a {
+      color: var(--primary-green);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 30px;
+    }
+
+    .feature-item {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .feature-icon {
+      font-size: 24px;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .feature-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .feature-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .adsterra-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--primary-green);
+      text-decoration: none;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    /* Estilos para el modo registro */
+    .register-mode .card-title span {
+      color: var(--primary-green);
+    }
+    
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 600px) {
+      .features-grid {
+        grid-template-columns: 1fr;
       }
-
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", loadTag);
-      } else {
-        loadTag();
-      }
-    })();
-  </script>
-
+    }
+  </style>
 </head>
-
 <body>
 
-<nav class="nav">
-  <div class="logo">💰 EarnPro</div>
-
-  <div class="auth-controls">
-    <input id="email" type="email" placeholder="Correo electrónico">
-    <input id="password" type="password" placeholder="Contraseña">
-
-    <button onclick="typeof login==='function' && login()">Iniciar Sesión</button>
-    <button onclick="typeof register==='function' && register()">Registrarse</button>
-  </div>
-</nav>
-
-<section class="hero">
-  <div class="container">
-    <h1>Gana Dinero Real Completando Tareas</h1>
-    <p>Únete a EarnPro y transforma tu tiempo libre en recompensas.</p>
-
-    <a href="#" class="btn pulse" onclick="typeof register==='function' && register(); return false;">
-      🚀 Empezar y Ganar Dinero
-    </a>
-
-    <!-- 🔥 ADSTERRA LINK HERO -->
-    <a href="https://beta.publishers.adsterra.com/referral/QUZqzsnPN1" target="_blank" rel="nofollow"
-       class="btn" style="background:#ff9800; margin-top:10px; display:inline-block;">
-      💰 Monetiza tu web con Adsterra
-    </a>
-
-    <p style="margin-top:10px; font-size:14px; opacity:0.8;">
-      🔥 +3,842 usuarios ganando hoy
-    </p>
-  </div>
-</section>
-
-<section class="features container">
-  <div class="feature-card">
-    <h3>Pagos Rápidos</h3>
-    <p>PayPal, Crypto y más.</p>
-  </div>
-
-  <div class="feature-card">
-    <h3>Tareas Variadas</h3>
-    <p>Videos, juegos y ofertas.</p>
-  </div>
-  
-  <div class="feature-card">
-    <h3>Comunidad Activa</h3>
-    <p>Miles de usuarios ganando.</p>
-  </div>
-</section>
-
-<section class="cta-section">
-  <div class="container">
-    <h2>¿Listo para empezar?</h2>
-
-    <a href="#" class="btn pulse" onclick="typeof register==='function' && register(); return false;">
-      ¡Regístrate Hoy!
-    </a>
-
-    <!-- 🔥 ADSTERRA CTA -->
-    <a href="https://beta.publishers.adsterra.com/referral/QUZqzsnPN1" target="_blank" rel="nofollow"
-       class="btn" style="background:#28a745; margin-top:10px; display:inline-block;">
-      🚀 Activar ingresos publicitarios
-    </a>
-  </div>
-</section>
-
-<footer class="footer">
-  <div class="container">
-    <p>&copy; 2026 EarnPro</p>
-  </div>
-</footer>
-
-<!-- ✅ POPUP -->
-<div id="welcome-popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:9999;">
-  <div style="background:#111; padding:25px; border-radius:10px; text-align:center; color:#fff;">
-    <h3>🔥 Bienvenido a EarnPro</h3>
-    <p>Completa tareas y gana dinero real desde hoy.</p>
-
-    <button onclick="closePopup()">Empezar</button>
-
-    <!-- 🔥 ADSTERRA POPUP LINK -->
-    <div style="margin-top:15px;">
-      <a href="https://beta.publishers.adsterra.com/referral/QUZqzsnPN1"
-         target="_blank" rel="nofollow" style="color:#00ff99;">
-        👉 Crear cuenta en Adsterra
-      </a>
+  <div class="header">
+    <div class="logo-container">
+      <div class="logo-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M19 7H5C3.89543 7 3 7.89543 3 9V18C3 19.1046 3.89543 20 5 20H19C20.1046 20 21 19.1046 21 18V9C21 7.89543 20.1046 7 19 7Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 7V5C16 4.46957 15.7893 3.96086 15.4142 3.58579C15.0391 3.21071 14.5304 3 14 3H10C9.46957 3 8.96086 3.21071 8.58579 3.58579C8.21071 3.96086 8 4.46957 8 5V7" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="12" cy="13.5" r="1.5" fill="black"/>
+        </svg>
+      </div>
+      <h1 class="logo-text">Earn<span>Pro</span></h1>
+    </div>
+    <p class="headline">Gana dinero real completando tareas simples</p>
+    <div class="stats-row">
+      <div class="stat-item">🔥 +3,842 usuarios ganando hoy</div>
+      <div class="stat-item">💸 PayPal & Crypto</div>
     </div>
   </div>
-</div>
 
-<script type="module" src="js/auth.js"></script>
+  <div class="login-card" id="authCard">
+    <!-- Login View -->
+    <div id="loginView">
+      <div class="card-title">
+        <span>⚡</span> Iniciar Sesión
+      </div>
+      <div class="form-group">
+        <input type="email" id="loginEmail" placeholder="Correo electrónico">
+      </div>
+      <div class="form-group">
+        <input type="password" id="loginPassword" placeholder="Contraseña (mín. 6 caracteres)">
+      </div>
+      <button class="btn-login" onclick="handleLogin()">Iniciar Sesión</button>
+      <div class="switch-auth">
+        ¿No tienes cuenta? <a href="#" onclick="toggleAuth(event, 'register')">Regístrate gratis</a>
+      </div>
+    </div>
 
-<!-- POPUNDER -->
-<script>
-let popLoaded = false;
+    <!-- Register View -->
+    <div id="registerView" class="hidden">
+      <div class="card-title">
+        <span>🚀</span> Crear Cuenta
+      </div>
+      <div class="form-group">
+        <input type="email" id="regEmail" placeholder="Correo electrónico">
+      </div>
+      <div class="form-group">
+        <input type="password" id="regPassword" placeholder="Contraseña (mín. 6 caracteres)">
+      </div>
+      <button class="btn-login" onclick="handleRegister()">Registrarse</button>
+      <div class="switch-auth">
+        ¿Ya tienes cuenta? <a href="#" onclick="toggleAuth(event, 'login')">Inicia sesión</a>
+      </div>
+    </div>
+  </div>
 
-function loadPop() {
-  if (popLoaded) return;
-  popLoaded = true;
+  <div class="features-grid">
+    <div class="feature-item">
+      <span class="feature-icon">💰</span>
+      <div class="feature-title">Pagos Rápidos</div>
+      <div class="feature-desc">PayPal, Crypto</div>
+    </div>
+    <div class="feature-item">
+      <span class="feature-icon">🎮</span>
+      <div class="feature-title">Tareas Fáciles</div>
+      <div class="feature-desc">Videos, juegos</div>
+    </div>
+    <div class="feature-item">
+      <span class="feature-icon">👥</span>
+      <div class="feature-title">Referidos</div>
+      <div class="feature-desc">+$1.00 por amigo</div>
+    </div>
+  </div>
 
-  const s = document.createElement("script");
-  s.src = "//omg10.com/4/10828691";
-  s.async = true;
-  document.body.appendChild(s);
-}
+  <a href="https://beta.publishers.adsterra.com/referral/QUZqzsnPN1" target="_blank" class="adsterra-link">
+    💰 Monetiza tu web con Adsterra
+  </a>
 
-document.addEventListener("pointerdown", loadPop, { once: true });
-</script>
+  <script type="module">
+    import { auth } from './js/firebase.js';
+    import { 
+      signInWithEmailAndPassword, 
+      createUserWithEmailAndPassword 
+    } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+    import { 
+      doc, setDoc, getDoc, updateDoc, increment, addDoc, collection 
+    } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    import { db } from './js/firebase.js';
 
-<!-- REF SYSTEM -->
-<script>
-const ref = new URLSearchParams(window.location.search).get("ref");
+    window.toggleAuth = (e, mode) => {
+      e.preventDefault();
+      const loginView = document.getElementById('loginView');
+      const registerView = document.getElementById('registerView');
+      if (mode === 'register') {
+        loginView.classList.add('hidden');
+        registerView.classList.remove('hidden');
+      } else {
+        loginView.classList.remove('hidden');
+        registerView.classList.add('hidden');
+      }
+    };
 
-if (ref) {
-  sessionStorage.setItem("referrer", ref);
-  console.log("REF CAPTURADO:", ref);
-}
-</script>
+    window.handleLogin = async () => {
+      const email = document.getElementById('loginEmail').value;
+      const pass = document.getElementById('loginPassword').value;
+      if (!email || !pass) return alert('Completa todos los campos');
+      
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+        window.location.href = 'dashboard.html';
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    };
 
-<!-- POPUP AUTO -->
-<script>
-setTimeout(() => {
-  const popup = document.getElementById("welcome-popup");
-  if (popup) popup.style.display = "flex";
-}, 2500);
+    window.handleRegister = async () => {
+      const email = document.getElementById('regEmail').value;
+      const pass = document.getElementById('regPassword').value;
+      
+      if (!email || pass.length < 6) {
+        return alert('Correo inválido o contraseña muy corta (mín. 6)');
+      }
 
-function closePopup() {
-  const popup = document.getElementById("welcome-popup");
-  if (popup) popup.style.display = "none";
-}
-</script>
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, email, pass);
+        const user = cred.user;
 
-<!-- ANIMACIÓN -->
-<style>
-.pulse {
-  animation: pulse 1.5s infinite;
-}
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-</style>
+        let referrer = sessionStorage.getItem("referrer");
+        const urlParams = new URLSearchParams(window.location.search);
+        if (!referrer) referrer = urlParams.get("ref");
 
+        await setDoc(doc(db, "users", user.uid), {
+          uid: user.uid,
+          email: email,
+          balance: 0,
+          referrer: referrer || null,
+          referrals: 0,
+          referralEarnings: 0,
+          videosLeft: 6,
+          videoDate: new Date().toDateString(),
+          todayEarnings: 0,
+          todayDate: new Date().toDateString(),
+          lastDaily: 0,
+          createdAt: Date.now()
+        });
+
+        if (referrer && referrer !== user.uid) {
+          try {
+            const refUser = doc(db, "users", referrer);
+            const refSnap = await getDoc(refUser);
+            if (refSnap.exists()) {
+              await updateDoc(refUser, {
+                referrals: increment(1),
+                referralEarnings: increment(1),
+                balance: increment(1)
+              });
+              await addDoc(collection(db, "referrals"), {
+                referrerId: referrer,
+                referredId: user.uid,
+                amount: 1,
+                date: Date.now()
+              });
+            }
+          } catch (err) { console.error("Error ref:", err); }
+        }
+
+        sessionStorage.removeItem("referrer");
+        alert("¡Cuenta creada con éxito! 🚀");
+        window.location.href = 'dashboard.html';
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    };
+
+    // Capturar referido de la URL
+    const ref = new URLSearchParams(window.location.search).get("ref");
+    if (ref) sessionStorage.setItem("referrer", ref);
+  </script>
 </body>
 </html>
