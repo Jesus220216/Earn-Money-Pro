@@ -86,8 +86,17 @@ window.startVideo = async () => {
   if (videosLeft <= 0) return showToast("Sin videos hoy ❌");
 
   taskCooldown = true;
-  openCPA("https://omg10.com/4/10751693", "video_01");
-  showToast("🎥 Reproduciendo video... 20s");
+
+  // 🔥 Pop (solo una vez)
+  if (!popShown) {
+    window.open("https://omg10.com/4/10751693", "_blank");
+    popShown = true;
+  }
+
+  // 💰 CPA REAL
+  openCPA("https://www.cpagrip.com/show.php?l=0&u=2515689", "video_01");
+
+  showToast("🎥 Completa la oferta para ganar dinero");
 
   setTimeout(async () => {
     try {
