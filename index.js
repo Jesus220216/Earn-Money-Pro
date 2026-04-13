@@ -56,15 +56,15 @@ app.all("/postback", async (req, res) => {
    const uid = data.uid || data.player_id || data.subid || data.tracking_id;
 const payout = parseFloat(data.usd || data.payout || 0);
 const tx = data.tx || data.transaction_id || (uid + "_" + Date.now());
-    const offer = data.offer_id || "unknown";
+    const offer = data.offer_id || data.offer || data.id || "unknown";
 
     const password = data.password;
     const SECRET = "Jhadenjerielpro2201";
 
     // 🔐 Seguridad básica
-    if (password && password !== SECRET) {
-      return res.status(403).send("denied");
-    }
+   if (data.password !== SECRET) {
+  return res.status(403).send("denied");
+}
 
     if (!uid || isNaN(payout) || !tx) {
       return res.status(400).send("invalid");
@@ -90,7 +90,9 @@ const tx = data.tx || data.transaction_id || (uid + "_" + Date.now());
       total,
       offer,
       date: Date.now(),
-      ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress
+     ip: (req.headers["x-forwarded-for"] || req.socket.remoteAddress || "")
+  .split(",")[0]
+  .trim()
     });
 
     // 💰 Actualizar usuario
