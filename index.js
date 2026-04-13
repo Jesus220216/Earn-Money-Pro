@@ -48,34 +48,58 @@ app.get("/admin", (req, res) => {
 // 🎯 POSTBACK CPA (REAL + BONUS)
 // ============================================
 app.all("/postback", async (req, res) => {
-  if (!db) return res.status(500).send("Database not initialized");
-  
+  if (!db) return res.status(500).send("DB error");
+
   try {
     const data = req.method === "POST" ? req.body : req.query;
-    const subid = data.subid || data.tracking_id;
+
+    const uid = data.player_id || data.subid || data.tracking_id;
     const payout = parseFloat(data.payout || 0);
+    const tx = data.transaction_id;
+    const offer = data.offer_id || "unknown";
+
     const password = data.password;
+    const SECRET = "Jhadenjerielpro2201";
 
-    if (password && password !== "Jhadenjerielpro2201") return res.send("denied");
-    if (!subid || isNaN(payout)) return res.send("invalid");
+    // 🔐 Seguridad básica
+    if (password && password !== SECRET) {
+      return res.status(403).send("denied");
+    }
 
-    const userRef = db.collection("users").doc(subid);
-    const userDoc = await userRef.get();
-    if (!userDoc.exists) return res.send("no user");
+    if (!uid || isNaN(payout) || !tx) {
+      return res.status(400).send("invalid");
+    }
 
-    // Bonus aleatorio (Gamificación)
-    const bonus = Math.random() < 0.1 ? 0.10 : 0.02; 
+    // 🔒 Evitar duplicados
+    const txRef = db.collection("transactions").doc(tx);
+    const txDoc = await txRef.get();
+
+    if (txDoc.exists) {
+      return res.status(200).send("duplicate");
+    }
+
+    // 🎁 Bonus (puedes dejarlo)
+    const bonus = Math.random() < 0.1 ? 0.10 : 0.02;
     const total = payout + bonus;
 
-    await db.collection("conversions").add({
-      uid: subid,
-      payout: payout,
-      bonus: bonus,
-      total: total,
-      offer: data.offer_id || "unknown",
+    // 💾 Guardar transacción
+    await txRef.set({
+      uid,
+      payout,
+      bonus,
+      total,
+      offer,
       date: Date.now(),
       ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress
     });
+
+    // 💰 Actualizar usuario
+    const userRef = db.collection("users").doc(uid);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      return res.status(200).send("no user");
+    }
 
     await userRef.update({
       balance: admin.firestore.FieldValue.increment(total),
@@ -83,11 +107,12 @@ app.all("/postback", async (req, res) => {
       lastUpdate: Date.now()
     });
 
-    console.log("💰 POSTBACK OK:", subid, total);
-    res.send("ok");
+    console.log("💰 POSTBACK OK:", uid, total);
+
+    res.status(200).send("OK");
   } catch (err) {
     console.error("❌ postback error:", err);
-    res.send("error");
+    res.status(500).send("error");
   }
 });
 
