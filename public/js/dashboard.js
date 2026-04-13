@@ -380,16 +380,20 @@ window.openLocker = () => {
 auth.onAuthStateChanged((u) => {
   if (u) {
     user = u;
+
     setupRealtime();
     loadOffers();
+
+    // 🔥 ADGEM OFFERWALL
+    const frame = document.getElementById("adgemFrame");
+    if (frame) {
+      frame.src = `https://adunits.adgem.com/wall?appid=32361&playerid=${user.uid}`;
+    }
+
   } else {
     window.location.href = "index.html";
   }
 });
-
-window.logout = () => {
-  auth.signOut().then(() => window.location.href = "index.html");
-};
 
 // ============================================
 // 🔔 TOAST
