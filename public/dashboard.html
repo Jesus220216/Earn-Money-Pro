@@ -427,22 +427,6 @@
       document.getElementById(section + '-section').classList.add('section-active');
     });
   });
-
-  <button onclick="openOfferwall()">Abrir ofertas</button>
-
-<script>
-function openOfferwall() {
-  const user = firebase.auth().currentUser;
-
-  if (!user) {
-    alert("Inicia sesión primero");
-    return;
-  }
-
-  const url = `https://adunits.adgem.com/wall?appid=32365&playerid=${user.uid}`;
-
-  window.open(url, "_blank");
-}
 </script>
 
 </body>
