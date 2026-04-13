@@ -53,9 +53,9 @@ app.all("/postback", async (req, res) => {
   try {
     const data = req.method === "POST" ? req.body : req.query;
 
-    const uid = data.player_id || data.subid || data.tracking_id;
-    const payout = parseFloat(data.payout || 0);
-    const tx = data.transaction_id;
+   const uid = data.uid || data.player_id || data.subid || data.tracking_id;
+const payout = parseFloat(data.usd || data.payout || 0);
+const tx = data.tx || data.transaction_id || (uid + "_" + Date.now());
     const offer = data.offer_id || "unknown";
 
     const password = data.password;
