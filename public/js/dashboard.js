@@ -63,6 +63,19 @@ function openCPA(url, offerId = "unknown") {
   showToast("💰 Completa la oferta para ganar dinero real");
 }
 
+function openOfferwall() {
+  const currentUser = auth.currentUser;
+
+  if (!currentUser) {
+    showToast("Inicia sesión primero");
+    return;
+  }
+
+  const url = `https://adunits.adgem.com/wall?appid=32365&playerid=${encodeURIComponent(currentUser.uid)}`;
+
+  window.open(url, "_blank");
+}
+
 // ============================================
 // 👥 LÓGICA DE REFERIDOS (COMISIONES)
 // ============================================
