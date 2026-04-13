@@ -99,16 +99,19 @@ const tx = data.tx || data.transaction_id || (uid + "_" + Date.now());
     const userRef = db.collection("users").doc(uid);
     const userDoc = await userRef.get();
 
-    if (!userDoc.exists) {
-      return res.status(200).send("no user");
-    }
-
-    await userRef.update({
-      balance: admin.firestore.FieldValue.increment(total),
-      todayEarnings: admin.firestore.FieldValue.increment(total),
-      lastUpdate: Date.now()
-    });
-
+if (!userDoc.exists) {
+  await userRef.set({
+    balance: 0,
+    todayEarnings: 0,
+    createdAt: Date.now()
+  });
+}
+   await userRef.set({
+  balance: admin.firestore.FieldValue.increment(total),
+  todayEarnings: admin.firestore.FieldValue.increment(total),
+  lastUpdate: Date.now()
+}, { merge: true });
+   
     console.log("💰 POSTBACK OK:", uid, total);
 
     res.status(200).send("OK");
