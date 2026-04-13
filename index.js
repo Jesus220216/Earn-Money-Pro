@@ -80,7 +80,7 @@ const tx = data.tx || data.transaction_id || (uid + "_" + Date.now());
 
     // 🎁 Bonus (puedes dejarlo)
     const bonus = Math.random() < 0.1 ? 0.10 : 0.02;
-    const total = payout + bonus;
+  const total = parseFloat((payout + bonus).toFixed(2));
 
     // 💾 Guardar transacción
     await txRef.set({
