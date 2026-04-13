@@ -413,3 +413,18 @@ function showToast(msg) {
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 3000);
 }
+document.getElementById("offerBtn").addEventListener("click", () => {
+  const user = firebase.auth().currentUser;
+
+  if (!user) {
+    alert("Inicia sesión primero");
+    return;
+  }
+
+  const uid = user.uid;
+
+  const url = `https://adunits.adgem.com/wall?appid=32361&playerid=${encodeURIComponent(uid)}`;
+
+  const win = window.open("", "_blank");
+  win.location.href = url;
+});
