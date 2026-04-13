@@ -378,21 +378,25 @@ window.openLocker = () => {
 // ============================================
 
 auth.onAuthStateChanged((u) => {
-  if (u) {
-    user = u;
-
-    setupRealtime();
-    loadOffers();
-
-    // 🔥 ADGEM OFFERWALL
-    const frame = document.getElementById("adgemFrame");
-    if (frame) {
-      frame.src = `https://adunits.adgem.com/wall?appid=32361&playerid=${user.uid}`;
-    }
-
-  } else {
+  if (!u) {
     window.location.href = "index.html";
+    return;
   }
+
+  user = u;
+
+  setupRealtime();
+  loadOffers();
+
+  setTimeout(() => {
+    const frame = document.getElementById("adgemFrame");
+
+    if (frame && user.uid) {
+      frame.src = `https://adunits.adgem.com/wall?appid=32361&playerid=${user.uid}`;
+    } else {
+      console.error("Iframe o UID no disponible");
+    }
+  }, 500);
 });
 
 // ============================================
