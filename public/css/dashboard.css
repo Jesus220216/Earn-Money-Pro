@@ -746,3 +746,46 @@ input::placeholder {
     gap: 10px;
   }
 }
+
+<style>
+.btn-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  color: white;
+  font-weight: bold;
+  transition: 0.2s;
+  margin-top: 10px;
+}
+
+.btn-offers {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  box-shadow: 0 8px 20px rgba(34,197,94,0.3);
+}
+
+.btn-action:hover {
+  transform: scale(1.03);
+}
+
+.action-icon {
+  font-size: 20px;
+}
+
+.action-text {
+  flex: 1;
+  text-align: left;
+}
+
+.action-reward {
+  background: rgba(255,255,255,0.2);
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+</style>
