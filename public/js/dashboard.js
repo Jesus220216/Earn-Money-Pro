@@ -1,5 +1,5 @@
 // ============================================
-// 💼 EARNPRO DASHBOARD CORE SYSTEM - PRO VERSION (V3)
+// 💼 EARNPRO DASHBOARD CORE SYSTEM - FIXED V4
 // ============================================
 
 import { auth, db } from "./firebase.js";
@@ -86,8 +86,8 @@ async function giveCommission(amount) {
     const userSnap = await getDoc(userRef);
     const userData = userSnap.data();
 
-    if (userData && userData.referredBy) {
-      const referrerId = userData.referredBy;
+    if (userData && userData.referrer) {
+      const referrerId = userData.referrer;
       const commission = amount * REF_COMMISSION;
       
       await updateDoc(doc(db, "users", referrerId), {
@@ -102,34 +102,12 @@ async function giveCommission(amount) {
 }
 
 // ============================================
-// 🎰 ACCIONES DE GANANCIA
+// 🎰 ACCIONES DE GANANCIA (SOLO ABREN CPA)
 // ============================================
 
-// --- NUEVA TAREA VIP (OMG10) ---
-window.startVIPTask = async () => {
-  if (taskCooldown) return showToast("Espera ⏳");
-  
-  taskCooldown = true;
-  // Usamos el nuevo enlace de OMG10
-  openCPA("https://omg10.com/4/10868360", "vip_task_01");
-  showToast("💎 Tarea VIP iniciada... ¡Gana más!");
-
-  // Como es una tarea VIP, le damos una recompensa mayor
-  setTimeout(async () => {
-    try {
-      const reward = 0.10; // Recompensa alta para motivar
-      await updateDoc(doc(db, "users", user.uid), {
-        balance: increment(reward),
-        todayEarnings: increment(reward)
-      });
-      await giveCommission(reward);
-      showToast(`✅ Tarea VIP completada +$${reward}`);
-    } catch (e) {
-      console.error(e);
-    }
-    taskCooldown = false;
-  }, 15000); // Tiempo de espera para validar
-};
+// IMPORTANTE: Estas funciones SOLO abren las ofertas CPA.
+// Las recompensas se acreditan cuando llega el POSTBACK desde CPA (en index.js)
+// NO se acredita dinero automáticamente aquí.
 
 window.startVideo = async () => {
   if (taskCooldown) return showToast("Espera ⏳");
@@ -137,69 +115,34 @@ window.startVideo = async () => {
 
   taskCooldown = true;
   triggerCPA("1889035");
-  showToast("🎥 Reproduciendo video... 20s");
+  showToast("🎥 Reproduciendo video... Completa la oferta para ganar");
 
-  setTimeout(async () => {
-    try {
-      const reward = 0.02;
-      await updateDoc(doc(db, "users", user.uid), {
-        balance: increment(reward),
-        videosLeft: increment(-1),
-        todayEarnings: increment(reward)
-      });
-      await giveCommission(reward);
-      showToast(`✅ Video completado +$${reward}`);
-    } catch (e) {
-      console.error(e);
-    }
+  // Esperar un poco antes de permitir otra acción
+  setTimeout(() => {
     taskCooldown = false;
-  }, VIDEO_TIME);
+  }, 3000);
 };
 
 window.playGame = async () => {
   if (taskCooldown) return showToast("Espera ⏳");
   taskCooldown = true;
   triggerCPA("1889035");
-  showToast("🎮 Jugando... 10s");
+  showToast("🎮 Abre el juego... Completa la oferta para ganar");
 
-  setTimeout(async () => {
-    try {
-      const reward = 0.05;
-      await updateDoc(doc(db, "users", user.uid), {
-        balance: increment(reward),
-        todayEarnings: increment(reward)
-      });
-      await giveCommission(reward);
-      showToast(`🎮 Juego completado +$${reward}`);
-    } catch (e) {
-      console.error(e);
-    }
+  setTimeout(() => {
     taskCooldown = false;
-  }, 10000);
+  }, 3000);
 };
 
 window.spin = async () => {
   if (taskCooldown) return showToast("Espera ⏳");
   taskCooldown = true;
   triggerCPA("1889035");
-  showToast("🎰 Girando ruleta...");
+  showToast("🎰 Abre la ruleta... Completa la oferta para ganar");
 
-  const rewards = [0.01, 0.02, 0.05, 0.10];
-  const reward = rewards[Math.floor(Math.random() * rewards.length)];
-
-  setTimeout(async () => {
-    try {
-      await updateDoc(doc(db, "users", user.uid), {
-        balance: increment(reward),
-        todayEarnings: increment(reward)
-      });
-      await giveCommission(reward);
-      showToast(`🎰 ¡Ganaste $${reward.toFixed(2)}!`);
-    } catch (e) {
-      console.error(e);
-    }
+  setTimeout(() => {
     taskCooldown = false;
-  }, 4000);
+  }, 3000);
 };
 
 window.daily = async () => {
@@ -215,20 +158,23 @@ window.daily = async () => {
 
   taskCooldown = true;
   triggerCPA("1889666");
+  showToast("🎁 Abre tu recompensa diaria... Completa la oferta");
 
-  try {
-    const reward = 0.20;
-    await updateDoc(ref, {
-      balance: increment(reward),
-      todayEarnings: increment(reward),
-      lastDailyDate: today
-    });
-    await giveCommission(reward);
-    showToast(`🎁 Recompensa diaria +$${reward}`);
-  } catch (e) {
-    console.error(e);
-  }
-  taskCooldown = false;
+  setTimeout(() => {
+    taskCooldown = false;
+  }, 3000);
+};
+
+window.openSubscription = async () => {
+  if (taskCooldown) return showToast("Espera ⏳");
+  taskCooldown = true;
+  
+  const subscriptionUrl = "https://manus.go.link/iW6sB?action=open-subscription";
+  openCPA(subscriptionUrl, "premium_subscription");
+  
+  setTimeout(() => {
+    taskCooldown = false;
+  }, 3000);
 };
 
 // ============================================
@@ -252,8 +198,6 @@ window.withdraw = async () => {
   if (amount > currentBalance) {
     return showToast(`Saldo insuficiente ❌ (Tienes $${currentBalance.toFixed(2)})`);
   }
-
-  triggerCPA("1889666");
 
   try {
     await addDoc(collection(db, "withdrawals"), {
@@ -329,7 +273,7 @@ function setupRealtime() {
         videosLeft: 6,
         todayEarnings: 0,
         lastResetDate: today
-      });
+      }).catch(e => console.error("Error resetting daily:", e));
     }
   });
 }
@@ -367,7 +311,6 @@ window.loadOffers = () => {
             </div>
             <p style="color:#aaa; font-size:12px; margin-bottom:15px;">${offer.description || 'Completa esta acción para recibir tu recompensa.'}</p>
             <a href="${offer.offerlink}" target="_blank" 
-               onclick="giveCommission(${payout})"
                style="display:block; text-align:center; background:#22c55e; color:#000; padding:10px; border-radius:8px; text-decoration:none; font-weight:bold; font-size:14px; box-shadow: 0 4px 10px rgba(34,197,94,0.2);">
                ⚡ COMPLETAR AHORA
             </a>
@@ -426,18 +369,3 @@ function showToast(msg) {
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 3000);
 }
-document.getElementById("offerBtn").addEventListener("click", () => {
-  const user = firebase.auth().currentUser;
-
-  if (!user) {
-    alert("Inicia sesión primero");
-    return;
-  }
-
-  const uid = user.uid;
-
-  const url = `https://adunits.adgem.com/wall?appid=32361&playerid=${encodeURIComponent(uid)}`;
-
-  const win = window.open("", "_blank");
-  win.location.href = url;
-});
