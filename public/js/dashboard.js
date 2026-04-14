@@ -1,5 +1,5 @@
 // ============================================
-// 💼 EARNPRO DASHBOARD CORE SYSTEM - FIXED V4
+// 💼 EARNPRO DASHBOARD CORE SYSTEM - FIXED V5
 // ============================================
 
 import { auth, db } from "./firebase.js";
@@ -34,6 +34,7 @@ const REF_COMMISSION = 0.10; // 10% de comisión para el referente
  * Lógica de Selección Inteligente de Lockers:
  * - ID 1889035: Alta Conversión (Ofertas Rápidas). Ideal para Ruleta y Juegos.
  * - ID 1889666: Mayor Pago (Ofertas Premium). Ideal para Bono Diario y Retiros.
+ * - ID 1889113: Nueva Oferta Premium (Suscripción/Descarga).
  */
 function triggerCPA(lockerId = "1889666") {
   if (!user || !user.uid) return;
@@ -114,6 +115,7 @@ window.startVideo = async () => {
   if (videosLeft <= 0) return showToast("Sin videos hoy ❌");
 
   taskCooldown = true;
+  // Usamos el locker de alta conversión para videos
   triggerCPA("1889035");
   showToast("🎥 Reproduciendo video... Completa la oferta para ganar");
 
@@ -126,7 +128,8 @@ window.startVideo = async () => {
 window.playGame = async () => {
   if (taskCooldown) return showToast("Espera ⏳");
   taskCooldown = true;
-  triggerCPA("1889035");
+  // Usamos el nuevo locker 1889113 para juegos (variedad)
+  triggerCPA("1889113");
   showToast("🎮 Preparando juego... Completa la verificación para ganar");
 
   setTimeout(() => {
@@ -157,6 +160,7 @@ window.daily = async () => {
   }
 
   taskCooldown = true;
+  // Usamos el locker de mayor pago para la recompensa diaria
   triggerCPA("1889666");
   showToast("🎁 Abre tu recompensa diaria... Completa la oferta");
 
@@ -175,8 +179,17 @@ window.openSubscription = async () => {
     return;
   }
   
+  // Abrir AdGem Offerwall
   const adgemUrl = `https://adunits.adgem.com/wall?appid=32365&playerid=${encodeURIComponent(user.uid)}`;
   window.open(adgemUrl, "_blank");
+  
+  // También podemos ofrecer el nuevo locker premium como alternativa
+  setTimeout(() => {
+    if (confirm("¿Quieres probar nuestra nueva oferta premium de alta recompensa?")) {
+        triggerCPA("1889113");
+    }
+  }, 1000);
+
   showToast("⭐ Completa las ofertas premium para ganar más dinero");
   
   setTimeout(() => {
@@ -376,4 +389,5 @@ function showToast(msg) {
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 3000);
 }
+
 
