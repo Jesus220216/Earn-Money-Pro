@@ -1,5 +1,5 @@
 // ============================================
-// 💼 EARNPRO DASHBOARD - PRO V16 FIXED
+// 💼 EARNPRO DASHBOARD - PRO REAL V15
 // ============================================
 
 import { auth, db } from "./firebase.js";
@@ -11,14 +11,16 @@ import {
   addDoc,
   collection,
   onSnapshot,
-  getDocs
+  getDocs,
+  query,
+  where
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 // ============================================
-// 🔐 STATE
+// 🔐 VARIABLES
 // ============================================
 
-let user = null;
+let user;
 let balance = 0;
 let videosLeft = 6;
 let taskCooldown = false;
@@ -26,30 +28,114 @@ let taskCooldown = false;
 const CPA_LINK = "https://getafilenow.com/1890309";
 
 // ============================================
-// 🧠 FILTER OFFERS
+// 🧠 SISTEMA DE APRENDIZAJE (TOP OFERTA)
+// ============================================
+
+async function getTopOffer() {
+  try {
+    const q = query(collection(db, "clicks"), where("uid", "==", user.uid));
+    const snap = await getDocs(q);
+
+    if (snap.empty) return null;
+
+    const map = {};
+    snap.forEach(d => {
+      const data = d.data();
+      map[data.offer] = (map[data.offer] || 0) + 1;
+    });
+
+    return Object.keys(map).sort((a, b) => map[b] - map[a])[0];
+  } catch {
+    return null;
+  }
+}
+
+// ============================================
+// 💰 ROTADOR PRO (MEJORADO)
+// ============================================
+
+async function triggerCPA() {
+  const r = Math.random();
+
+  // 🔥 40% smartlink (estable)
+  if (r < 0.4) return openCPA(CPA_LINK, "smart");
+
+  // 🔥 30% oferta aprendida
+  const learned = await getTopOffer();
+  if (learned && r < 0.7) return openCPA(learned, "learned");
+
+  // 🔥 30% feed limpio
+  loadAndOpenBestOffer();
+}
+
+// ============================================
+// 🧠 FILTRO ULTRA PRO (ANTI BASURA)
 // ============================================
 
 function isGoodOffer(o) {
   const t = (o.title || "").toLowerCase();
-  const p = parseFloat(o.payout || 0);
+  const p = parseFloat(o.payout);
 
   return (
     p >= 0.30 &&
+
+    // ❌ basura total
+    !t.includes("deposit") &&
     !t.includes("crypto") &&
     !t.includes("casino") &&
     !t.includes("bet") &&
     !t.includes("trading") &&
+    !t.includes("bitcoin") &&
+    !t.includes("forex") &&
+    !t.includes("invest") &&
+    !t.includes("loan") &&
+    !t.includes("credit") &&
+    !t.includes("bank") &&
+    !t.includes("iq") &&
+
+    // ✅ conversion real
     (
       t.includes("app") ||
       t.includes("install") ||
       t.includes("download") ||
-      t.includes("game")
+      t.includes("game") ||
+      t.includes("reward") ||
+      t.includes("gift")
     )
   );
 }
 
 // ============================================
-// 🔗 OPEN CPA SAFE
+// 🔥 MEJOR OFERTA
+// ============================================
+
+function loadAndOpenBestOffer() {
+  fetch(`https://www.cpagrip.com/common/offer_feed_json.php?user_id=2515689&pubkey=34053872c6552fb19c9838ebb8b56138&tracking_id=${user.uid}`)
+    .then(r => r.json())
+    .then(data => {
+
+      if (!data.offers?.length) {
+        return openCPA(CPA_LINK, "fallback");
+      }
+
+      const filtered = data.offers.filter(isGoodOffer);
+
+      const pick = filtered.length
+        ? filtered.sort((a, b) => parseFloat(b.payout) - parseFloat(a.payout))[0]
+        : null;
+
+      if (pick) {
+        openCPA(pick.offerlink, pick.title);
+      } else {
+        openCPA(CPA_LINK, "fallback_safe");
+      }
+
+    })
+    .catch(() => openCPA(CPA_LINK, "error"));
+}
+
+// ============================================
+// 🔗 OPEN CPA + TRACKING + UX PRO
 // ============================================
 
 function openCPA(url, name = "offer") {
@@ -59,68 +145,42 @@ function openCPA(url, name = "offer") {
     url + (url.includes("?") ? "&" : "?") +
     "subid=" + encodeURIComponent(user.uid);
 
-  addDoc(collection(db, "clicks"), {
-    uid: user.uid,
-    offer: url,
-    name,
-    timestamp: Date.now()
-  });
-
-  showToast("💰 Abriendo oferta...");
-
-  window.open(finalURL, "_blank");
-}
-
-// ============================================
-// 🔥 CPA ROTATOR
-// ============================================
-
-function triggerCPA() {
-  const r = Math.random();
-
-  if (r < 0.4) {
-    return openCPA(CPA_LINK, "smart-fallback");
-  }
-
-  loadBestOffer();
-}
-
-// ============================================
-// 💰 BEST OFFER
-// ============================================
-
-async function loadBestOffer() {
+  // guardar click
   try {
-    const res = await fetch(
-      `https://www.cpagrip.com/common/offer_feed_json.php?user_id=2515689&pubkey=34053872c6552fb19c9838ebb8b56138&tracking_id=${user.uid}`
-    );
+    addDoc(collection(db, "clicks"), {
+      uid: user.uid,
+      offer: url,
+      name,
+      timestamp: Date.now()
+    });
+  } catch {}
 
-    const data = await res.json();
-    const offers = data.offers || [];
+  showToast("💰 Completa la oferta y gana dinero");
 
-    const filtered = offers.filter(isGoodOffer);
-
-    const best = filtered.sort(
-      (a, b) => parseFloat(b.payout) - parseFloat(a.payout)
-    )[0];
-
-    if (best?.offerlink) {
-      openCPA(best.offerlink, best.title);
-    } else {
-      openCPA(CPA_LINK, "fallback");
-    }
-
-  } catch (e) {
-    openCPA(CPA_LINK, "error");
-  }
+  // UX delay (mejora conversión)
+  setTimeout(() => {
+    window.open(finalURL, "_blank");
+  }, 600);
 }
 
 // ============================================
-// 🎮 TASK SYSTEM
+// ⭐ OFFERWALLS (MULTI)
+// ============================================
+
+window.openSubscription = () => {
+  if (!user?.uid) return showToast("Login requerido ❌");
+
+  // AdGem
+  const adgem = `https://adunits.adgem.com/wall?appid=32365&playerid=${user.uid}&subid=${user.uid}`;
+  window.open(adgem, "_blank");
+};
+
+// ============================================
+// 🎮 SISTEMA DE GANANCIAS (ENGAGEMENT)
 // ============================================
 
 function doTask() {
-  if (taskCooldown) return showToast("⏳ Espera...");
+  if (taskCooldown) return showToast("Espera ⏳");
 
   taskCooldown = true;
   triggerCPA();
@@ -129,73 +189,52 @@ function doTask() {
 }
 
 window.startVideo = () => {
-  if (videosLeft <= 0) return showToast("❌ Sin videos");
+  if (videosLeft <= 0) return showToast("Sin videos ❌");
 
   videosLeft--;
   doTask();
 };
 
 window.playGame = () => {
-  showToast("🎮 Jugando...");
   doTask();
 };
 
 window.spin = () => {
-  if (Math.random() < 0.25) {
-    showToast("🎉 BONUS!");
+  const rand = Math.random();
+
+  if (rand < 0.3) {
+    showToast("🎉 Ganaste bonus!");
   }
+
   doTask();
 };
 
 window.daily = async () => {
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
-
-  const data = snap.data();
+  const d = snap.data();
   const today = new Date().toDateString();
 
-  if (data.lastDailyDate === today) {
-    return showToast("❌ Ya reclamado");
+  if (d.lastDailyDate === today) {
+    return showToast("Ya reclamado ❌");
   }
 
-  await updateDoc(ref, {
-    lastDailyDate: today,
-    todayEarnings: increment(0.2),
-    balance: increment(0.2)
-  });
-
-  showToast("🎁 +$0.20");
+  doTask();
 };
 
 // ============================================
-// 🔗 REFERRAL SYSTEM
-// ============================================
-
-window.copyRef = async () => {
-  const link = `${window.location.origin}/index.html?ref=${user.uid}`;
-  await navigator.clipboard.writeText(link);
-  showToast("🔗 Copiado");
-};
-
-window.shareWhatsApp = () => {
-  const link = `${window.location.origin}/index.html?ref=${user.uid}`;
-  const text = `💰 Gana dinero aquí: ${link}`;
-  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
-};
-
-// ============================================
-// 💳 WITHDRAW
+// 💳 RETIRO
 // ============================================
 
 window.withdraw = async () => {
   const amount = parseFloat(document.getElementById("amount").value);
   const email = document.getElementById("email").value.trim();
 
-  if (!email || amount < 5)
-    return showToast("Mínimo $5");
+  if (!email || isNaN(amount) || amount < 5)
+    return showToast("Mínimo $5 ❌");
 
   if (amount > balance)
-    return showToast("Saldo insuficiente");
+    return showToast("Saldo insuficiente ❌");
 
   await addDoc(collection(db, "withdrawals"), {
     userId: user.uid,
@@ -209,28 +248,21 @@ window.withdraw = async () => {
     balance: increment(-amount)
   });
 
-  showToast("💸 Enviado");
+  showToast("Retiro enviado 🚀");
 };
 
 // ============================================
-// 📊 ADMIN (FIXED SINGLE VERSION)
+// 🔗 REFERIDOS
 // ============================================
 
-async function loadAdminStats() {
-  try {
-    const usersSnap = await getDocs(collection(db, "users"));
-    const clicksSnap = await getDocs(collection(db, "clicks"));
-
-    set("adminUsers", usersSnap.size);
-    set("adminClicks", clicksSnap.size);
-
-  } catch (e) {
-    console.log("admin error", e);
-  }
-}
+window.copyRef = async () => {
+  const el = document.getElementById("refLink");
+  await navigator.clipboard.writeText(el.value);
+  showToast("Copiado ✅");
+};
 
 // ============================================
-// 📡 REALTIME
+// 📡 REALTIME (UI SYNC)
 // ============================================
 
 function set(id, value, money = false) {
@@ -238,7 +270,7 @@ function set(id, value, money = false) {
   if (!el) return;
 
   el.innerText = money
-    ? `$${parseFloat(value || 0).toFixed(2)}`
+    ? "$" + parseFloat(value).toFixed(2)
     : value;
 }
 
@@ -249,33 +281,33 @@ function setupRealtime() {
     const d = snap.data();
 
     balance = d.balance || 0;
-    videosLeft = d.videosLeft ?? videosLeft;
+    videosLeft = d.videosLeft ?? 6;
 
     set("balance", balance, true);
     set("availableBalance", balance, true);
     set("todayEarnings", d.todayEarnings || 0, true);
-    set("videos", `${videosLeft}/6`);
+    set("videosLeft", videosLeft);
     set("refCount", d.referrals || 0);
 
-    document.getElementById("refLink").value =
-      `${window.location.origin}/index.html?ref=${user.uid}`;
+    const refInput = document.getElementById("refLink");
+    if (refInput) {
+      refInput.value =
+        window.location.origin + "/index.html?ref=" + user.uid;
+    }
   });
 }
 
 // ============================================
-// 🚪 AUTH INIT
+// 🚪 INIT
 // ============================================
 
 auth.onAuthStateChanged((u) => {
-  if (!u) {
+  if (u) {
+    user = u;
+    setupRealtime();
+  } else {
     window.location.href = "index.html";
-    return;
   }
-
-  user = u;
-
-  setupRealtime();
-  loadAdminStats();
 });
 
 // ============================================
@@ -286,8 +318,7 @@ function showToast(msg) {
   const t = document.createElement("div");
   t.innerText = msg;
   t.style =
-    "position:fixed;bottom:20px;right:20px;background:#22c55e;color:#000;padding:10px;border-radius:8px;z-index:9999;";
+    "position:fixed;bottom:20px;right:20px;background:#22c55e;color:#000;padding:10px 15px;border-radius:8px;font-weight:bold;z-index:9999;";
   document.body.appendChild(t);
-
-  setTimeout(() => t.remove(), 2500);
+  setTimeout(() => t.remove(), 3000);
 }
