@@ -1,5 +1,5 @@
 // ============================================
-// 💼 EARNPRO DASHBOARD CORE SYSTEM - IMPERIO CPA V9
+// 💼 EARNPRO DASHBOARD - AUTO GANANCIAS V10
 // ============================================
 
 import { auth, db } from "./firebase.js";
@@ -10,7 +10,10 @@ import {
   increment,
   addDoc,
   collection,
-  onSnapshot
+  onSnapshot,
+  getDocs,
+  query,
+  where
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 // ============================================
@@ -23,42 +26,74 @@ let videosLeft = 6;
 let taskCooldown = false;
 
 const REF_COMMISSION = 0.10;
-
-// 🔥 SMARTLINK PRO (CPAGrip)
 const CPA_LINK = "https://getafilenow.com/1890309";
 
 // ============================================
-// 🌍 DETECTOR DE PAÍS (BÁSICO)
+// 🧠 AUTO OPTIMIZADOR (APRENDE SOLO)
 // ============================================
 
-function getUserCountry() {
-  return navigator.language || "es-DO";
+async function getTopOfferFromClicks() {
+  try {
+    const q = query(
+      collection(db, "clicks"),
+      where("uid", "==", user.uid)
+    );
+
+    const snap = await getDocs(q);
+
+    if (snap.empty) return null;
+
+    const counts = {};
+
+    snap.forEach(doc => {
+      const d = doc.data();
+      counts[d.offer] = (counts[d.offer] || 0) + 1;
+    });
+
+    // 🔥 elegir el más usado
+    let top = null;
+    let max = 0;
+
+    for (let key in counts) {
+      if (counts[key] > max) {
+        max = counts[key];
+        top = key;
+      }
+    }
+
+    return top;
+  } catch {
+    return null;
+  }
 }
 
 // ============================================
-// 💰 ROTADOR IMPERIO
+// 💰 ROTADOR AUTOMÁTICO
 // ============================================
 
-function triggerCPA() {
+async function triggerCPA() {
   const rand = Math.random();
-  const country = getUserCountry();
 
-  // 🌎 Ajuste por país (más conversión)
-  if (country.includes("US")) {
-    if (rand < 0.5) return loadAndOpenBestOffer();
-    return openCPA(CPA_LINK, "us_smart");
+  // 🔥 50% usar smartlink
+  if (rand < 0.5) {
+    openCPA(CPA_LINK, "smart_auto");
+    return;
   }
 
-  // 🌎 LATAM (RD incluido)
-  if (rand < 0.7) {
-    openCPA(CPA_LINK, "latam_smart");
-  } else {
-    loadAndOpenBestOffer();
+  // 🔥 intentar usar mejor oferta previa
+  const topOffer = await getTopOfferFromClicks();
+
+  if (topOffer && topOffer.startsWith("http")) {
+    openCPA(topOffer, "learned_offer");
+    return;
   }
+
+  // 🔥 fallback → mejor oferta actual
+  loadAndOpenBestOffer();
 }
 
 // ============================================
-// 🧠 MEJOR OFERTA AUTOMÁTICA
+// 🧠 MEJOR OFERTA POR PAYOUT
 // ============================================
 
 function loadAndOpenBestOffer() {
@@ -70,10 +105,8 @@ function loadAndOpenBestOffer() {
         return;
       }
 
-      // 🔥 filtrar ofertas malas
       const filtered = data.offers.filter(o => parseFloat(o.payout) >= 0.50);
 
-      // 🔥 elegir mejor payout
       const best = filtered.length
         ? filtered.sort((a, b) => parseFloat(b.payout) - parseFloat(a.payout))[0]
         : data.offers[Math.floor(Math.random() * data.offers.length)];
@@ -99,38 +132,35 @@ function openCPA(url, offerId = "unknown") {
     "subid=" + encodeURIComponent(user.uid) +
     "&offer_id=" + encodeURIComponent(offerId);
 
-  // 🔥 guardar click
   try {
     addDoc(collection(db, "clicks"), {
       uid: user.uid,
-      offer: offerId,
-      url: finalURL,
+      offer: url,
+      name: offerId,
       timestamp: Date.now()
     });
   } catch (e) {}
 
-  // 🔥 mensaje optimizado
-  showToast("🔥 Gana dinero fácil ahora");
+  showToast("🔥 Generando dinero automático...");
 
-  // 🔥 delay psicológico
   setTimeout(() => {
     window.open(finalURL, "_blank");
-  }, 800);
+  }, 700);
 }
 
 // ============================================
-// ⭐ ADGEM OFFERWALL
+// ⭐ ADGEM
 // ============================================
 
 window.openOfferwall = function () {
-  if (!user || !user.uid) return showToast("Inicia sesión ❌");
+  if (!user) return showToast("Login requerido ❌");
 
   const url = `https://adunits.adgem.com/wall?appid=32365&playerid=${user.uid}&subid=${user.uid}`;
   window.open(url, "_blank");
 };
 
 // ============================================
-// 🎮 ACCIONES CENTRALIZADAS
+// 🎮 ACCIONES
 // ============================================
 
 function doTask() {
@@ -161,18 +191,6 @@ window.daily = async () => {
   }
 
   doTask();
-};
-
-// ============================================
-// ⭐ PREMIUM
-// ============================================
-
-window.openSubscription = () => {
-  doTask();
-
-  setTimeout(() => {
-    window.openOfferwall();
-  }, 1200);
 };
 
 // ============================================
@@ -207,16 +225,6 @@ window.withdraw = async () => {
 };
 
 // ============================================
-// 🔗 REFERIDOS
-// ============================================
-
-window.copyRef = async () => {
-  const el = document.getElementById("refLink");
-  await navigator.clipboard.writeText(el.value);
-  showToast("Copiado ✅");
-};
-
-// ============================================
 // 📡 REALTIME
 // ============================================
 
@@ -235,48 +243,9 @@ function setupRealtime() {
     videosLeft = d.videosLeft ?? 6;
 
     set("balance", balance, true);
-    set("availableBalance", balance, true);
-    set("todayEarnings", d.todayEarnings || 0, true);
     set("videosLeft", videosLeft);
-    set("refCount", d.referrals || 0);
-
-    document.getElementById("refLink").value =
-      window.location.origin + "/index.html?ref=" + user.uid;
   });
 }
-
-// ============================================
-// 🔥 OFERTAS VISUALES
-// ============================================
-
-window.loadOffers = () => {
-  const container = document.getElementById("offers");
-
-  fetch(`https://www.cpagrip.com/common/offer_feed_json.php?user_id=2515689&pubkey=34053872c6552fb19c9838ebb8b56138&tracking_id=${user.uid}`)
-    .then(res => res.json())
-    .then(data => {
-      let html = "";
-
-      const offers = data.offers
-        .filter(o => parseFloat(o.payout) >= 0.30)
-        .sort((a, b) => parseFloat(b.payout) - parseFloat(a.payout))
-        .slice(0, 8);
-
-      offers.forEach(offer => {
-        html += `
-        <div style="padding:15px;border:1px solid #333;border-radius:10px;">
-          <h4>${offer.title}</h4>
-          <p>$${offer.payout}</p>
-          <a href="#" onclick="openCPA('${offer.offerlink}','${offer.title}');return false;"
-            style="background:#22c55e;padding:10px;display:block;text-align:center;border-radius:8px;">
-            COMPLETAR
-          </a>
-        </div>`;
-      });
-
-      container.innerHTML = html;
-    });
-};
 
 // ============================================
 // 🚪 INIT
@@ -286,7 +255,6 @@ auth.onAuthStateChanged((u) => {
   if (u) {
     user = u;
     setupRealtime();
-    loadOffers();
   } else {
     window.location.href = "index.html";
   }
@@ -303,4 +271,3 @@ function showToast(msg) {
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 3000);
 }
-
