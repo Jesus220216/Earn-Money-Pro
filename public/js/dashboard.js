@@ -1,5 +1,5 @@
 // ============================================
-// 💼 EARNPRO DASHBOARD - PRO CPA CLEAN V14
+// 💼 EARNPRO DASHBOARD - PRO REAL V15
 // ============================================
 
 import { auth, db } from "./firebase.js";
@@ -28,7 +28,7 @@ let taskCooldown = false;
 const CPA_LINK = "https://getafilenow.com/1890309";
 
 // ============================================
-// 🧠 APRENDIZAJE (MEJOR OFERTA)
+// 🧠 SISTEMA DE APRENDIZAJE (TOP OFERTA)
 // ============================================
 
 async function getTopOffer() {
@@ -51,67 +51,74 @@ async function getTopOffer() {
 }
 
 // ============================================
-// 💰 ROTADOR INTELIGENTE
+// 💰 ROTADOR PRO (MEJORADO)
 // ============================================
 
 async function triggerCPA() {
   const r = Math.random();
 
-  // 🔥 50% Smartlink (estable)
-  if (r < 0.5) return openCPA(CPA_LINK, "smart");
+  // 🔥 40% smartlink (estable)
+  if (r < 0.4) return openCPA(CPA_LINK, "smart");
 
-  // 🔥 25% oferta aprendida
+  // 🔥 30% oferta aprendida
   const learned = await getTopOffer();
-  if (learned && r < 0.75) return openCPA(learned, "learned");
+  if (learned && r < 0.7) return openCPA(learned, "learned");
 
-  // 🔥 25% mejor oferta del feed
+  // 🔥 30% feed limpio
   loadAndOpenBestOffer();
 }
 
 // ============================================
-// 🧠 FILTRO PRO (ANTI OFERTA BASURA)
+// 🧠 FILTRO ULTRA PRO (ANTI BASURA)
+// ============================================
+
+function isGoodOffer(o) {
+  const t = (o.title || "").toLowerCase();
+  const p = parseFloat(o.payout);
+
+  return (
+    p >= 0.30 &&
+
+    // ❌ basura total
+    !t.includes("deposit") &&
+    !t.includes("crypto") &&
+    !t.includes("casino") &&
+    !t.includes("bet") &&
+    !t.includes("trading") &&
+    !t.includes("bitcoin") &&
+    !t.includes("forex") &&
+    !t.includes("invest") &&
+    !t.includes("loan") &&
+    !t.includes("credit") &&
+    !t.includes("bank") &&
+    !t.includes("iq") &&
+
+    // ✅ conversion real
+    (
+      t.includes("app") ||
+      t.includes("install") ||
+      t.includes("download") ||
+      t.includes("game") ||
+      t.includes("reward") ||
+      t.includes("gift")
+    )
+  );
+}
+
+// ============================================
+// 🔥 MEJOR OFERTA
 // ============================================
 
 function loadAndOpenBestOffer() {
   fetch(`https://www.cpagrip.com/common/offer_feed_json.php?user_id=2515689&pubkey=34053872c6552fb19c9838ebb8b56138&tracking_id=${user.uid}`)
     .then(r => r.json())
     .then(data => {
+
       if (!data.offers?.length) {
         return openCPA(CPA_LINK, "fallback");
       }
 
-      const filtered = data.offers.filter(o => {
-        const t = (o.title || "").toLowerCase();
-        const p = parseFloat(o.payout);
-
-        return (
-          p >= 0.30 &&
-
-          // ❌ eliminar ofertas basura
-          !t.includes("deposit") &&
-          !t.includes("crypto") &&
-          !t.includes("casino") &&
-          !t.includes("bet") &&
-          !t.includes("trading") &&
-          !t.includes("bitcoin") &&
-          !t.includes("forex") &&
-          !t.includes("invest") &&
-          !t.includes("loan") &&
-          !t.includes("credit") &&
-          !t.includes("bank") &&
-
-          // ✅ solo lo que convierte
-          (
-            t.includes("download") ||
-            t.includes("app") ||
-            t.includes("install") ||
-            t.includes("game") ||
-            t.includes("win") ||
-            t.includes("gift") ||
-            t.includes("reward")
-          )
-        );
-      });
+      const filtered = data.offers.filter(isGoodOffer);
 
       const pick = filtered.length
         ? filtered.sort((a, b) => parseFloat(b.payout) - parseFloat(a.payout))[0]
@@ -122,12 +129,13 @@ function loadAndOpenBestOffer() {
       } else {
         openCPA(CPA_LINK, "fallback_safe");
       }
+
     })
     .catch(() => openCPA(CPA_LINK, "error"));
 }
 
 // ============================================
-// 🔗 ABRIR CPA + TRACKING
+// 🔗 OPEN CPA + TRACKING + UX PRO
 // ============================================
 
 function openCPA(url, name = "offer") {
@@ -147,26 +155,28 @@ function openCPA(url, name = "offer") {
     });
   } catch {}
 
-  showToast("⚡ Completa la oferta para ganar dinero");
+  showToast("💰 Completa la oferta y gana dinero");
 
+  // UX delay (mejora conversión)
   setTimeout(() => {
     window.open(finalURL, "_blank");
-  }, 500);
+  }, 600);
 }
 
 // ============================================
-// ⭐ OFFERWALL (ADGEM)
+// ⭐ OFFERWALLS (MULTI)
 // ============================================
 
-window.openOfferwall = () => {
-  if (!user?.uid) return showToast("Inicia sesión ❌");
+window.openSubscription = () => {
+  if (!user?.uid) return showToast("Login requerido ❌");
 
-  const url = `https://adunits.adgem.com/wall?appid=32365&playerid=${user.uid}&subid=${user.uid}`;
-  window.open(url, "_blank");
+  // AdGem
+  const adgem = `https://adunits.adgem.com/wall?appid=32365&playerid=${user.uid}&subid=${user.uid}`;
+  window.open(adgem, "_blank");
 };
 
 // ============================================
-// 🎮 ACCIONES
+// 🎮 SISTEMA DE GANANCIAS (ENGAGEMENT)
 // ============================================
 
 function doTask() {
@@ -180,11 +190,24 @@ function doTask() {
 
 window.startVideo = () => {
   if (videosLeft <= 0) return showToast("Sin videos ❌");
+
+  videosLeft--;
   doTask();
 };
 
-window.playGame = doTask;
-window.spin = doTask;
+window.playGame = () => {
+  doTask();
+};
+
+window.spin = () => {
+  const rand = Math.random();
+
+  if (rand < 0.3) {
+    showToast("🎉 Ganaste bonus!");
+  }
+
+  doTask();
+};
 
 window.daily = async () => {
   const ref = doc(db, "users", user.uid);
@@ -239,13 +262,16 @@ window.copyRef = async () => {
 };
 
 // ============================================
-// 📡 REALTIME
+// 📡 REALTIME (UI SYNC)
 // ============================================
 
 function set(id, value, money = false) {
   const el = document.getElementById(id);
   if (!el) return;
-  el.innerText = money ? "$" + parseFloat(value).toFixed(2) : value;
+
+  el.innerText = money
+    ? "$" + parseFloat(value).toFixed(2)
+    : value;
 }
 
 function setupRealtime() {
@@ -253,6 +279,7 @@ function setupRealtime() {
     if (!snap.exists()) return;
 
     const d = snap.data();
+
     balance = d.balance || 0;
     videosLeft = d.videosLeft ?? 6;
 
@@ -262,8 +289,11 @@ function setupRealtime() {
     set("videosLeft", videosLeft);
     set("refCount", d.referrals || 0);
 
-    document.getElementById("refLink").value =
-      window.location.origin + "/index.html?ref=" + user.uid;
+    const refInput = document.getElementById("refLink");
+    if (refInput) {
+      refInput.value =
+        window.location.origin + "/index.html?ref=" + user.uid;
+    }
   });
 }
 
@@ -288,7 +318,7 @@ function showToast(msg) {
   const t = document.createElement("div");
   t.innerText = msg;
   t.style =
-    "position:fixed;bottom:20px;right:20px;background:#22c55e;color:#000;padding:10px 15px;border-radius:8px;font-weight:bold;";
+    "position:fixed;bottom:20px;right:20px;background:#22c55e;color:#000;padding:10px 15px;border-radius:8px;font-weight:bold;z-index:9999;";
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 3000);
 }
