@@ -6,6 +6,10 @@
   <title>Centro de Ganancias - EarnPro</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/dashboard.css">
+  <style>
+    .section-hidden { display: none; }
+    .section-active { display: block; }
+  </style>
 </head>
 <body>
 
@@ -19,10 +23,7 @@
       <span>📊</span> Dashboard
     </a>
     <a href="#" class="nav-item" data-section="earnings">
-      <span>💰</span> Centro de Ganancias
-    </a>
-    <a href="#" class="nav-item" data-section="tasks">
-      <span>📋</span> Tareas
+      <span>💰</span> Ganancias
     </a>
     <a href="#" class="nav-item" data-section="referrals">
       <span>🔗</span> Referidos
@@ -42,8 +43,8 @@
   <!-- HEADER -->
   <div class="header-hero">
     <div class="header-content">
-      <h1>Centro de Ganancias</h1>
-      <p>Completa tareas y gana dinero real • Actualizado hace 30s</p>
+      <h1>Panel de Control</h1>
+      <p>Bienvenido a EarnPro • Gana dinero real hoy</p>
     </div>
   </div>
 
@@ -52,8 +53,6 @@
 
     <!-- SECTION: DASHBOARD -->
     <section id="dashboard-section" class="section-active">
-      
-      <!-- STATS CARDS -->
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-icon">💵</div>
@@ -62,7 +61,6 @@
             <p id="balance">$0.00</p>
           </div>
         </div>
-
         <div class="stat-card">
           <div class="stat-icon">📈</div>
           <div class="stat-content">
@@ -70,26 +68,22 @@
             <p id="todayEarnings">$0.00</p>
           </div>
         </div>
-
         <div class="stat-card">
           <div class="stat-icon">🎥</div>
           <div class="stat-content">
-            <h3>Videos Disponibles</h3>
+            <h3>Videos</h3>
             <p id="videos">0/6</p>
           </div>
         </div>
-
         <div class="stat-card">
           <div class="stat-icon">👥</div>
           <div class="stat-content">
-            <h3>Referidos Activos</h3>
+            <h3>Referidos</h3>
             <p id="refCount">0</p>
           </div>
         </div>
       </div>
 
-    
-      <!-- QUICK ACTIONS -->
       <div class="section-card">
         <h2>⚡ Acciones Rápidas</h2>
         <div class="quick-actions">
@@ -97,11 +91,6 @@
             <span class="action-icon">🎥</span>
             <span class="action-text">Ver Video</span>
             <span class="action-reward">+$0.02</span>
-          </button>
-          <button class="btn-action btn-offers" onclick="openOfferwall()">
-            <span class="action-icon">💰</span>
-            <span class="action-text">Ir a ofertas</span>
-            <span class="action-reward">+$0.10</span>
           </button>
           <button class="btn-action btn-game" onclick="playGame()">
             <span class="action-icon">🎮</span>
@@ -115,324 +104,117 @@
           </button>
           <button class="btn-action btn-daily" onclick="daily()">
             <span class="action-icon">🎁</span>
-            <span class="action-text">Recompensa Diaria</span>
+            <span class="action-text">Diario</span>
             <span class="action-reward">+$0.20</span>
           </button>
         </div>
       </div>
-
-      <!-- PROGRESS BONUS -->
-      <div class="section-card">
-        <h2>🎯 Progreso Bonus Diario</h2>
-        <div class="progress-container">
-          <div class="progress-bar-wrapper">
-            <div id="progressBar" class="progress-bar"></div>
-          </div>
-          <p id="progressText" class="progress-text">0/3 ofertas completadas</p>
-          <p class="progress-hint">Completa 3 ofertas para desbloquear +$0.50</p>
-        </div>
-      </div>  
-
-      <!-- Contenedor del Log de Actividad -->
-<div style="background: rgba(255,255,255,0.05); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; margin-top: 20px;">
-    <div style="background: rgba(255,255,255,0.05); padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-        <h3 style="color: #fff; font-size: 14px; margin: 0; display: flex; align-items: center; gap: 8px;">
-            <span style="color: #22c55e;">●</span> Actividad en Vivo
-        </h3>
-    </div>
-    <div id="activityLog" style="max-height: 300px; overflow-y: auto;">
-        <!-- Aquí aparecerán las actividades automáticamente -->
-        <p style="color: #666; text-align: center; padding: 20px; font-size: 13px;">Cargando actividad...</p>
-    </div>
-</div>
-
-
     </section>
 
-    <!-- SECTION: EARNINGS (Centro de Ganancias) -->
+    <!-- SECTION: EARNINGS -->
     <section id="earnings-section" class="section-hidden">
-      
       <div class="section-card">
         <h2>💰 Centro de Ganancias</h2>
-        <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">
-          Acceso a todas las formas de ganar dinero en EarnPro. Completa tareas, ve videos y gana recompensas.
-        </p>
-
-        <!-- EARNINGS METHODS -->
         <div class="earnings-grid">
-          
-          <!-- VIDEOS -->
           <div class="earning-method">
             <div class="method-header">
               <h3>🎥 Videos</h3>
-              <span class="method-badge">Disponibles: <span id="videosLeft">6</span></span>
+              <span class="method-badge">Restantes: <span id="videosLeft">6</span></span>
             </div>
             <p class="method-description">Mira videos cortos y gana dinero instantáneamente</p>
-            <div class="method-details">
-              <div class="detail-item">
-                <span class="detail-label">Duración:</span>
-                <span class="detail-value">20 segundos</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Recompensa:</span>
-                <span class="detail-value">$0.02 por video</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Límite diario:</span>
-                <span class="detail-value">6 videos</span>
-              </div>
-            </div>
-            <button class="btn-pro btn-video" onclick="startVideo()" style="width: 100%; margin-top: 10px;">
-              ▶️ Ver Video Ahora
-            </button>
+            <button class="btn-pro btn-video" onclick="startVideo()" style="width: 100%; background:#22c55e; color:#000; border:none; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer;">▶️ Ver Video</button>
           </div>
-
-          <!-- GAMES -->
           <div class="earning-method">
             <div class="method-header">
               <h3>🎮 Juegos</h3>
-              <span class="method-badge">Sin límite</span>
+              <span class="method-badge">Ilimitado</span>
             </div>
             <p class="method-description">Juega y completa desafíos para ganar dinero</p>
-            <div class="method-details">
-              <div class="detail-item">
-                <span class="detail-label">Duración:</span>
-                <span class="detail-value">10 segundos</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Recompensa:</span>
-                <span class="detail-value">$0.05 por juego</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Límite diario:</span>
-                <span class="detail-value">Ilimitado</span>
-              </div>
-            </div>
-            <button class="btn-pro btn-game" onclick="playGame()" style="width: 100%; margin-top: 10px;">
-              🎮 Jugar Ahora
-            </button>
+            <button class="btn-pro btn-game" onclick="playGame()" style="width: 100%; background:#3b82f6; color:#fff; border:none; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer;">🎮 Jugar</button>
           </div>
-
-          <!-- WHEEL -->
           <div class="earning-method">
             <div class="method-header">
-              <h3>🎰 Ruleta de la Fortuna</h3>
-              <span class="method-badge">Diaria</span>
+              <h3>⭐ Oferta Premium</h3>
+              <span class="method-badge">Alta Recompensa</span>
             </div>
-            <p class="method-description">Gira la ruleta y gana premios aleatorios</p>
-            <div class="method-details">
-              <div class="detail-item">
-                <span class="detail-label">Premios:</span>
-                <span class="detail-value">$0 - $0.10</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Duración:</span>
-                <span class="detail-value">4 segundos</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Límite diario:</span>
-                <span class="detail-value">Ilimitado</span>
-              </div>
-            </div>
-            <button class="btn-pro btn-spin" onclick="spin()" style="width: 100%; margin-top: 10px;">
-              🎡 Girar Ruleta
-            </button>
+            <p class="method-description">Suscríbete para desbloquear funciones y ganar más</p>
+            <button class="btn-pro btn-subscription" onclick="openSubscription()" style="width: 100%; background:#f59e0b; color:#000; border:none; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer;">💎 Suscribirse</button>
           </div>
-    
-          <!-- DAILY REWARD -->
-          <div class="earning-method">
-            <div class="method-header">
-              <h3>🎁 Recompensa Diaria</h3>
-              <span class="method-badge">Cada 24h</span>
-            </div>
-            <p class="method-description">Reclama tu bonificación diaria garantizada</p>
-            <div class="method-details">
-              <div class="detail-item">
-                <span class="detail-label">Recompensa:</span>
-                <span class="detail-value">$0.20 diarios</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Frecuencia:</span>
-                <span class="detail-value">Cada 24 horas</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Acción:</span>
-                <span class="detail-value">Un clic</span>
-              </div>
-            </div>
-            <button class="btn-pro btn-daily" onclick="daily()" style="width: 100%; margin-top: 10px;">
-              🎉 Reclamar Ahora
-            </button>
-          </div>
-
         </div>
 
-        <!-- OFFERS SECTION -->
-        <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
-          <h3 style="margin-bottom: 15px;">📢 Ofertas Especiales</h3>
-          <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <button class="btn-pro btn-video" onclick="loadOffers()">📥 Cargar Ofertas</button>
-            <button class="btn-pro btn-spin" onclick="openLocker()">🔓 Abrir Locker</button>
-          </div>
+        <div style="margin-top: 25px;">
+          <h3 style="margin-bottom: 15px;">📢 Ofertas Especiales (CPA)</h3>
           <div id="offers" style="min-height: 50px;">
-            <p style="color: #94a3b8; font-size: 13px;">Cargando ofertas...</p>
+            <p style="color: #94a3b8;">Cargando ofertas...</p>
           </div>
         </div>
-
-      </div>  
-<!-- Botón para la Tarea VIP -->
-<div style="background: linear-gradient(135deg, #6366f1, #a855f7); padding: 20px; border-radius: 15px; text-align: center; margin: 20px 0; border: 1px solid rgba(255,255,255,0.2);">
-    <h3 style="color: white; margin-bottom: 10px;">💎 Tarea VIP Especial</h3>
-    <p style="color: #e0e7ff; font-size: 14px; margin-bottom: 15px;">Completa esta oferta especial y gana $0.10 al instante.</p>
-    <button onclick="startVIPTask()" style="background: white; color: #6366f1; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-        🚀 EMPEZAR TAREA VIP
-    </button>
-</div>
-
-   <h2>Gana dinero completando ofertas</h2>
-
-
-    </section>
-
-    <!-- SECTION: TASKS -->
-    <section id="tasks-section" class="section-hidden">
-      
-      <div class="section-card">
-        <h2>📋 Mis Tareas</h2>
-        <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">
-          Sigue estos pasos para ganar dinero de forma consistente.
-        </p>
-
-        <div class="steps-container">
-          <div class="step-item">
-            <div class="step-number" id="step1">🟡 Paso 1</div>
-            <div class="step-description">
-              <h4>Haz clic en una oferta</h4>
-              <p>Selecciona cualquier oferta disponible en el Centro de Ganancias</p>
-            </div>
-          </div>
-
-          <div class="step-item">
-            <div class="step-number" id="step2">⚪ Paso 2</div>
-            <div class="step-description">
-              <h4>Completa el registro</h4>
-              <p>Sigue las instrucciones y completa el formulario de registro</p>
-            </div>
-          </div>
-
-          <div class="step-item">
-            <div class="step-number" id="step3">⚪ Paso 3</div>
-            <div class="step-description">
-              <h4>Recibe tu dinero</h4>
-              <p>Tu recompensa se acreditará automáticamente en tu saldo</p>
-            </div>
-          </div>
-        </div>
-
       </div>
-
-    
-
     </section>
 
     <!-- SECTION: REFERRALS -->
     <section id="referrals-section" class="section-hidden">
-      
       <div class="section-card">
         <h2>🔗 Sistema de Referidos</h2>
-        <p style="font-size: 13px; color: #94a3b8; margin-bottom: 20px;">
-          ¡Gana dinero invitando amigos! Recibe $1.00 por cada amigo que se registre con tu enlace.
-        </p>
-
+        <p style="font-size: 14px; color: #94a3b8; margin-bottom: 20px;">Gana $1.00 por cada amigo que se registre con tu enlace.</p>
         <div class="referral-info">
           <div class="referral-stat">
             <h4>Referidos Totales</h4>
             <p id="totalReferrals">0</p>
           </div>
           <div class="referral-stat">
-            <h4>Ganancias por Referidos</h4>
+            <h4>Ganancias</h4>
             <p id="referralEarnings">$0.00</p>
           </div>
         </div>
-
-        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
-          <h3 style="margin-bottom: 10px;">Tu Enlace de Referido</h3>
-          <div style="display: flex; gap: 5px;">
-            <input type="text" id="refLink" readonly style="flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #10B981; font-weight: bold; padding: 12px; border-radius: 8px;" value="Cargando enlace...">
-            <button class="btn-pro btn-video" onclick="copyRef()" style="white-space: nowrap; padding: 12px 20px;">
-              📋 Copiar
-            </button>
+        <div style="margin-top: 20px;">
+          <h3 style="margin-bottom: 10px;">Tu Enlace</h3>
+          <div style="display: flex; gap: 10px;">
+            <input type="text" id="refLink" readonly style="flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #22c55e; padding: 12px; border-radius: 8px;" value="Cargando...">
+            <button onclick="copyRef()" style="background:#22c55e; color:#000; border:none; padding:0 20px; border-radius:8px; font-weight:bold; cursor:pointer;">Copiar</button>
           </div>
         </div>
-
       </div>
-
     </section>
 
     <!-- SECTION: WITHDRAWALS -->
     <section id="withdraw-section" class="section-hidden">
-      
       <div class="section-card">
         <h2>💳 Solicitar Retiro</h2>
-        <p style="font-size: 13px; color: #94a3b8; margin-bottom: 20px;">
-          Retira tu dinero a través de PayPal. Mínimo $5.00.
-        </p>
-
+        <p style="font-size: 14px; color: #94a3b8; margin-bottom: 20px;">Mínimo $5.00 vía PayPal.</p>
         <div class="withdraw-form">
           <div class="form-group">
-            <label for="email">Email de PayPal</label>
-            <input type="email" id="email" placeholder="tu@email.com" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; margin-top: 5px;">
+            <label>Email de PayPal</label>
+            <input type="email" id="email" placeholder="tu@email.com">
           </div>
-
           <div class="form-group">
-            <label for="amount">Monto a Retirar</label>
-            <input type="number" id="amount" placeholder="Mínimo $5.00" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; margin-top: 5px;" step="0.01" min="5">
+            <label>Monto a Retirar</label>
+            <input type="number" id="amount" placeholder="Mínimo 5.00" step="0.01">
           </div>
-
-          <div class="withdraw-info">
-            <p><strong>Saldo Disponible:</strong> <span id="availableBalance">$0.00</span></p>
-            <p><strong>Mínimo de Retiro:</strong> $5.00</p>
-            <p><strong>Método:</strong> PayPal (Instantáneo)</p>
-          </div>
-
-          <button class="btn-pro btn-game" style="width: 100%; padding: 14px; font-size: 15px; margin-top: 15px;" onclick="withdraw()">
-            🚀 Solicitar Retiro
-          </button>
+          <p style="margin-bottom: 15px;">Saldo Disponible: <span id="availableBalance" style="color:#22c55e; font-weight:bold;">$0.00</span></p>
+          <button onclick="withdraw()" style="width: 100%; background:#22c55e; color:#000; border:none; padding:14px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:16px;">🚀 Solicitar Retiro</button>
         </div>
-
       </div>
-
     </section>
 
   </div>
-
 </div>
 
-<!-- TOAST NOTIFICATIONS -->
-<div id="toast" class="toast"></div>
-
-<!-- SCRIPT DE DASHBOARD -->
 <script type="module" src="/js/dashboard.js"></script>
-
-<!-- NAVIGATION SCRIPT -->
 <script>
   document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', function(e) {
       e.preventDefault();
       const section = this.dataset.section;
-      
-      // Remove active class from all nav items
       document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
       this.classList.add('active');
-      
-      // Hide all sections
-      document.querySelectorAll('[id$="-section"]').forEach(sec => sec.classList.remove('section-active'));
-      
-      // Show selected section
+      document.querySelectorAll('section').forEach(sec => {
+        sec.classList.remove('section-active');
+        sec.classList.add('section-hidden');
+      });
       document.getElementById(section + '-section').classList.add('section-active');
+      document.getElementById(section + '-section').classList.remove('section-hidden');
     });
   });
 </script>
-
 </body>
 </html>
