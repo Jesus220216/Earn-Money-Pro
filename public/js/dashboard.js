@@ -1,5 +1,5 @@
 // ============================================
-// 💼 EARNPRO DASHBOARD - IMPERIO TOTAL V13
+// 💼 EARNPRO DASHBOARD - PRO CPA CLEAN V14
 // ============================================
 
 import { auth, db } from "./firebase.js";
@@ -28,7 +28,7 @@ let taskCooldown = false;
 const CPA_LINK = "https://getafilenow.com/1890309";
 
 // ============================================
-// 🧠 APRENDIZAJE (OFERTA MÁS USADA)
+// 🧠 APRENDIZAJE (MEJOR OFERTA)
 // ============================================
 
 async function getTopOffer() {
@@ -57,52 +57,77 @@ async function getTopOffer() {
 async function triggerCPA() {
   const r = Math.random();
 
-  // 50% smartlink (estable)
+  // 🔥 50% Smartlink (estable)
   if (r < 0.5) return openCPA(CPA_LINK, "smart");
 
-  // 25% oferta aprendida
+  // 🔥 25% oferta aprendida
   const learned = await getTopOffer();
   if (learned && r < 0.75) return openCPA(learned, "learned");
 
-  // 25% feed filtrado
+  // 🔥 25% mejor oferta del feed
   loadAndOpenBestOffer();
 }
 
 // ============================================
-// 🧠 FILTRO DE OFERTAS (IMPORTANTE)
+// 🧠 FILTRO PRO (ANTI OFERTA BASURA)
 // ============================================
 
 function loadAndOpenBestOffer() {
   fetch(`https://www.cpagrip.com/common/offer_feed_json.php?user_id=2515689&pubkey=34053872c6552fb19c9838ebb8b56138&tracking_id=${user.uid}`)
     .then(r => r.json())
     .then(data => {
-      if (!data.offers?.length) return openCPA(CPA_LINK, "fallback");
+      if (!data.offers?.length) {
+        return openCPA(CPA_LINK, "fallback");
+      }
 
       const filtered = data.offers.filter(o => {
         const t = (o.title || "").toLowerCase();
         const p = parseFloat(o.payout);
 
         return (
-          p >= 0.2 &&
+          p >= 0.30 &&
+
+          // ❌ eliminar ofertas basura
           !t.includes("deposit") &&
           !t.includes("crypto") &&
           !t.includes("casino") &&
           !t.includes("bet") &&
-          !t.includes("trading")
+          !t.includes("trading") &&
+          !t.includes("bitcoin") &&
+          !t.includes("forex") &&
+          !t.includes("invest") &&
+          !t.includes("loan") &&
+          !t.includes("credit") &&
+          !t.includes("bank") &&
+
+          // ✅ solo lo que convierte
+          (
+            t.includes("download") ||
+            t.includes("app") ||
+            t.includes("install") ||
+            t.includes("game") ||
+            t.includes("win") ||
+            t.includes("gift") ||
+            t.includes("reward")
+          )
         );
       });
 
       const pick = filtered.length
         ? filtered.sort((a, b) => parseFloat(b.payout) - parseFloat(a.payout))[0]
-        : data.offers[Math.floor(Math.random() * data.offers.length)];
+        : null;
 
-      openCPA(pick.offerlink, pick.title);
+      if (pick) {
+        openCPA(pick.offerlink, pick.title);
+      } else {
+        openCPA(CPA_LINK, "fallback_safe");
+      }
     })
     .catch(() => openCPA(CPA_LINK, "error"));
 }
 
 // ============================================
-// 🔗 ABRIR CPA + TRACKING + MONETAG CONTROLADO
+// 🔗 ABRIR CPA + TRACKING
 // ============================================
 
 function openCPA(url, name = "offer") {
@@ -112,36 +137,25 @@ function openCPA(url, name = "offer") {
     url + (url.includes("?") ? "&" : "?") +
     "subid=" + encodeURIComponent(user.uid);
 
-  // Guardar click
+  // guardar click
   try {
     addDoc(collection(db, "clicks"), {
       uid: user.uid,
       offer: url,
       name,
-      ts: Date.now()
+      timestamp: Date.now()
     });
   } catch {}
 
-  showToast("⚡ Completa un paso rápido para ganar");
+  showToast("⚡ Completa la oferta para ganar dinero");
 
   setTimeout(() => {
     window.open(finalURL, "_blank");
-
-    // Monetag SOLO 25% (evita penalización)
-    if (Math.random() < 0.25) {
-      try {
-        const s = document.createElement("script");
-        s.src = "https://al5sm.com/tag.min.js";
-        s.dataset.zone = "10877528";
-        document.body.appendChild(s);
-      } catch {}
-    }
-
   }, 500);
 }
 
 // ============================================
-// ⭐ OFFERWALL ADGEM
+// ⭐ OFFERWALL (ADGEM)
 // ============================================
 
 window.openOfferwall = () => {
@@ -215,6 +229,16 @@ window.withdraw = async () => {
 };
 
 // ============================================
+// 🔗 REFERIDOS
+// ============================================
+
+window.copyRef = async () => {
+  const el = document.getElementById("refLink");
+  await navigator.clipboard.writeText(el.value);
+  showToast("Copiado ✅");
+};
+
+// ============================================
 // 📡 REALTIME
 // ============================================
 
@@ -233,7 +257,13 @@ function setupRealtime() {
     videosLeft = d.videosLeft ?? 6;
 
     set("balance", balance, true);
+    set("availableBalance", balance, true);
+    set("todayEarnings", d.todayEarnings || 0, true);
     set("videosLeft", videosLeft);
+    set("refCount", d.referrals || 0);
+
+    document.getElementById("refLink").value =
+      window.location.origin + "/index.html?ref=" + user.uid;
   });
 }
 
@@ -257,7 +287,8 @@ auth.onAuthStateChanged((u) => {
 function showToast(msg) {
   const t = document.createElement("div");
   t.innerText = msg;
-  t.style = "position:fixed;bottom:20px;right:20px;background:#22c55e;padding:10px;border-radius:8px;";
+  t.style =
+    "position:fixed;bottom:20px;right:20px;background:#22c55e;color:#000;padding:10px 15px;border-radius:8px;font-weight:bold;";
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 3000);
 }
