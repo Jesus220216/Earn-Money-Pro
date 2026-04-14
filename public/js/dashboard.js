@@ -1,5 +1,5 @@
 // ============================================
-// 💼 EARNPRO DASHBOARD - IMPERIO FINAL V12
+// 💼 EARNPRO DASHBOARD - IMPERIO TOTAL V13
 // ============================================
 
 import { auth, db } from "./firebase.js";
@@ -28,7 +28,7 @@ let taskCooldown = false;
 const CPA_LINK = "https://getafilenow.com/1890309";
 
 // ============================================
-// 🧠 APRENDIZAJE AUTOMÁTICO
+// 🧠 APRENDIZAJE (OFERTA MÁS USADA)
 // ============================================
 
 async function getTopOffer() {
@@ -38,13 +38,13 @@ async function getTopOffer() {
 
     if (snap.empty) return null;
 
-    const count = {};
-    snap.forEach(doc => {
-      const d = doc.data();
-      count[d.offer] = (count[d.offer] || 0) + 1;
+    const map = {};
+    snap.forEach(d => {
+      const data = d.data();
+      map[data.offer] = (map[data.offer] || 0) + 1;
     });
 
-    return Object.keys(count).sort((a, b) => count[b] - count[a])[0];
+    return Object.keys(map).sort((a, b) => map[b] - map[a])[0];
   } catch {
     return null;
   }
@@ -55,107 +55,97 @@ async function getTopOffer() {
 // ============================================
 
 async function triggerCPA() {
-  const rand = Math.random();
+  const r = Math.random();
 
-  // 🔥 40% smartlink
-  if (rand < 0.4) {
-    openCPA(CPA_LINK, "smart");
-    return;
-  }
+  // 50% smartlink (estable)
+  if (r < 0.5) return openCPA(CPA_LINK, "smart");
 
-  // 🔥 30% oferta aprendida
+  // 25% oferta aprendida
   const learned = await getTopOffer();
-  if (learned && rand < 0.7) {
-    openCPA(learned, "learned");
-    return;
-  }
+  if (learned && r < 0.75) return openCPA(learned, "learned");
 
-  // 🔥 30% mejor oferta filtrada
+  // 25% feed filtrado
   loadAndOpenBestOffer();
 }
 
 // ============================================
-// 🧠 FILTRO PRO
+// 🧠 FILTRO DE OFERTAS (IMPORTANTE)
 // ============================================
 
 function loadAndOpenBestOffer() {
   fetch(`https://www.cpagrip.com/common/offer_feed_json.php?user_id=2515689&pubkey=34053872c6552fb19c9838ebb8b56138&tracking_id=${user.uid}`)
-    .then(res => res.json())
+    .then(r => r.json())
     .then(data => {
-      if (!data.offers || data.offers.length === 0) {
-        openCPA(CPA_LINK, "fallback");
-        return;
-      }
+      if (!data.offers?.length) return openCPA(CPA_LINK, "fallback");
 
       const filtered = data.offers.filter(o => {
-        const name = (o.title || "").toLowerCase();
-        const payout = parseFloat(o.payout);
+        const t = (o.title || "").toLowerCase();
+        const p = parseFloat(o.payout);
 
         return (
-          payout >= 0.20 &&
-          !name.includes("deposit") &&
-          !name.includes("trading") &&
-          !name.includes("crypto") &&
-          !name.includes("bet") &&
-          !name.includes("casino")
+          p >= 0.2 &&
+          !t.includes("deposit") &&
+          !t.includes("crypto") &&
+          !t.includes("casino") &&
+          !t.includes("bet") &&
+          !t.includes("trading")
         );
       });
 
-      const best = filtered.length
+      const pick = filtered.length
         ? filtered.sort((a, b) => parseFloat(b.payout) - parseFloat(a.payout))[0]
         : data.offers[Math.floor(Math.random() * data.offers.length)];
 
-      openCPA(best.offerlink, best.title);
+      openCPA(pick.offerlink, pick.title);
     })
     .catch(() => openCPA(CPA_LINK, "error"));
 }
 
 // ============================================
-// 🔗 OPEN CPA + MONETAG
+// 🔗 ABRIR CPA + TRACKING + MONETAG CONTROLADO
 // ============================================
 
 function openCPA(url, name = "offer") {
-  if (!user || !user.uid) return;
+  if (!user?.uid) return;
 
   const finalURL =
-    url +
-    (url.includes("?") ? "&" : "?") +
+    url + (url.includes("?") ? "&" : "?") +
     "subid=" + encodeURIComponent(user.uid);
 
-  // 🔥 Guardar click
+  // Guardar click
   try {
     addDoc(collection(db, "clicks"), {
       uid: user.uid,
       offer: url,
       name,
-      timestamp: Date.now()
+      ts: Date.now()
     });
-  } catch (e) {}
+  } catch {}
 
-  showToast("⚡ Completa un paso rápido para ganar dinero");
+  showToast("⚡ Completa un paso rápido para ganar");
 
   setTimeout(() => {
     window.open(finalURL, "_blank");
 
-    // 💰 MONETAG (30% fallback)
-    if (Math.random() < 0.3) {
+    // Monetag SOLO 25% (evita penalización)
+    if (Math.random() < 0.25) {
       try {
         const s = document.createElement("script");
         s.src = "https://al5sm.com/tag.min.js";
         s.dataset.zone = "10877528";
         document.body.appendChild(s);
-      } catch (e) {}
+      } catch {}
     }
 
-  }, 600);
+  }, 500);
 }
 
 // ============================================
-// ⭐ ADGEM
+// ⭐ OFFERWALL ADGEM
 // ============================================
 
 window.openOfferwall = () => {
-  if (!user) return showToast("Inicia sesión ❌");
+  if (!user?.uid) return showToast("Inicia sesión ❌");
 
   const url = `https://adunits.adgem.com/wall?appid=32365&playerid=${user.uid}&subid=${user.uid}`;
   window.open(url, "_blank");
@@ -185,10 +175,10 @@ window.spin = doTask;
 window.daily = async () => {
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
-  const data = snap.data();
+  const d = snap.data();
   const today = new Date().toDateString();
 
-  if (data.lastDailyDate === today) {
+  if (d.lastDailyDate === today) {
     return showToast("Ya reclamado ❌");
   }
 
@@ -203,13 +193,11 @@ window.withdraw = async () => {
   const amount = parseFloat(document.getElementById("amount").value);
   const email = document.getElementById("email").value.trim();
 
-  if (!email || isNaN(amount) || amount < 5) {
+  if (!email || isNaN(amount) || amount < 5)
     return showToast("Mínimo $5 ❌");
-  }
 
-  if (amount > balance) {
+  if (amount > balance)
     return showToast("Saldo insuficiente ❌");
-  }
 
   await addDoc(collection(db, "withdrawals"), {
     userId: user.uid,
