@@ -1,5 +1,5 @@
 // ============================================
-// 💼 EARNPRO DASHBOARD - PRO V16 (FULL SYSTEM)
+// 💼 EARNPRO DASHBOARD - PRO V16 FIXED
 // ============================================
 
 import { auth, db } from "./firebase.js";
@@ -11,16 +11,14 @@ import {
   addDoc,
   collection,
   onSnapshot,
-  getDocs,
-  query,
-  where
+  getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 // ============================================
-// 🔐 VARIABLES
+// 🔐 STATE
 // ============================================
 
-let user;
+let user = null;
 let balance = 0;
 let videosLeft = 6;
 let taskCooldown = false;
@@ -28,69 +26,30 @@ let taskCooldown = false;
 const CPA_LINK = "https://getafilenow.com/1890309";
 
 // ============================================
-// 🧠 FILTRO PRO (ANTI BASURA)
+// 🧠 FILTER OFFERS
 // ============================================
 
 function isGoodOffer(o) {
   const t = (o.title || "").toLowerCase();
-  const p = parseFloat(o.payout);
+  const p = parseFloat(o.payout || 0);
 
   return (
     p >= 0.30 &&
     !t.includes("crypto") &&
-    !t.includes("trading") &&
     !t.includes("casino") &&
     !t.includes("bet") &&
-    !t.includes("iq") &&
+    !t.includes("trading") &&
     (
       t.includes("app") ||
       t.includes("install") ||
       t.includes("download") ||
-      t.includes("game") ||
-      t.includes("reward")
+      t.includes("game")
     )
   );
 }
 
 // ============================================
-// 💰 ROTADOR INTELIGENTE
-// ============================================
-
-async function triggerCPA() {
-  const r = Math.random();
-
-  if (r < 0.4) return openCPA(CPA_LINK, "smart");
-
-  loadAndOpenBestOffer();
-}
-
-// ============================================
-// 🔥 MEJOR OFERTA
-// ============================================
-
-function loadAndOpenBestOffer() {
-  fetch(`https://www.cpagrip.com/common/offer_feed_json.php?user_id=2515689&pubkey=34053872c6552fb19c9838ebb8b56138&tracking_id=${user.uid}`)
-    .then(r => r.json())
-    .then(data => {
-
-      const filtered = data.offers?.filter(isGoodOffer) || [];
-
-      const pick = filtered.length
-        ? filtered.sort((a, b) => parseFloat(b.payout) - parseFloat(a.payout))[0]
-        : null;
-
-      if (pick) {
-        openCPA(pick.offerlink, pick.title);
-      } else {
-        openCPA(CPA_LINK, "fallback");
-      }
-
-    })
-    .catch(() => openCPA(CPA_LINK, "error"));
-}
-
-// ============================================
-// 🔗 OPEN CPA + TRACKING
+// 🔗 OPEN CPA SAFE
 // ============================================
 
 function openCPA(url, name = "offer") {
@@ -107,107 +66,125 @@ function openCPA(url, name = "offer") {
     timestamp: Date.now()
   });
 
-  showToast("💰 Completa la oferta para ganar");
+  showToast("💰 Abriendo oferta...");
 
-  setTimeout(() => {
-    window.open(finalURL, "_blank");
-  }, 500);
+  window.open(finalURL, "_blank");
 }
 
-// =============================
-// 📲 WHATSAPP VIRAL
-// =============================
-window.shareWhatsApp = () => {
-  const link = document.getElementById("refLink").value;
+// ============================================
+// 🔥 CPA ROTATOR
+// ============================================
 
-  const text = `💰 Gana dinero gratis aquí:\n${link}`;
+function triggerCPA() {
+  const r = Math.random();
 
-  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
-};
+  if (r < 0.4) {
+    return openCPA(CPA_LINK, "smart-fallback");
+  }
 
-// =============================
-// 🛠 ADMIN PANEL
-// =============================
-async function loadAdminStats() {
+  loadBestOffer();
+}
+
+// ============================================
+// 💰 BEST OFFER
+// ============================================
+
+async function loadBestOffer() {
   try {
-    const usersSnap = await getDocs(collection(db, "users"));
-    const clicksSnap = await getDocs(collection(db, "clicks"));
+    const res = await fetch(
+      `https://www.cpagrip.com/common/offer_feed_json.php?user_id=2515689&pubkey=34053872c6552fb19c9838ebb8b56138&tracking_id=${user.uid}`
+    );
 
-    document.getElementById("adminUsers").innerText = usersSnap.size;
-    document.getElementById("adminClicks").innerText = clicksSnap.size;
+    const data = await res.json();
+    const offers = data.offers || [];
+
+    const filtered = offers.filter(isGoodOffer);
+
+    const best = filtered.sort(
+      (a, b) => parseFloat(b.payout) - parseFloat(a.payout)
+    )[0];
+
+    if (best?.offerlink) {
+      openCPA(best.offerlink, best.title);
+    } else {
+      openCPA(CPA_LINK, "fallback");
+    }
 
   } catch (e) {
-    console.log("Admin error", e);
+    openCPA(CPA_LINK, "error");
   }
 }
+
 // ============================================
-// 🎮 SISTEMA DE JUEGOS / MISIONES
+// 🎮 TASK SYSTEM
 // ============================================
 
+function doTask() {
+  if (taskCooldown) return showToast("⏳ Espera...");
+
+  taskCooldown = true;
+  triggerCPA();
+
+  setTimeout(() => (taskCooldown = false), 2500);
+}
+
 window.startVideo = () => {
-  if (videosLeft <= 0) return showToast("Sin videos ❌");
+  if (videosLeft <= 0) return showToast("❌ Sin videos");
 
   videosLeft--;
   doTask();
 };
 
 window.playGame = () => {
-  showToast("🎮 Jugando misión...");
+  showToast("🎮 Jugando...");
   doTask();
 };
 
 window.spin = () => {
-  const win = Math.random();
-
-  if (win < 0.25) {
-    showToast("🎉 BONUS ACTIVADO");
+  if (Math.random() < 0.25) {
+    showToast("🎉 BONUS!");
   }
-
   doTask();
 };
 
 window.daily = async () => {
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
-  const d = snap.data();
+
+  const data = snap.data();
   const today = new Date().toDateString();
 
-  if (d.lastDailyDate === today) {
-    return showToast("Ya reclamado ❌");
+  if (data.lastDailyDate === today) {
+    return showToast("❌ Ya reclamado");
   }
 
   await updateDoc(ref, {
     lastDailyDate: today,
-    todayEarnings: increment(0.2)
+    todayEarnings: increment(0.2),
+    balance: increment(0.2)
   });
 
-  showToast("🎁 Bonus diario +$0.20");
+  showToast("🎁 +$0.20");
 };
 
 // ============================================
-// 🔥 SISTEMA VIRAL (REFERIDOS PRO)
+// 🔗 REFERRAL SYSTEM
 // ============================================
 
 window.copyRef = async () => {
-  const link =
-    window.location.origin + "/index.html?ref=" + user.uid;
-
+  const link = `${window.location.origin}/index.html?ref=${user.uid}`;
   await navigator.clipboard.writeText(link);
-
-  showToast("🔗 Link copiado — invita y gana");
+  showToast("🔗 Copiado");
 };
 
 window.shareWhatsApp = () => {
-  const link =
-    window.location.origin + "/index.html?ref=" + user.uid;
-
-  const text = `💰 Gana dinero gratis aquí: ${link}`;
-
+  const link = `${window.location.origin}/index.html?ref=${user.uid}`;
+  const text = `💰 Gana dinero aquí: ${link}`;
   window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
 };
 
 // ============================================
-// 💳 RETIRO
+// 💳 WITHDRAW
 // ============================================
 
 window.withdraw = async () => {
@@ -215,10 +192,10 @@ window.withdraw = async () => {
   const email = document.getElementById("email").value.trim();
 
   if (!email || amount < 5)
-    return showToast("Mínimo $5 ❌");
+    return showToast("Mínimo $5");
 
   if (amount > balance)
-    return showToast("Saldo insuficiente ❌");
+    return showToast("Saldo insuficiente");
 
   await addDoc(collection(db, "withdrawals"), {
     userId: user.uid,
@@ -232,19 +209,24 @@ window.withdraw = async () => {
     balance: increment(-amount)
   });
 
-  showToast("💸 Retiro enviado");
+  showToast("💸 Enviado");
 };
 
 // ============================================
-// 📊 ADMIN PANEL (BÁSICO)
+// 📊 ADMIN (FIXED SINGLE VERSION)
 // ============================================
 
 async function loadAdminStats() {
-  const usersSnap = await getDocs(collection(db, "users"));
-  const clicksSnap = await getDocs(collection(db, "clicks"));
+  try {
+    const usersSnap = await getDocs(collection(db, "users"));
+    const clicksSnap = await getDocs(collection(db, "clicks"));
 
-  set("adminUsers", usersSnap.size);
-  set("adminClicks", clicksSnap.size);
+    set("adminUsers", usersSnap.size);
+    set("adminClicks", clicksSnap.size);
+
+  } catch (e) {
+    console.log("admin error", e);
+  }
 }
 
 // ============================================
@@ -256,7 +238,7 @@ function set(id, value, money = false) {
   if (!el) return;
 
   el.innerText = money
-    ? "$" + parseFloat(value).toFixed(2)
+    ? `$${parseFloat(value || 0).toFixed(2)}`
     : value;
 }
 
@@ -267,44 +249,33 @@ function setupRealtime() {
     const d = snap.data();
 
     balance = d.balance || 0;
-    videosLeft = d.videosLeft ?? 6;
+    videosLeft = d.videosLeft ?? videosLeft;
 
     set("balance", balance, true);
     set("availableBalance", balance, true);
     set("todayEarnings", d.todayEarnings || 0, true);
-    set("videosLeft", videosLeft);
+    set("videos", `${videosLeft}/6`);
     set("refCount", d.referrals || 0);
 
     document.getElementById("refLink").value =
-      window.location.origin + "/index.html?ref=" + user.uid;
+      `${window.location.origin}/index.html?ref=${user.uid}`;
   });
 }
 
 // ============================================
-// 🎮 CORE TASK
-// ============================================
-
-function doTask() {
-  if (taskCooldown) return showToast("Espera ⏳");
-
-  taskCooldown = true;
-  triggerCPA();
-
-  setTimeout(() => (taskCooldown = false), 2500);
-}
-
-// ============================================
-// 🚪 INIT
+// 🚪 AUTH INIT
 // ============================================
 
 auth.onAuthStateChanged((u) => {
-  if (u) {
-    user = u;
-    setupRealtime();
-    loadAdminStats();
-  } else {
+  if (!u) {
     window.location.href = "index.html";
+    return;
   }
+
+  user = u;
+
+  setupRealtime();
+  loadAdminStats();
 });
 
 // ============================================
@@ -315,7 +286,8 @@ function showToast(msg) {
   const t = document.createElement("div");
   t.innerText = msg;
   t.style =
-    "position:fixed;bottom:20px;right:20px;background:#22c55e;color:#000;padding:10px;border-radius:8px;";
+    "position:fixed;bottom:20px;right:20px;background:#22c55e;color:#000;padding:10px;border-radius:8px;z-index:9999;";
   document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
+
+  setTimeout(() => t.remove(), 2500);
 }
