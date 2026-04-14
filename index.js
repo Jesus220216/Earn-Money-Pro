@@ -5,7 +5,7 @@ const path = require("path");
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
- 
+
 // 🔐 FIREBASE
 let serviceAccount;
 try {
@@ -48,76 +48,46 @@ app.get("/admin", (req, res) => {
 // 🎯 POSTBACK CPA (REAL + BONUS)
 // ============================================
 app.all("/postback", async (req, res) => {
-  if (!db) return res.status(500).send("DB error");
-
+  if (!db) return res.status(500).send("Database not initialized");
+  
   try {
     const data = req.method === "POST" ? req.body : req.query;
-
-   const uid = data.uid || data.player_id || data.subid || data.tracking_id;
-const payout = parseFloat(data.usd || data.payout || 0);
-const tx = data.tx || data.transaction_id || (uid + "_" + Date.now());
-    const offer = data.offer_id || data.offer || data.id || "unknown";
-
+    const subid = data.subid || data.tracking_id;
+    const payout = parseFloat(data.payout || 0);
     const password = data.password;
-    const SECRET = "Jhadenjerielpro2201";
 
-    // 🔐 Seguridad básica
-   if (data.password !== SECRET) {
-  return res.status(403).send("denied");
-}
+    if (password && password !== "EarnPro2026") return res.send("denied");
+    if (!subid || isNaN(payout)) return res.send("invalid");
 
-    if (!uid || isNaN(payout) || !tx) {
-      return res.status(400).send("invalid");
-    }
+    const userRef = db.collection("users").doc(subid);
+    const userDoc = await userRef.get();
+    if (!userDoc.exists) return res.send("no user");
 
-    // 🔒 Evitar duplicados
-    const txRef = db.collection("transactions").doc(tx);
-    const txDoc = await txRef.get();
+    // Bonus aleatorio (Gamificación)
+    const bonus = Math.random() < 0.1 ? 0.10 : 0.02; 
+    const total = payout + bonus;
 
-    if (txDoc.exists) {
-      return res.status(200).send("duplicate");
-    }
-
-    // 🎁 Bonus (puedes dejarlo)
-    const bonus = Math.random() < 0.1 ? 0.10 : 0.02;
-  const total = parseFloat((payout + bonus).toFixed(2));
-
-    // 💾 Guardar transacción
-    await txRef.set({
-      uid,
-      payout,
-      bonus,
-      total,
-      offer,
+    await db.collection("conversions").add({
+      uid: subid,
+      payout: payout,
+      bonus: bonus,
+      total: total,
+      offer: data.offer_id || "unknown",
       date: Date.now(),
-     ip: (req.headers["x-forwarded-for"] || req.socket.remoteAddress || "")
-  .split(",")[0]
-  .trim()
+      ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress
     });
 
-    // 💰 Actualizar usuario
-    const userRef = db.collection("users").doc(uid);
-    const userDoc = await userRef.get();
+    await userRef.update({
+      balance: admin.firestore.FieldValue.increment(total),
+      todayEarnings: admin.firestore.FieldValue.increment(total),
+      lastUpdate: Date.now()
+    });
 
-if (!userDoc.exists) {
-  await userRef.set({
-    balance: 0,
-    todayEarnings: 0,
-    createdAt: Date.now()
-  });
-}
-   await userRef.set({
-  balance: admin.firestore.FieldValue.increment(total),
-  todayEarnings: admin.firestore.FieldValue.increment(total),
-  lastUpdate: Date.now()
-}, { merge: true });
-   
-    console.log("💰 POSTBACK OK:", uid, total);
-
-    res.status(200).send("OK");
+    console.log("💰 POSTBACK OK:", subid, total);
+    res.send("ok");
   } catch (err) {
     console.error("❌ postback error:", err);
-    res.status(500).send("error");
+    res.send("error");
   }
 });
 
