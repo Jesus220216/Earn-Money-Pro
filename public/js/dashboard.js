@@ -114,6 +114,32 @@ function openCPA(url, name = "offer") {
   }, 500);
 }
 
+// =============================
+// 📲 WHATSAPP VIRAL
+// =============================
+window.shareWhatsApp = () => {
+  const link = document.getElementById("refLink").value;
+
+  const text = `💰 Gana dinero gratis aquí:\n${link}`;
+
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+};
+
+// =============================
+// 🛠 ADMIN PANEL
+// =============================
+async function loadAdminStats() {
+  try {
+    const usersSnap = await getDocs(collection(db, "users"));
+    const clicksSnap = await getDocs(collection(db, "clicks"));
+
+    document.getElementById("adminUsers").innerText = usersSnap.size;
+    document.getElementById("adminClicks").innerText = clicksSnap.size;
+
+  } catch (e) {
+    console.log("Admin error", e);
+  }
+}
 // ============================================
 // 🎮 SISTEMA DE JUEGOS / MISIONES
 // ============================================
