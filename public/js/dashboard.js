@@ -1,5 +1,5 @@
 // ============================================
-// 💼 EARNPRO DASHBOARD - AUTO GANANCIAS V10
+// 💼 EARNPRO DASHBOARD - IMPERIO FINAL V12
 // ============================================
 
 import { auth, db } from "./firebase.js";
@@ -25,75 +25,57 @@ let balance = 0;
 let videosLeft = 6;
 let taskCooldown = false;
 
-const REF_COMMISSION = 0.10;
 const CPA_LINK = "https://getafilenow.com/1890309";
 
 // ============================================
-// 🧠 AUTO OPTIMIZADOR (APRENDE SOLO)
+// 🧠 APRENDIZAJE AUTOMÁTICO
 // ============================================
 
-async function getTopOfferFromClicks() {
+async function getTopOffer() {
   try {
-    const q = query(
-      collection(db, "clicks"),
-      where("uid", "==", user.uid)
-    );
-
+    const q = query(collection(db, "clicks"), where("uid", "==", user.uid));
     const snap = await getDocs(q);
 
     if (snap.empty) return null;
 
-    const counts = {};
-
+    const count = {};
     snap.forEach(doc => {
       const d = doc.data();
-      counts[d.offer] = (counts[d.offer] || 0) + 1;
+      count[d.offer] = (count[d.offer] || 0) + 1;
     });
 
-    // 🔥 elegir el más usado
-    let top = null;
-    let max = 0;
-
-    for (let key in counts) {
-      if (counts[key] > max) {
-        max = counts[key];
-        top = key;
-      }
-    }
-
-    return top;
+    return Object.keys(count).sort((a, b) => count[b] - count[a])[0];
   } catch {
     return null;
   }
 }
 
 // ============================================
-// 💰 ROTADOR AUTOMÁTICO
+// 💰 ROTADOR INTELIGENTE
 // ============================================
 
 async function triggerCPA() {
   const rand = Math.random();
 
-  // 🔥 50% usar smartlink
-  if (rand < 0.5) {
-    openCPA(CPA_LINK, "smart_auto");
+  // 🔥 40% smartlink
+  if (rand < 0.4) {
+    openCPA(CPA_LINK, "smart");
     return;
   }
 
-  // 🔥 intentar usar mejor oferta previa
-  const topOffer = await getTopOfferFromClicks();
-
-  if (topOffer && topOffer.startsWith("http")) {
-    openCPA(topOffer, "learned_offer");
+  // 🔥 30% oferta aprendida
+  const learned = await getTopOffer();
+  if (learned && rand < 0.7) {
+    openCPA(learned, "learned");
     return;
   }
 
-  // 🔥 fallback → mejor oferta actual
+  // 🔥 30% mejor oferta filtrada
   loadAndOpenBestOffer();
 }
 
 // ============================================
-// 🧠 MEJOR OFERTA POR PAYOUT
+// 🧠 FILTRO PRO
 // ============================================
 
 function loadAndOpenBestOffer() {
@@ -105,7 +87,19 @@ function loadAndOpenBestOffer() {
         return;
       }
 
-      const filtered = data.offers.filter(o => parseFloat(o.payout) >= 0.50);
+      const filtered = data.offers.filter(o => {
+        const name = (o.title || "").toLowerCase();
+        const payout = parseFloat(o.payout);
+
+        return (
+          payout >= 0.20 &&
+          !name.includes("deposit") &&
+          !name.includes("trading") &&
+          !name.includes("crypto") &&
+          !name.includes("bet") &&
+          !name.includes("casino")
+        );
+      });
 
       const best = filtered.length
         ? filtered.sort((a, b) => parseFloat(b.payout) - parseFloat(a.payout))[0]
@@ -117,43 +111,51 @@ function loadAndOpenBestOffer() {
 }
 
 // ============================================
-// 🔗 OPEN CPA + TRACKING
+// 🔗 OPEN CPA + MONETAG
 // ============================================
 
-function openCPA(url, offerId = "unknown") {
-  if (!user || !user.uid) {
-    showToast("Error usuario ❌");
-    return;
-  }
+function openCPA(url, name = "offer") {
+  if (!user || !user.uid) return;
 
   const finalURL =
     url +
     (url.includes("?") ? "&" : "?") +
-    "subid=" + encodeURIComponent(user.uid) +
-    "&offer_id=" + encodeURIComponent(offerId);
+    "subid=" + encodeURIComponent(user.uid);
 
+  // 🔥 Guardar click
   try {
     addDoc(collection(db, "clicks"), {
       uid: user.uid,
       offer: url,
-      name: offerId,
+      name,
       timestamp: Date.now()
     });
   } catch (e) {}
 
-  showToast("🔥 Generando dinero automático...");
+  showToast("⚡ Completa un paso rápido para ganar dinero");
 
   setTimeout(() => {
     window.open(finalURL, "_blank");
-  }, 700);
+
+    // 💰 MONETAG (30% fallback)
+    if (Math.random() < 0.3) {
+      try {
+        const s = document.createElement("script");
+        s.src = "https://al5sm.com/tag.min.js";
+        s.dataset.zone = "10877528";
+        document.body.appendChild(s);
+      } catch (e) {}
+    }
+
+  }, 600);
 }
 
 // ============================================
 // ⭐ ADGEM
 // ============================================
 
-window.openOfferwall = function () {
-  if (!user) return showToast("Login requerido ❌");
+window.openOfferwall = () => {
+  if (!user) return showToast("Inicia sesión ❌");
 
   const url = `https://adunits.adgem.com/wall?appid=32365&playerid=${user.uid}&subid=${user.uid}`;
   window.open(url, "_blank");
@@ -169,7 +171,7 @@ function doTask() {
   taskCooldown = true;
   triggerCPA();
 
-  setTimeout(() => (taskCooldown = false), 3000);
+  setTimeout(() => (taskCooldown = false), 2500);
 }
 
 window.startVideo = () => {
@@ -221,7 +223,7 @@ window.withdraw = async () => {
     balance: increment(-amount)
   });
 
-  showToast("Retiro solicitado 🚀");
+  showToast("Retiro enviado 🚀");
 };
 
 // ============================================
