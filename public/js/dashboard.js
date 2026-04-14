@@ -127,7 +127,7 @@ window.playGame = async () => {
   if (taskCooldown) return showToast("Espera ⏳");
   taskCooldown = true;
   triggerCPA("1889035");
-  showToast("🎮 Abre el juego... Completa la oferta para ganar");
+  showToast("🎮 Preparando juego... Completa la verificación para ganar");
 
   setTimeout(() => {
     taskCooldown = false;
@@ -138,7 +138,7 @@ window.spin = async () => {
   if (taskCooldown) return showToast("Espera ⏳");
   taskCooldown = true;
   triggerCPA("1889035");
-  showToast("🎰 Abre la ruleta... Completa la oferta para ganar");
+  showToast("🎰 Girando ruleta... Completa la verificación para ganar");
 
   setTimeout(() => {
     taskCooldown = false;
@@ -169,8 +169,15 @@ window.openSubscription = async () => {
   if (taskCooldown) return showToast("Espera ⏳");
   taskCooldown = true;
   
-  const subscriptionUrl = "https://manus.go.link/iW6sB?action=open-subscription";
-  openCPA(subscriptionUrl, "premium_subscription");
+  if (!user || !user.uid) {
+    showToast("Inicia sesión primero");
+    taskCooldown = false;
+    return;
+  }
+  
+  const adgemUrl = `https://adunits.adgem.com/wall?appid=32365&playerid=${encodeURIComponent(user.uid)}`;
+  window.open(adgemUrl, "_blank");
+  showToast("⭐ Completa las ofertas premium para ganar más dinero");
   
   setTimeout(() => {
     taskCooldown = false;
@@ -369,3 +376,4 @@ function showToast(msg) {
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 3000);
 }
+
