@@ -1,5 +1,5 @@
 // ============================================
-// 💼 EARNPRO DASHBOARD - PRO REAL V15
+// 💼 EARNPRO DASHBOARD - PRO V16 (FULL SYSTEM)
 // ============================================
 
 import { auth, db } from "./firebase.js";
@@ -28,48 +28,7 @@ let taskCooldown = false;
 const CPA_LINK = "https://getafilenow.com/1890309";
 
 // ============================================
-// 🧠 SISTEMA DE APRENDIZAJE (TOP OFERTA)
-// ============================================
-
-async function getTopOffer() {
-  try {
-    const q = query(collection(db, "clicks"), where("uid", "==", user.uid));
-    const snap = await getDocs(q);
-
-    if (snap.empty) return null;
-
-    const map = {};
-    snap.forEach(d => {
-      const data = d.data();
-      map[data.offer] = (map[data.offer] || 0) + 1;
-    });
-
-    return Object.keys(map).sort((a, b) => map[b] - map[a])[0];
-  } catch {
-    return null;
-  }
-}
-
-// ============================================
-// 💰 ROTADOR PRO (MEJORADO)
-// ============================================
-
-async function triggerCPA() {
-  const r = Math.random();
-
-  // 🔥 40% smartlink (estable)
-  if (r < 0.4) return openCPA(CPA_LINK, "smart");
-
-  // 🔥 30% oferta aprendida
-  const learned = await getTopOffer();
-  if (learned && r < 0.7) return openCPA(learned, "learned");
-
-  // 🔥 30% feed limpio
-  loadAndOpenBestOffer();
-}
-
-// ============================================
-// 🧠 FILTRO ULTRA PRO (ANTI BASURA)
+// 🧠 FILTRO PRO (ANTI BASURA)
 // ============================================
 
 function isGoodOffer(o) {
@@ -78,31 +37,31 @@ function isGoodOffer(o) {
 
   return (
     p >= 0.30 &&
-
-    // ❌ basura total
-    !t.includes("deposit") &&
     !t.includes("crypto") &&
+    !t.includes("trading") &&
     !t.includes("casino") &&
     !t.includes("bet") &&
-    !t.includes("trading") &&
-    !t.includes("bitcoin") &&
-    !t.includes("forex") &&
-    !t.includes("invest") &&
-    !t.includes("loan") &&
-    !t.includes("credit") &&
-    !t.includes("bank") &&
     !t.includes("iq") &&
-
-    // ✅ conversion real
     (
       t.includes("app") ||
       t.includes("install") ||
       t.includes("download") ||
       t.includes("game") ||
-      t.includes("reward") ||
-      t.includes("gift")
+      t.includes("reward")
     )
   );
+}
+
+// ============================================
+// 💰 ROTADOR INTELIGENTE
+// ============================================
+
+async function triggerCPA() {
+  const r = Math.random();
+
+  if (r < 0.4) return openCPA(CPA_LINK, "smart");
+
+  loadAndOpenBestOffer();
 }
 
 // ============================================
@@ -114,11 +73,7 @@ function loadAndOpenBestOffer() {
     .then(r => r.json())
     .then(data => {
 
-      if (!data.offers?.length) {
-        return openCPA(CPA_LINK, "fallback");
-      }
-
-      const filtered = data.offers.filter(isGoodOffer);
+      const filtered = data.offers?.filter(isGoodOffer) || [];
 
       const pick = filtered.length
         ? filtered.sort((a, b) => parseFloat(b.payout) - parseFloat(a.payout))[0]
@@ -127,7 +82,7 @@ function loadAndOpenBestOffer() {
       if (pick) {
         openCPA(pick.offerlink, pick.title);
       } else {
-        openCPA(CPA_LINK, "fallback_safe");
+        openCPA(CPA_LINK, "fallback");
       }
 
     })
@@ -135,7 +90,7 @@ function loadAndOpenBestOffer() {
 }
 
 // ============================================
-// 🔗 OPEN CPA + TRACKING + UX PRO
+// 🔗 OPEN CPA + TRACKING
 // ============================================
 
 function openCPA(url, name = "offer") {
@@ -145,48 +100,23 @@ function openCPA(url, name = "offer") {
     url + (url.includes("?") ? "&" : "?") +
     "subid=" + encodeURIComponent(user.uid);
 
-  // guardar click
-  try {
-    addDoc(collection(db, "clicks"), {
-      uid: user.uid,
-      offer: url,
-      name,
-      timestamp: Date.now()
-    });
-  } catch {}
+  addDoc(collection(db, "clicks"), {
+    uid: user.uid,
+    offer: url,
+    name,
+    timestamp: Date.now()
+  });
 
-  showToast("💰 Completa la oferta y gana dinero");
+  showToast("💰 Completa la oferta para ganar");
 
-  // UX delay (mejora conversión)
   setTimeout(() => {
     window.open(finalURL, "_blank");
-  }, 600);
+  }, 500);
 }
 
 // ============================================
-// ⭐ OFFERWALLS (MULTI)
+// 🎮 SISTEMA DE JUEGOS / MISIONES
 // ============================================
-
-window.openSubscription = () => {
-  if (!user?.uid) return showToast("Login requerido ❌");
-
-  // AdGem
-  const adgem = `https://adunits.adgem.com/wall?appid=32365&playerid=${user.uid}&subid=${user.uid}`;
-  window.open(adgem, "_blank");
-};
-
-// ============================================
-// 🎮 SISTEMA DE GANANCIAS (ENGAGEMENT)
-// ============================================
-
-function doTask() {
-  if (taskCooldown) return showToast("Espera ⏳");
-
-  taskCooldown = true;
-  triggerCPA();
-
-  setTimeout(() => (taskCooldown = false), 2500);
-}
 
 window.startVideo = () => {
   if (videosLeft <= 0) return showToast("Sin videos ❌");
@@ -196,14 +126,15 @@ window.startVideo = () => {
 };
 
 window.playGame = () => {
+  showToast("🎮 Jugando misión...");
   doTask();
 };
 
 window.spin = () => {
-  const rand = Math.random();
+  const win = Math.random();
 
-  if (rand < 0.3) {
-    showToast("🎉 Ganaste bonus!");
+  if (win < 0.25) {
+    showToast("🎉 BONUS ACTIVADO");
   }
 
   doTask();
@@ -219,7 +150,34 @@ window.daily = async () => {
     return showToast("Ya reclamado ❌");
   }
 
-  doTask();
+  await updateDoc(ref, {
+    lastDailyDate: today,
+    todayEarnings: increment(0.2)
+  });
+
+  showToast("🎁 Bonus diario +$0.20");
+};
+
+// ============================================
+// 🔥 SISTEMA VIRAL (REFERIDOS PRO)
+// ============================================
+
+window.copyRef = async () => {
+  const link =
+    window.location.origin + "/index.html?ref=" + user.uid;
+
+  await navigator.clipboard.writeText(link);
+
+  showToast("🔗 Link copiado — invita y gana");
+};
+
+window.shareWhatsApp = () => {
+  const link =
+    window.location.origin + "/index.html?ref=" + user.uid;
+
+  const text = `💰 Gana dinero gratis aquí: ${link}`;
+
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
 };
 
 // ============================================
@@ -230,7 +188,7 @@ window.withdraw = async () => {
   const amount = parseFloat(document.getElementById("amount").value);
   const email = document.getElementById("email").value.trim();
 
-  if (!email || isNaN(amount) || amount < 5)
+  if (!email || amount < 5)
     return showToast("Mínimo $5 ❌");
 
   if (amount > balance)
@@ -248,21 +206,23 @@ window.withdraw = async () => {
     balance: increment(-amount)
   });
 
-  showToast("Retiro enviado 🚀");
+  showToast("💸 Retiro enviado");
 };
 
 // ============================================
-// 🔗 REFERIDOS
+// 📊 ADMIN PANEL (BÁSICO)
 // ============================================
 
-window.copyRef = async () => {
-  const el = document.getElementById("refLink");
-  await navigator.clipboard.writeText(el.value);
-  showToast("Copiado ✅");
-};
+async function loadAdminStats() {
+  const usersSnap = await getDocs(collection(db, "users"));
+  const clicksSnap = await getDocs(collection(db, "clicks"));
+
+  set("adminUsers", usersSnap.size);
+  set("adminClicks", clicksSnap.size);
+}
 
 // ============================================
-// 📡 REALTIME (UI SYNC)
+// 📡 REALTIME
 // ============================================
 
 function set(id, value, money = false) {
@@ -289,12 +249,22 @@ function setupRealtime() {
     set("videosLeft", videosLeft);
     set("refCount", d.referrals || 0);
 
-    const refInput = document.getElementById("refLink");
-    if (refInput) {
-      refInput.value =
-        window.location.origin + "/index.html?ref=" + user.uid;
-    }
+    document.getElementById("refLink").value =
+      window.location.origin + "/index.html?ref=" + user.uid;
   });
+}
+
+// ============================================
+// 🎮 CORE TASK
+// ============================================
+
+function doTask() {
+  if (taskCooldown) return showToast("Espera ⏳");
+
+  taskCooldown = true;
+  triggerCPA();
+
+  setTimeout(() => (taskCooldown = false), 2500);
 }
 
 // ============================================
@@ -305,6 +275,7 @@ auth.onAuthStateChanged((u) => {
   if (u) {
     user = u;
     setupRealtime();
+    loadAdminStats();
   } else {
     window.location.href = "index.html";
   }
@@ -318,7 +289,7 @@ function showToast(msg) {
   const t = document.createElement("div");
   t.innerText = msg;
   t.style =
-    "position:fixed;bottom:20px;right:20px;background:#22c55e;color:#000;padding:10px 15px;border-radius:8px;font-weight:bold;z-index:9999;";
+    "position:fixed;bottom:20px;right:20px;background:#22c55e;color:#000;padding:10px;border-radius:8px;";
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 3000);
 }
