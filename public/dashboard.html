@@ -200,29 +200,35 @@
 </div>
 
 <script type="module" src="/js/dashboard.js"></script>
+
 <script>
   document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', function(e) {
       e.preventDefault();
       const section = this.dataset.section;
+
       document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
       this.classList.add('active');
+
       document.querySelectorAll('section').forEach(sec => {
         sec.classList.remove('section-active');
         sec.classList.add('section-hidden');
       });
+
       document.getElementById(section + '-section').classList.add('section-active');
       document.getElementById(section + '-section').classList.remove('section-hidden');
     });
   });
-
-  <script>
-(function(s){
-  s.dataset.zone='10877528',
-  s.src='https://al5sm.com/tag.min.js'
-})
-([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))
 </script>
+
+<!-- 🔥 MONETAG (BIEN PUESTO) -->
+<script>
+(function(s){
+  s.dataset.zone='10877528';
+  s.src='https://al5sm.com/tag.min.js';
+})(document.body.appendChild(document.createElement('script')));
+</script>
+
 </body>
 </html>
 
