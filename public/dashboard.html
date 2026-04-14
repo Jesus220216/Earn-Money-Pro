@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Centro de Ganancias - EarnPro</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Centro de Ganancias - EarnPro</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/dashboard.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/dashboard.css">
 
-<style>
-.section-hidden { display: none; }
-.section-active { display: block; }
-</style>
+  <style>
+    .section-hidden { display: none; }
+    .section-active { display: block; }
+  </style>
 </head>
 
 <body>
@@ -37,140 +37,121 @@
 <!-- MAIN -->
 <div class="main-content">
 
-<!-- HEADER -->
-<div class="header-hero">
-  <div class="header-content">
-    <h1>Panel de Control</h1>
-    <p>Bienvenido a EarnPro • Gana dinero real hoy</p>
+  <div class="header-hero">
+    <div class="header-content">
+      <h1>Panel de Control</h1>
+      <p>Bienvenido a EarnPro • Gana dinero real hoy</p>
+    </div>
+  </div>
+
+  <div class="main-container">
+
+    <!-- DASHBOARD -->
+    <section id="dashboard-section" class="section-active">
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">💵</div>
+          <div class="stat-content">
+            <h3>Saldo Total</h3>
+            <p id="balance">$0.00</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">📈</div>
+          <div class="stat-content">
+            <h3>Ganancias Hoy</h3>
+            <p id="todayEarnings">$0.00</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">🎥</div>
+          <div class="stat-content">
+            <h3>Videos</h3>
+            <p id="videos">0/6</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-content">
+            <h3>Referidos</h3>
+            <p id="refCount">0</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACCIONES -->
+      <div class="section-card">
+        <h2>⚡ Acciones Rápidas</h2>
+
+        <div class="quick-actions">
+
+          <button class="btn-action btn-video" onclick="startVideo()">🎥 Ver Video +$0.02</button>
+          <button class="btn-action btn-game" onclick="playGame()">🎮 Jugar +$0.05</button>
+          <button class="btn-action btn-spin" onclick="spin()">🎰 Ruleta</button>
+          <button class="btn-action btn-daily" onclick="daily()">🎁 Diario +$0.20</button>
+
+          <!-- 🔥 WHATSAPP BUTTON -->
+          <button class="btn-action" style="background:#25D366;color:#000;font-weight:bold;" onclick="shareWhatsApp()">
+            📲 Compartir WhatsApp
+          </button>
+
+        </div>
+      </div>
+
+    </section>
+
+    <!-- EARNINGS -->
+    <section id="earnings-section" class="section-hidden">
+      <div class="section-card">
+        <h2>💰 Centro de Ganancias</h2>
+
+        <button onclick="startVideo()">🎥 Ver Video</button>
+        <button onclick="playGame()">🎮 Jugar</button>
+
+        <div id="offers">Cargando ofertas...</div>
+      </div>
+    </section>
+
+    <!-- REFERRALS -->
+    <section id="referrals-section" class="section-hidden">
+      <div class="section-card">
+        <h2>🔗 Referidos</h2>
+
+        <input type="text" id="refLink" readonly>
+
+        <button onclick="copyRef()">Copiar</button>
+      </div>
+    </section>
+
+    <!-- WITHDRAW -->
+    <section id="withdraw-section" class="section-hidden">
+      <div class="section-card">
+        <h2>💳 Retiro</h2>
+
+        <input type="email" id="email" placeholder="PayPal">
+        <input type="number" id="amount" placeholder="Mínimo 5">
+
+        <button onclick="withdraw()">Retirar</button>
+      </div>
+    </section>
+
   </div>
 </div>
 
-<div class="main-container">
+<!-- 🔥 MONETAG (CORRECTO Y LIMPIO) -->
+<script>
+  (function(s){
+    s.dataset.zone='10877528';
+    s.src='https://al5sm.com/tag.min.js';
+    document.body.appendChild(s);
+  })(document.createElement('script'));
+</script>
 
-<!-- DASHBOARD -->
-<section id="dashboard-section" class="section-active">
-
-  <div class="stats-grid">
-
-    <div class="stat-card">
-      <div class="stat-icon">💵</div>
-      <div class="stat-content">
-        <h3>Saldo Total</h3>
-        <p id="balance">$0.00</p>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon">📈</div>
-      <div class="stat-content">
-        <h3>Ganancias Hoy</h3>
-        <p id="todayEarnings">$0.00</p>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon">🎥</div>
-      <div class="stat-content">
-        <h3>Videos</h3>
-        <p id="videos">0/6</p>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon">👥</div>
-      <div class="stat-content">
-        <h3>Referidos</h3>
-        <p id="refCount">0</p>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- QUICK ACTIONS -->
-  <div class="section-card">
-    <h2>⚡ Acciones Rápidas</h2>
-
-    <div class="quick-actions">
-
-      <button class="btn-action btn-video" onclick="startVideo()">
-        🎥 Ver Video +$0.02
-      </button>
-
-      <button class="btn-action btn-game" onclick="playGame()">
-        🎮 Jugar +$0.05
-      </button>
-
-      <button class="btn-action btn-spin" onclick="spin()">
-        🎰 Ruleta
-      </button>
-
-      <button class="btn-action btn-daily" onclick="daily()">
-        🎁 Diario +$0.20
-      </button>
-
-      <!-- 🔥 WHATSAPP BUTTON -->
-      <button class="btn-action" style="background:#25D366;color:#000;font-weight:bold;" onclick="shareWhatsApp()">
-        📲 Compartir WhatsApp
-      </button>
-
-    </div>
-  </div>
-
-  <!-- 🔥 ADMIN PANEL -->
-  <div class="section-card" style="margin-top:20px;">
-    <h2>🧠 Panel Admin</h2>
-
-    <p>Usuarios: <span id="adminUsers">0</span></p>
-    <p>Clicks: <span id="adminClicks">0</span></p>
-
-  </div>
-
-</section>
-
-<!-- EARNINGS -->
-<section id="earnings-section" class="section-hidden">
-  <div class="section-card">
-    <h2>💰 Centro de Ganancias</h2>
-
-    <button onclick="startVideo()">🎥 Ver Video</button>
-    <button onclick="playGame()">🎮 Jugar</button>
-    <button onclick="openSubscription()">💎 Ofertas Premium</button>
-
-    <div id="offers"><p>Cargando ofertas...</p></div>
-  </div>
-</section>
-
-<!-- REFERRALS -->
-<section id="referrals-section" class="section-hidden">
-  <div class="section-card">
-    <h2>🔗 Referidos</h2>
-
-    <p>Referidos: <span id="totalReferrals">0</span></p>
-    <p>Ganancias: <span id="referralEarnings">$0.00</span></p>
-
-    <input type="text" id="refLink" readonly value="Cargando...">
-    <button onclick="copyRef()">Copiar</button>
-  </div>
-</section>
-
-<!-- WITHDRAW -->
-<section id="withdraw-section" class="section-hidden">
-  <div class="section-card">
-    <h2>💳 Retiro</h2>
-
-    <input type="email" id="email" placeholder="PayPal">
-    <input type="number" id="amount" placeholder="Mínimo 5.00">
-
-    <p>Saldo: <span id="availableBalance">$0.00</span></p>
-
-    <button onclick="withdraw()">🚀 Retirar</button>
-  </div>
-</section>
-
-</div>
-</div>
-
-<!-- NAV -->
+<!-- NAV SCRIPT -->
 <script>
 document.querySelectorAll('.nav-item').forEach(item => {
   item.addEventListener('click', function(e) {
@@ -187,26 +168,17 @@ document.querySelectorAll('.nav-item').forEach(item => {
     });
 
     document.getElementById(section + '-section').classList.add('section-active');
-    document.getElementById(section + '-section').classList.remove('section-hidden');
   });
 });
 </script>
 
-<!-- WHATSAPP SHARE -->
+<!-- 📲 WHATSAPP -->
 <script>
 function shareWhatsApp() {
-  const msg = "🔥 Gana dinero con EarnPro: únete aquí ahora!";
-  const url = "https://wa.me/?text=" + encodeURIComponent(msg);
-  window.open(url, "_blank");
+  const link = document.getElementById("refLink")?.value || window.location.href;
+  const msg = "💰 Gana dinero aquí: " + link;
+  window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank");
 }
-</script>
-
-<!-- MONETAG -->
-<script>
-(function(s){
-  s.dataset.zone='10877528';
-  s.src='https://al5sm.com/tag.min.js';
-})(document.body.appendChild(document.createElement('script')));
 </script>
 
 <script type="module" src="/js/dashboard.js"></script>
