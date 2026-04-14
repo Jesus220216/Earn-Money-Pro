@@ -3,225 +3,137 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Centro de Ganancias - EarnPro</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <title>EarnPro - Panel PRO</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/dashboard.css">
+
   <style>
-    .section-hidden { display: none; }
-    .section-active { display: block; }
+    body { font-family: Poppins; }
+    .section-hidden { display:none }
+    .section-active { display:block }
+
+    .admin-box{
+      background:#111;
+      border:1px solid #22c55e;
+      padding:15px;
+      border-radius:10px;
+      margin-top:20px;
+    }
   </style>
 </head>
 <body>
 
-<!-- SIDEBAR NAVIGATION -->
+<!-- SIDEBAR -->
 <div class="sidebar">
-  <div class="sidebar-header">
-    <h2>💰 EarnPro</h2>
-  </div>
-  <nav class="sidebar-nav">
-    <a href="#" class="nav-item active" data-section="dashboard">
-      <span>📊</span> Dashboard
-    </a>
-    <a href="#" class="nav-item" data-section="earnings">
-      <span>💰</span> Ganancias
-    </a>
-    <a href="#" class="nav-item" data-section="referrals">
-      <span>🔗</span> Referidos
-    </a>
-    <a href="#" class="nav-item" data-section="withdraw">
-      <span>💳</span> Retiros
-    </a>
-  </nav>
-  <div class="sidebar-footer">
-    <button class="btn-logout" onclick="logout()">🚪 Cerrar sesión</button>
-  </div>
+  <h2>💰 EarnPro</h2>
+
+  <a href="#" class="nav-item active" data-section="dashboard">📊 Dashboard</a>
+  <a href="#" class="nav-item" data-section="earnings">💰 Ganar</a>
+  <a href="#" class="nav-item" data-section="referrals">🔗 Referidos</a>
+  <a href="#" class="nav-item" data-section="withdraw">💳 Retiro</a>
+  <a href="#" class="nav-item" data-section="admin">🛠 Admin</a>
+
+  <button onclick="logout()">🚪 Salir</button>
 </div>
 
-<!-- MAIN CONTENT -->
+<!-- MAIN -->
 <div class="main-content">
 
-  <!-- HEADER -->
-  <div class="header-hero">
-    <div class="header-content">
-      <h1>Panel de Control</h1>
-      <p>Bienvenido a EarnPro • Gana dinero real hoy</p>
-    </div>
-  </div>
+<!-- DASHBOARD -->
+<section id="dashboard-section" class="section-active">
 
-  <!-- MAIN CONTAINER -->
-  <div class="main-container">
+<h2>Panel</h2>
 
-    <!-- SECTION: DASHBOARD -->
-    <section id="dashboard-section" class="section-active">
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon">💵</div>
-          <div class="stat-content">
-            <h3>Saldo Total</h3>
-            <p id="balance">$0.00</p>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">📈</div>
-          <div class="stat-content">
-            <h3>Ganancias Hoy</h3>
-            <p id="todayEarnings">$0.00</p>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">🎥</div>
-          <div class="stat-content">
-            <h3>Videos</h3>
-            <p id="videos">0/6</p>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">👥</div>
-          <div class="stat-content">
-            <h3>Referidos</h3>
-            <p id="refCount">0</p>
-          </div>
-        </div>
-      </div>
+<p>Saldo: <span id="balance">$0.00</span></p>
+<p>Hoy: <span id="todayEarnings">$0.00</span></p>
+<p>Videos: <span id="videosLeft">6</span></p>
 
-      <div class="section-card">
-        <h2>⚡ Acciones Rápidas</h2>
-        <div class="quick-actions">
-          <button class="btn-action btn-video" onclick="startVideo()">
-            <span class="action-icon">🎥</span>
-            <span class="action-text">Ver Video</span>
-            <span class="action-reward">+$0.02</span>
-          </button>
-          <button class="btn-action btn-game" onclick="playGame()">
-            <span class="action-icon">🎮</span>
-            <span class="action-text">Jugar</span>
-            <span class="action-reward">+$0.05</span>
-          </button>
-          <button class="btn-action btn-spin" onclick="spin()">
-            <span class="action-icon">🎰</span>
-            <span class="action-text">Ruleta</span>
-            <span class="action-reward">Hasta $0.10</span>
-          </button>
-          <button class="btn-action btn-daily" onclick="daily()">
-            <span class="action-icon">🎁</span>
-            <span class="action-text">Diario</span>
-            <span class="action-reward">+$0.20</span>
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION: EARNINGS -->
-    <section id="earnings-section" class="section-hidden">
-      <div class="section-card">
-        <h2>💰 Centro de Ganancias</h2>
-        <div class="earnings-grid">
-          <div class="earning-method">
-            <div class="method-header">
-              <h3>🎥 Videos</h3>
-              <span class="method-badge">Restantes: <span id="videosLeft">6</span></span>
-            </div>
-            <p class="method-description">Mira videos cortos y gana dinero instantáneamente</p>
-            <button class="btn-pro btn-video" onclick="startVideo()" style="width: 100%; background:#22c55e; color:#000; border:none; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer;">▶️ Ver Video</button>
-          </div>
-          <div class="earning-method">
-            <div class="method-header">
-              <h3>🎮 Juegos</h3>
-              <span class="method-badge">Ilimitado</span>
-            </div>
-            <p class="method-description">Juega y completa desafíos para ganar dinero</p>
-            <button class="btn-pro btn-game" onclick="playGame()" style="width: 100%; background:#3b82f6; color:#fff; border:none; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer;">🎮 Jugar</button>
-          </div>
-          <div class="earning-method">
-            <div class="method-header">
-              <h3>⭐ Ofertas Premium</h3>
-              <span class="method-badge">Máxima Ganancia</span>
-            </div>
-            <p class="method-description">Completa ofertas premium de AdGem y gana dinero real</p>
-            <button class="btn-pro btn-subscription" onclick="openSubscription()" style="width: 100%; background:#f59e0b; color:#000; border:none; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer;">💎 Abrir Ofertas</button>
-          </div>
-        </div>
-
-        <div style="margin-top: 25px;">
-          <h3 style="margin-bottom: 15px;">📢 Ofertas Especiales (CPA)</h3>
-          <div id="offers" style="min-height: 50px;">
-            <p style="color: #94a3b8;">Cargando ofertas...</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION: REFERRALS -->
-    <section id="referrals-section" class="section-hidden">
-      <div class="section-card">
-        <h2>🔗 Sistema de Referidos</h2>
-        <p style="font-size: 14px; color: #94a3b8; margin-bottom: 20px;">Gana $1.00 por cada amigo que se registre con tu enlace.</p>
-        <div class="referral-info">
-          <div class="referral-stat">
-            <h4>Referidos Totales</h4>
-            <p id="totalReferrals">0</p>
-          </div>
-          <div class="referral-stat">
-            <h4>Ganancias</h4>
-            <p id="referralEarnings">$0.00</p>
-          </div>
-        </div>
-        <div style="margin-top: 20px;">
-          <h3 style="margin-bottom: 10px;">Tu Enlace</h3>
-          <div style="display: flex; gap: 10px;">
-            <input type="text" id="refLink" readonly style="flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #22c55e; padding: 12px; border-radius: 8px;" value="Cargando...">
-            <button onclick="copyRef()" style="background:#22c55e; color:#000; border:none; padding:0 20px; border-radius:8px; font-weight:bold; cursor:pointer;">Copiar</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION: WITHDRAWALS -->
-    <section id="withdraw-section" class="section-hidden">
-      <div class="section-card">
-        <h2>💳 Solicitar Retiro</h2>
-        <p style="font-size: 14px; color: #94a3b8; margin-bottom: 20px;">Mínimo $5.00 vía PayPal.</p>
-        <div class="withdraw-form">
-          <div class="form-group">
-            <label>Email de PayPal</label>
-            <input type="email" id="email" placeholder="tu@email.com">
-          </div>
-          <div class="form-group">
-            <label>Monto a Retirar</label>
-            <input type="number" id="amount" placeholder="Mínimo 5.00" step="0.01">
-          </div>
-          <p style="margin-bottom: 15px;">Saldo Disponible: <span id="availableBalance" style="color:#22c55e; font-weight:bold;">$0.00</span></p>
-          <button onclick="withdraw()" style="width: 100%; background:#22c55e; color:#000; border:none; padding:14px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:16px;">🚀 Solicitar Retiro</button>
-        </div>
-      </div>
-    </section>
-
-  </div>
+<div>
+<button onclick="startVideo()">🎥 Video</button>
+<button onclick="playGame()">🎮 Juego</button>
+<button onclick="spin()">🎰 Spin</button>
+<button onclick="daily()">🎁 Diario</button>
 </div>
 
+</section>
+
+<!-- GANANCIAS -->
+<section id="earnings-section" class="section-hidden">
+
+<h2>Ganar Dinero</h2>
+
+<button onclick="startVideo()">🎥 Ver Video</button>
+<button onclick="playGame()">🎮 Jugar</button>
+
+<!-- 🔥 BOTONES CPA EXTRA -->
+<button onclick="openOfferwall()">⭐ Ofertas PRO</button>
+<button onclick="triggerCPA()">💰 Oferta Rápida</button>
+
+<!-- 🔥 VIRAL -->
+<button onclick="shareWhatsApp()">📲 Compartir WhatsApp</button>
+
+</section>
+
+<!-- REFERIDOS -->
+<section id="referrals-section" class="section-hidden">
+
+<h2>Referidos</h2>
+
+<input id="refLink" readonly style="width:100%">
+<button onclick="copyRef()">Copiar</button>
+
+</section>
+
+<!-- RETIRO -->
+<section id="withdraw-section" class="section-hidden">
+
+<h2>Retiro</h2>
+
+<input id="email" placeholder="PayPal">
+<input id="amount" placeholder="Monto">
+
+<button onclick="withdraw()">Retirar</button>
+
+</section>
+
+<!-- 🔥 ADMIN PANEL -->
+<section id="admin-section" class="section-hidden">
+
+<h2>🛠 Panel Admin</h2>
+
+<div class="admin-box">
+<p>Usuarios: <span id="adminUsers">0</span></p>
+<p>Clicks: <span id="adminClicks">0</span></p>
+</div>
+
+</section>
+
+</div>
+
+<!-- JS -->
 <script type="module" src="/js/dashboard.js"></script>
 
+<!-- NAV -->
 <script>
-  document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', function(e) {
-      e.preventDefault();
-      const section = this.dataset.section;
+document.querySelectorAll('.nav-item').forEach(btn=>{
+  btn.onclick = e=>{
+    e.preventDefault()
 
-      document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-      this.classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'))
+    btn.classList.add('active')
 
-      document.querySelectorAll('section').forEach(sec => {
-        sec.classList.remove('section-active');
-        sec.classList.add('section-hidden');
-      });
+    document.querySelectorAll('section').forEach(s=>{
+      s.classList.remove('section-active')
+      s.classList.add('section-hidden')
+    })
 
-      document.getElementById(section + '-section').classList.add('section-active');
-      document.getElementById(section + '-section').classList.remove('section-hidden');
-    });
-  });
+    document.getElementById(btn.dataset.section + "-section").classList.add('section-active')
+  }
+})
 </script>
 
-<!-- 🔥 MONETAG (BIEN PUESTO) -->
+<!-- 🔥 MONETAG -->
 <script>
 (function(s){
   s.dataset.zone='10877528';
