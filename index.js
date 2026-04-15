@@ -56,8 +56,9 @@ app.all("/postback", async (req, res) => {
     const payout = parseFloat(data.payout || 0);
     const password = data.password;
 
-    if (password && password !== "Jhadenjerielpro2201") return res.send("denied");
-    if (!subid || isNaN(payout)) return res.send("invalid");
+   if (password && password !== "EarnPro2026" && password !== "Jhadenjerielpro2201") {
+  return res.send("denied");
+}
 
     const userRef = db.collection("users").doc(subid);
     const userDoc = await userRef.get();
