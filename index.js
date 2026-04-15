@@ -134,6 +134,50 @@ app.get("/admin/reject", async (req, res) => {
   }
 });
 
+// ============================================
+// 🎯 POSTBACK CPX RESEARCH
+// ============================================
+app.all("/postback-cpx", async (req, res) => {
+  if (!db) return res.status(500).send("Database not initialized");
+  
+  try {
+    const data = req.method === "POST" ? req.body : req.query;
+    
+    // CPX envía: status, trans_id, user_id, amount_local, amount_usd, etc.
+    const subid = data.user_id;
+    const payout = parseFloat(data.amount_local || 0);
+    
+    if (!subid) return res.send("no user_id");
+
+    const userRef = db.collection("users").doc(subid);
+    const userDoc = await userRef.get();
+    if (!userDoc.exists) return res.send("no user");
+
+    // Guardar conversión
+    await db.collection("conversions").add({
+      uid: subid,
+      payout: payout,
+      type: "cpx_research",
+      trans_id: data.trans_id || "unknown",
+      date: Date.now(),
+      ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress
+    });
+
+    // Actualizar saldo del usuario
+    await userRef.update({
+      balance: admin.firestore.FieldValue.increment(payout),
+      todayEarnings: admin.firestore.FieldValue.increment(payout),
+      lastUpdate: Date.now()
+    });
+
+    console.log("💰 CPX POSTBACK OK:", subid, payout);
+    res.send("ok");
+  } catch (err) {
+    console.error("❌ cpx postback error:", err);
+    res.send("error");
+  }
+});
+
 // 🚀 START
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
