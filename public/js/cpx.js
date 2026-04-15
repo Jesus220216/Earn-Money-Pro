@@ -25,7 +25,7 @@ export function initCPX(userId) {
 
     const config = {
         general_config: {
-            app_id: 32365, // Using the AdGem app_id as placeholder or user should provide one
+            app_id: 32499, // CPX Research App ID
             ext_user_id: userId,
             email: "",
             username: "",
