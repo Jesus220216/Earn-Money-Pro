@@ -29,10 +29,11 @@ const CPA_LINK = "https://getafilenow.com/1890309";
 
 // 🔥 CPX RESEARCH CONFIG
 const CPX_CONFIG = {
-  app_id: 32365,
+  app_id: 32499, // <--- CAMBIA ESTO A 32499
   enabled: true,
   wall_url: "https://wall.cpx-research.com/index.php"
 };
+
 
 // ============================================
 // 🧠 SISTEMA DE APRENDIZAJE (TOP OFERTA)
