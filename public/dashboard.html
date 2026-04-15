@@ -7,6 +7,7 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script type="text/javascript" src="https://cdn.cpx-research.com/assets/js/script_tag_v2.0.js"></script>
   
   <style>
     * {
@@ -1052,8 +1053,66 @@
 
   window.openCPXWall = () => {
     if (!user?.uid) return showToast("Login requerido ❌");
-    showToast("Abriendo encuestas CPX Research...");
-    // CPX Research wall would be initialized here
+    
+    const config = {
+      general_config: {
+        app_id: 32499,
+        ext_user_id: user.uid,
+        email: user.email || "",
+        username: user.displayName || "",
+        secure_hash: "",
+        subid_1: "",
+        subid_2: "",
+      },
+      style_config: {
+        text_color: "#e5e7eb",
+        survey_box: {
+          topbar_background_color: "#10B981",
+          box_background_color: "#1f2937",
+          rounded_borders: true,
+          stars_filled: "#F59E0B",
+        },
+      },
+      script_config: [
+        {
+          div_id: "cpx-fullscreen",
+          theme_style: 1,
+          order_by: 2,
+          limit_surveys: 7
+        }
+      ],
+      debug: false,
+      useIFrame: true,
+      iFramePosition: 1,
+      functions: {
+        no_surveys_available: () => {
+          console.log("CPX: No surveys available");
+          const container = document.getElementById("cpx-fullscreen");
+          if (container) container.innerHTML = "<p>No hay encuestas disponibles en este momento. Intenta más tarde.</p>";
+        },
+        count_new_surveys: (count) => {
+          console.log("CPX: New surveys count:", count);
+        },
+        get_all_surveys: (surveys) => {
+          console.log("CPX: All surveys:", surveys);
+        },
+        get_transaction: (transactions) => {
+          console.log("CPX: Transactions:", transactions);
+        }
+      }
+    };
+
+    window.config = config;
+    
+    // Si ya existe el script de CPX, lo reiniciamos si es necesario o simplemente dejamos que actúe
+    // El script de CPX Research v2.0 se inicializa automáticamente con window.config
+    showToast("📋 Cargando encuestas CPX Research...");
+    
+    // Forzar renderizado si el contenedor está vacío
+    const container = document.getElementById("cpx-fullscreen");
+    if (container && container.innerHTML.includes("aparecerán aquí")) {
+        container.innerHTML = "";
+    }
   };
 
   // ============================================
