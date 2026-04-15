@@ -3,12 +3,721 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Centro de Ganancias - EarnPro</title>
+  <title>Dashboard Pro - EarnPro | Gana Dinero Real</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/dashboard.css">
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #10B981;
+      --primary-dark: #059669;
+      --primary-light: #D1FAE5;
+      --secondary: #3B82F6;
+      --secondary-dark: #1D4ED8;
+      --accent: #F59E0B;
+      --danger: #EF4444;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --purple: #8B5CF6;
+      --bg-dark: #0b1220;
+      --bg-darker: #0f172a;
+      --bg-card: rgba(255,255,255,0.04);
+      --border-color: rgba(255,255,255,0.08);
+      --text-primary: #e5e7eb;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    html, body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    /* ============================================
+       SIDEBAR NAVIGATION
+       ============================================ */
+
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 260px;
+      height: 100vh;
+      background: linear-gradient(180deg, var(--bg-darker) 0%, rgba(15, 23, 42, 0.8) 100%);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      z-index: 1000;
+      overflow-y: auto;
+      backdrop-filter: blur(10px);
+    }
+
+    .sidebar-header {
+      padding: 25px 20px;
+      border-bottom: 1px solid var(--border-color);
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, transparent 100%);
+    }
+
+    .sidebar-header h2 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 20px 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-size: 14px;
+      font-weight: 600;
+      border-left: 3px solid transparent;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .nav-item:hover {
+      background: rgba(16, 185, 129, 0.08);
+      color: var(--primary);
+      padding-left: 22px;
+    }
+
+    .nav-item.active {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--primary);
+      border-left-color: var(--primary);
+    }
+
+    .nav-item span {
+      font-size: 18px;
+      min-width: 24px;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--danger);
+      color: white;
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    .sidebar-footer {
+      padding: 15px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .btn-logout {
+      width: 100%;
+      padding: 12px;
+      background: rgba(239, 68, 68, 0.1);
+      color: #EF4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 13px;
+    }
+
+    .btn-logout:hover {
+      background: rgba(239, 68, 68, 0.2);
+      transform: translateY(-2px);
+    }
+
+    /* ============================================
+       MAIN CONTENT
+       ============================================ */
+
+    .main-content {
+      margin-left: 260px;
+      min-height: 100vh;
+      background: var(--bg-dark);
+    }
+
+    /* HEADER */
+    .header-hero {
+      padding: 35px 40px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .header-content h1 {
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 5px;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-content p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-time {
+      text-align: right;
+    }
+
+    .header-time .time {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .header-time .date {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* MAIN CONTAINER */
+    .main-container {
+      padding: 30px 40px;
+      max-width: 1600px;
+    }
+
+    /* ============================================
+       STATS GRID
+       ============================================ */
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.05) 100%);
+      pointer-events: none;
+    }
+
+    .stat-card:hover {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%);
+      border-color: rgba(16, 185, 129, 0.3);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow);
+    }
+
+    .stat-icon {
+      font-size: 40px;
+      min-width: 60px;
+      text-align: center;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+    }
+
+    .stat-content {
+      flex: 1;
+      position: relative;
+      z-index: 1;
+    }
+
+    .stat-content h3 {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 600;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-content p {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--primary);
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    /* ============================================
+       SECTION CARDS
+       ============================================ */
+
+    .section-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 25px;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .section-card:hover {
+      border-color: rgba(16, 185, 129, 0.2);
+    }
+
+    .section-card h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+    }
+
+    /* ============================================
+       QUICK ACTIONS
+       ============================================ */
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 15px;
+    }
+
+    .btn-action {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 24px 16px;
+      border: none;
+      border-radius: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: white;
+      font-size: 13px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-action::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      transition: left 0.3s ease;
+    }
+
+    .btn-action:hover::before {
+      left: 100%;
+    }
+
+    .btn-action:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow);
+    }
+
+    .action-icon {
+      font-size: 32px;
+    }
+
+    .action-text {
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .action-reward {
+      font-size: 10px;
+      opacity: 0.8;
+    }
+
+    .btn-video { background: linear-gradient(135deg, #10B981 0%, #059669 100%); }
+    .btn-game { background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%); }
+    .btn-spin { background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); }
+    .btn-daily { background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%); }
+    .btn-cpx { background: linear-gradient(135deg, #EC4899 0%, #BE185D 100%); }
+    .btn-whatsapp { background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); }
+
+    /* ============================================
+       OFFERS SECTION
+       ============================================ */
+
+    .offers-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 18px;
+      margin-top: 20px;
+    }
+
+    .offer-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 20px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .offer-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+    }
+
+    .offer-card:hover {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+      border-color: rgba(16, 185, 129, 0.3);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow);
+    }
+
+    .offer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 12px;
+    }
+
+    .offer-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .offer-badge {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--primary);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .offer-description {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    .offer-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .offer-payout {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .offer-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .offer-btn:hover {
+      background: var(--primary-dark);
+      transform: scale(1.05);
+    }
+
+    /* ============================================
+       PROGRESS SECTION
+       ============================================ */
+
+    .progress-section {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .progress-item {
+      margin-bottom: 15px;
+    }
+
+    .progress-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+      transition: width 0.3s ease;
+      border-radius: 10px;
+    }
+
+    /* ============================================
+       REFERRAL SECTION
+       ============================================ */
+
+    .referral-box {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+      border: 1px solid rgba(139, 92, 246, 0.2);
+      border-radius: 14px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .referral-link-container {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .referral-input {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: rgba(0, 0, 0, 0.3);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .referral-btn {
+      padding: 12px 20px;
+      background: var(--purple);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .referral-btn:hover {
+      background: #7C3AED;
+      transform: translateY(-2px);
+    }
+
+    /* ============================================
+       WITHDRAW SECTION
+       ============================================ */
+
+    .withdraw-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-group input {
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: rgba(0, 0, 0, 0.3);
+      color: var(--text-primary);
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: rgba(0, 0, 0, 0.5);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    .btn-withdraw {
+      grid-column: 1 / -1;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 14px;
+    }
+
+    .btn-withdraw:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    /* ============================================
+       TOAST NOTIFICATIONS
+       ============================================ */
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      padding: 14px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      z-index: 9999;
+      animation: slideIn 0.3s ease;
+      box-shadow: var(--shadow);
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    /* ============================================
+       RESPONSIVE
+       ============================================ */
+
+    @media (max-width: 1024px) {
+      .sidebar {
+        width: 220px;
+      }
+
+      .main-content {
+        margin-left: 220px;
+      }
+
+      .main-container {
+        padding: 20px 25px;
+      }
+
+      .header-hero {
+        padding: 25px 25px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        left: -260px;
+        transition: left 0.3s ease;
+        width: 260px;
+      }
+
+      .sidebar.active {
+        left: 0;
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .quick-actions {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .offers-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .section-hidden { display: none; }
     .section-active { display: block; }
   </style>
@@ -23,10 +732,22 @@
   </div>
 
   <nav class="sidebar-nav">
-    <a href="#" class="nav-item active" data-section="dashboard"><span>📊</span> Dashboard</a>
-    <a href="#" class="nav-item" data-section="earnings"><span>💰</span> Ganancias</a>
-    <a href="#" class="nav-item" data-section="referrals"><span>🔗</span> Referidos</a>
-    <a href="#" class="nav-item" data-section="withdraw"><span>💳</span> Retiros</a>
+    <a href="#" class="nav-item active" data-section="dashboard">
+      <span>📊</span> Dashboard
+    </a>
+    <a href="#" class="nav-item" data-section="earnings">
+      <span>💰</span> Ganancias
+      <span class="nav-badge">3</span>
+    </a>
+    <a href="#" class="nav-item" data-section="cpx">
+      <span>📋</span> CPX Research
+    </a>
+    <a href="#" class="nav-item" data-section="referrals">
+      <span>🔗</span> Referidos
+    </a>
+    <a href="#" class="nav-item" data-section="withdraw">
+      <span>💳</span> Retiros
+    </a>
   </nav>
 
   <div class="sidebar-footer">
@@ -34,21 +755,28 @@
   </div>
 </div>
 
-<!-- MAIN -->
+<!-- MAIN CONTENT -->
 <div class="main-content">
 
+  <!-- HEADER -->
   <div class="header-hero">
     <div class="header-content">
       <h1>Panel de Control</h1>
-      <p>Bienvenido a EarnPro • Gana dinero real hoy</p>
+      <p>✨ Bienvenido a EarnPro • Gana dinero real hoy</p>
+    </div>
+    <div class="header-time">
+      <div class="time" id="current-time">00:00</div>
+      <div class="date" id="current-date">Cargando...</div>
     </div>
   </div>
 
+  <!-- MAIN CONTAINER -->
   <div class="main-container">
 
-    <!-- DASHBOARD -->
+    <!-- DASHBOARD SECTION -->
     <section id="dashboard-section" class="section-active">
 
+      <!-- STATS GRID -->
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-icon">💵</div>
@@ -69,7 +797,7 @@
         <div class="stat-card">
           <div class="stat-icon">🎥</div>
           <div class="stat-content">
-            <h3>Videos</h3>
+            <h3>Videos Disponibles</h3>
             <p id="videos">0/6</p>
           </div>
         </div>
@@ -77,72 +805,166 @@
         <div class="stat-card">
           <div class="stat-icon">👥</div>
           <div class="stat-content">
-            <h3>Referidos</h3>
+            <h3>Referidos Activos</h3>
             <p id="refCount">0</p>
           </div>
         </div>
       </div>
 
-      <!-- ACCIONES -->
+      <!-- QUICK ACTIONS -->
       <div class="section-card">
         <h2>⚡ Acciones Rápidas</h2>
-
         <div class="quick-actions">
-
-          <button class="btn-action btn-video" onclick="startVideo()">🎥 Ver Video +$0.02</button>
-          <button class="btn-action btn-game" onclick="playGame()">🎮 Jugar +$0.05</button>
-          <button class="btn-action btn-spin" onclick="spin()">🎰 Ruleta</button>
-          <button class="btn-action btn-daily" onclick="daily()">🎁 Diario +$0.20</button>
-
-          <!-- 🔥 WHATSAPP BUTTON -->
-          <button class="btn-action" style="background:#25D366;color:#000;font-weight:bold;" onclick="shareWhatsApp()">
-            📲 Compartir WhatsApp
+          <button class="btn-action btn-video" onclick="startVideo()">
+            <div class="action-icon">🎥</div>
+            <div class="action-text">Ver Video</div>
+            <div class="action-reward">+$0.02</div>
           </button>
+          <button class="btn-action btn-game" onclick="playGame()">
+            <div class="action-icon">🎮</div>
+            <div class="action-text">Jugar</div>
+            <div class="action-reward">+$0.05</div>
+          </button>
+          <button class="btn-action btn-spin" onclick="spin()">
+            <div class="action-icon">🎰</div>
+            <div class="action-text">Ruleta</div>
+            <div class="action-reward">Bonus</div>
+          </button>
+          <button class="btn-action btn-daily" onclick="daily()">
+            <div class="action-icon">🎁</div>
+            <div class="action-text">Diario</div>
+            <div class="action-reward">+$0.20</div>
+          </button>
+          <button class="btn-action btn-cpx" onclick="openCPXWall()">
+            <div class="action-icon">📋</div>
+            <div class="action-text">Encuestas</div>
+            <div class="action-reward">Hasta $5</div>
+          </button>
+          <button class="btn-action btn-whatsapp" onclick="shareWhatsApp()">
+            <div class="action-icon">📲</div>
+            <div class="action-text">WhatsApp</div>
+            <div class="action-reward">Compartir</div>
+          </button>
+        </div>
+      </div>
 
+      <!-- PROGRESS SECTION -->
+      <div class="section-card">
+        <h2>📊 Tu Progreso Hoy</h2>
+        <div class="progress-section">
+          <div class="progress-item">
+            <div class="progress-label">
+              <span>Objetivo Diario</span>
+              <span id="progress-percent">0%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+          </div>
         </div>
       </div>
 
     </section>
 
-    <!-- EARNINGS -->
+    <!-- EARNINGS SECTION -->
     <section id="earnings-section" class="section-hidden">
       <div class="section-card">
         <h2>💰 Centro de Ganancias</h2>
-
-        <button onclick="startVideo()">🎥 Ver Video</button>
-        <button onclick="playGame()">🎮 Jugar</button>
-
-        <div id="offers">Cargando ofertas...</div>
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">Explora todas las formas de ganar dinero en EarnPro</p>
+        
+        <div class="offers-container" id="offers">
+          <div style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary);">
+            Cargando ofertas...
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- REFERRALS -->
+    <!-- CPX RESEARCH SECTION -->
+    <section id="cpx-section" class="section-hidden">
+      <div class="section-card">
+        <h2>📋 CPX Research - Encuestas Remuneradas</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">Completa encuestas y gana dinero. Hasta $5 por encuesta.</p>
+        
+        <button class="btn-action btn-cpx" onclick="openCPXWall()" style="width: 100%; margin-bottom: 20px;">
+          <div class="action-icon">📋</div>
+          <div class="action-text">Abrir Centro de Encuestas</div>
+        </button>
+
+        <div id="cpx-fullscreen" style="min-height: 400px; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 20px; text-align: center; color: var(--text-secondary);">
+          Las encuestas aparecerán aquí...
+        </div>
+      </div>
+    </section>
+
+    <!-- REFERRALS SECTION -->
     <section id="referrals-section" class="section-hidden">
       <div class="section-card">
-        <h2>🔗 Referidos</h2>
+        <h2>🔗 Programa de Referidos</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">Gana 10% de las ganancias de tus referidos</p>
+        
+        <div class="referral-box">
+          <h3>Tu Enlace de Referencia</h3>
+          <div class="referral-link-container">
+            <input type="text" id="refLink" class="referral-input" readonly placeholder="Tu enlace aparecerá aquí">
+            <button class="referral-btn" onclick="copyRef()">📋 Copiar</button>
+          </div>
+        </div>
 
-        <input type="text" id="refLink" readonly>
-
-        <button onclick="copyRef()">Copiar</button>
+        <div class="section-card" style="margin-top: 20px;">
+          <h3>Estadísticas de Referidos</h3>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">👥</div>
+              <div class="stat-content">
+                <h3>Total de Referidos</h3>
+                <p id="totalReferrals">0</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">💵</div>
+              <div class="stat-content">
+                <h3>Ganancias por Referidos</h3>
+                <p id="referralEarnings">$0.00</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- WITHDRAW -->
+    <!-- WITHDRAW SECTION -->
     <section id="withdraw-section" class="section-hidden">
       <div class="section-card">
-        <h2>💳 Retiro</h2>
+        <h2>💳 Solicitar Retiro</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">Mínimo: $5.00 | Máximo: Tu saldo disponible</p>
+        
+        <form class="withdraw-form" onsubmit="withdraw(event)">
+          <div class="form-group">
+            <label for="email">Correo PayPal</label>
+            <input type="email" id="email" placeholder="tu@email.com" required>
+          </div>
+          <div class="form-group">
+            <label for="amount">Cantidad a Retirar</label>
+            <input type="number" id="amount" placeholder="Mínimo $5" step="0.01" min="5" required>
+          </div>
+          <button type="submit" class="btn-withdraw">🚀 Solicitar Retiro</button>
+        </form>
 
-        <input type="email" id="email" placeholder="PayPal">
-        <input type="number" id="amount" placeholder="Mínimo 5">
-
-        <button onclick="withdraw()">Retirar</button>
+        <div style="margin-top: 20px; padding: 15px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; border-left: 3px solid var(--primary);">
+          <p style="font-size: 12px; color: var(--text-secondary);">
+            ✅ Los retiros se procesan dentro de 24-48 horas<br>
+            ✅ No hay comisiones de retiro<br>
+            ✅ Saldo actual: <span style="color: var(--primary); font-weight: 700;" id="availableBalance">$0.00</span>
+          </p>
+        </div>
       </div>
     </section>
 
   </div>
 </div>
 
-<!-- 🔥 MONETAG (CORRECTO Y LIMPIO) -->
+<!-- MONETAG SCRIPT -->
 <script>
   (function(s){
     s.dataset.zone='10877528';
@@ -151,37 +973,251 @@
   })(document.createElement('script'));
 </script>
 
-<!-- NAV SCRIPT -->
-<script>
-document.querySelectorAll('.nav-item').forEach(item => {
-  item.addEventListener('click', function(e) {
-    e.preventDefault();
+<!-- MAIN SCRIPT -->
+<script type="module">
+  import { auth, db } from "./js/firebase.js";
+  import {
+    doc,
+    getDoc,
+    updateDoc,
+    increment,
+    addDoc,
+    collection,
+    onSnapshot,
+    getDocs,
+    query,
+    where
+  } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-    const section = this.dataset.section;
+  // ============================================
+  // VARIABLES
+  // ============================================
 
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    this.classList.add('active');
+  let user;
+  let balance = 0;
+  let videosLeft = 6;
+  let taskCooldown = false;
 
-    document.querySelectorAll('section').forEach(s => {
-      s.classList.remove('section-active');
-      s.classList.add('section-hidden');
+  const CPA_LINK = "https://getafilenow.com/1890309";
+
+  // ============================================
+  // UPDATE TIME
+  // ============================================
+
+  function updateTime() {
+    const now = new Date();
+    document.getElementById('current-time').textContent = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('current-date').textContent = now.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  setInterval(updateTime, 1000);
+  updateTime();
+
+  // ============================================
+  // NAVIGATION
+  // ============================================
+
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      e.preventDefault();
+      const section = this.dataset.section;
+
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      this.classList.add('active');
+
+      document.querySelectorAll('section').forEach(s => {
+        s.classList.remove('section-active');
+        s.classList.add('section-hidden');
+      });
+
+      document.getElementById(section + '-section').classList.add('section-active');
     });
-
-    document.getElementById(section + '-section').classList.add('section-active');
   });
-});
-</script>
 
-<!-- 📲 WHATSAPP -->
-<script>
-function shareWhatsApp() {
-  const link = document.getElementById("refLink")?.value || window.location.href;
-  const msg = "💰 Gana dinero aquí: " + link;
-  window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank");
-}
-</script>
+  // ============================================
+  // TOAST NOTIFICATIONS
+  // ============================================
 
-<script type="module" src="/js/dashboard.js"></script>
+  function showToast(msg) {
+    const t = document.createElement("div");
+    t.className = "toast";
+    t.innerText = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+  }
+
+  // ============================================
+  // CPX RESEARCH
+  // ============================================
+
+  window.openCPXWall = () => {
+    if (!user?.uid) return showToast("Login requerido ❌");
+    showToast("Abriendo encuestas CPX Research...");
+    // CPX Research wall would be initialized here
+  };
+
+  // ============================================
+  // WHATSAPP SHARE
+  // ============================================
+
+  window.shareWhatsApp = () => {
+    const link = document.getElementById("refLink")?.value || window.location.href;
+    const msg = "💰 ¡Gana dinero con EarnPro! Acceso exclusivo a encuestas, videos y más. " + link;
+    window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank");
+  };
+
+  // ============================================
+  // COPY REFERRAL LINK
+  // ============================================
+
+  window.copyRef = async () => {
+    const el = document.getElementById("refLink");
+    await navigator.clipboard.writeText(el.value);
+    showToast("¡Enlace copiado! ✅");
+  };
+
+  // ============================================
+  // LOGOUT
+  // ============================================
+
+  window.logout = () => {
+    auth.signOut().then(() => {
+      window.location.href = "index.html";
+    });
+  };
+
+  // ============================================
+  // QUICK ACTIONS
+  // ============================================
+
+  function doTask() {
+    if (taskCooldown) return showToast("Espera ⏳");
+    taskCooldown = true;
+    showToast("💰 Completa la oferta y gana dinero");
+    setTimeout(() => (taskCooldown = false), 2500);
+  }
+
+  window.startVideo = () => {
+    if (videosLeft <= 0) return showToast("Sin videos disponibles ❌");
+    videosLeft--;
+    doTask();
+  };
+
+  window.playGame = () => {
+    doTask();
+  };
+
+  window.spin = () => {
+    const rand = Math.random();
+    if (rand < 0.3) {
+      showToast("🎉 ¡Ganaste bonus!");
+    }
+    doTask();
+  };
+
+  window.daily = async () => {
+    const ref = doc(db, "users", user.uid);
+    const snap = await getDoc(ref);
+    const d = snap.data();
+    const today = new Date().toDateString();
+
+    if (d.lastDailyDate === today) {
+      return showToast("Ya reclamado hoy ❌");
+    }
+    doTask();
+  };
+
+  // ============================================
+  // WITHDRAW
+  // ============================================
+
+  window.withdraw = async (e) => {
+    e.preventDefault();
+    const amount = parseFloat(document.getElementById("amount").value);
+    const email = document.getElementById("email").value.trim();
+
+    if (!email || isNaN(amount) || amount < 5)
+      return showToast("Mínimo $5 ❌");
+
+    if (amount > balance)
+      return showToast("Saldo insuficiente ❌");
+
+    try {
+      await addDoc(collection(db, "withdrawals"), {
+        userId: user.uid,
+        amount,
+        email,
+        status: "pending",
+        date: Date.now()
+      });
+
+      await updateDoc(doc(db, "users", user.uid), {
+        balance: increment(-amount)
+      });
+
+      showToast("Retiro enviado 🚀");
+      document.querySelector('.withdraw-form').reset();
+    } catch (err) {
+      showToast("Error al procesar retiro ❌");
+    }
+  };
+
+  // ============================================
+  // REALTIME UI SYNC
+  // ============================================
+
+  function set(id, value, money = false) {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    el.innerText = money
+      ? "$" + parseFloat(value).toFixed(2)
+      : value;
+  }
+
+  function setupRealtime() {
+    onSnapshot(doc(db, "users", user.uid), (snap) => {
+      if (!snap.exists()) return;
+
+      const d = snap.data();
+
+      balance = d.balance || 0;
+      videosLeft = d.videosLeft ?? 6;
+
+      set("balance", balance, true);
+      set("availableBalance", balance, true);
+      set("todayEarnings", d.todayEarnings || 0, true);
+      set("videos", videosLeft + "/6");
+      set("refCount", d.referrals || 0);
+      set("totalReferrals", d.referrals || 0);
+      set("referralEarnings", d.referralEarnings || 0, true);
+
+      // Update progress
+      const dailyGoal = 5;
+      const progress = Math.min((d.todayEarnings || 0) / dailyGoal * 100, 100);
+      document.getElementById("progress-fill").style.width = progress + "%";
+      document.getElementById("progress-percent").textContent = Math.round(progress) + "%";
+
+      const refInput = document.getElementById("refLink");
+      if (refInput) {
+        refInput.value = window.location.origin + "/index.html?ref=" + user.uid;
+      }
+    });
+  }
+
+  // ============================================
+  // INIT
+  // ============================================
+
+  auth.onAuthStateChanged((u) => {
+    if (u) {
+      user = u;
+      setupRealtime();
+    } else {
+      window.location.href = "index.html";
+    }
+  });
+</script>
 
 </body>
 </html>
