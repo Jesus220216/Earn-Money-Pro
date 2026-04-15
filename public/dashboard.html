@@ -1114,7 +1114,10 @@
         container.innerHTML = "";
     }
   };
-
+  
+<iframe id="adgemFrame"
+style="position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none;">
+</iframe>
   // ============================================
   // WHATSAPP SHARE
   // ============================================
@@ -1264,19 +1267,20 @@
     });
   }
 
-  // ============================================
-  // INIT
-  // ============================================
+ <script>
+auth.onAuthStateChanged((u) => {
+  if (u) {
+    user = u;
+    setupRealtime();
 
-  auth.onAuthStateChanged((u) => {
-    if (u) {
-      user = u;
-      setupRealtime();
-    } else {
-      window.location.href = "index.html";
+    // 🔥 ADGEM OFFERWALL
+    const frame = document.getElementById("adgemFrame");
+    if (frame) {
+      frame.src = "https://adunits.adgem.com/wall?appid=32365&playerid=" + user.uid;
     }
-  });
-</script>
 
-</body>
-</html>
+  } else {
+    window.location.href = "index.html";
+  }
+});
+</script>
