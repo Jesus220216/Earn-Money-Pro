@@ -1263,17 +1263,21 @@
       }
     });
   }
-  <iframe id="adgemFrame"
+ <body>
+
+<!-- TODO TU CONTENIDO (panel, botones, etc.) -->
+
+<iframe id="adgemFrame"
 style="position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none;">
 </iframe>
 
-</script>
+<!-- TUS SCRIPTS -->
+<script>
 auth.onAuthStateChanged((u) => {
   if (u) {
     user = u;
     setupRealtime();
 
-    // 🔥 ADGEM OFFERWALL
     const frame = document.getElementById("adgemFrame");
     if (frame) {
       frame.src = "https://adunits.adgem.com/wall?appid=32365&playerid=" + user.uid;
@@ -1284,3 +1288,8 @@ auth.onAuthStateChanged((u) => {
   }
 });
 </script>
+
+
+</body>
+</html>
+
