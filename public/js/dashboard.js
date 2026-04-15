@@ -27,6 +27,13 @@ let taskCooldown = false;
 
 const CPA_LINK = "https://getafilenow.com/1890309";
 
+// 🔥 CPX RESEARCH CONFIG
+const CPX_CONFIG = {
+  app_id: 32365,
+  enabled: true,
+  wall_url: "https://wall.cpx-research.com/index.php"
+};
+
 // ============================================
 // 🧠 SISTEMA DE APRENDIZAJE (TOP OFERTA)
 // ============================================
@@ -175,6 +182,21 @@ window.openSubscription = () => {
   window.open(adgem, "_blank");
 };
 
+// 🔥 CPX RESEARCH WALL
+window.openCPXWall = () => {
+  if (!user?.uid) return showToast("Login requerido ❌");
+  
+  if (!CPX_CONFIG.enabled) return showToast("CPX Research no disponible ❌");
+  
+  const cpxUrl = `${CPX_CONFIG.wall_url}?app_id=${CPX_CONFIG.app_id}&ext_user_id=${user.uid}&tracking_id=${user.uid}`;
+  
+  showToast("📋 Abriendo encuestas CPX Research...");
+  
+  setTimeout(() => {
+    window.open(cpxUrl, "_blank");
+  }, 600);
+};
+
 // ============================================
 // 🎮 SISTEMA DE GANANCIAS (ENGAGEMENT)
 // ============================================
@@ -305,6 +327,9 @@ auth.onAuthStateChanged((u) => {
   if (u) {
     user = u;
     setupRealtime();
+    
+    // Log CPX integration status
+    console.log("✅ CPX Research integrado:", CPX_CONFIG);
   } else {
     window.location.href = "index.html";
   }
