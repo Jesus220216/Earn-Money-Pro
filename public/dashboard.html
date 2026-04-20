@@ -778,6 +778,13 @@
     <a href="#" class="nav-item" data-section="withdraw">
       <span>💳</span> Retiros
     </a>
+    <div style="margin: 10px 18px; height: 1px; background: var(--border-color);"></div>
+    <a href="support.html" class="nav-item">
+      <span>🛠️</span> Soporte Técnico
+    </a>
+    <a href="terms.html" class="nav-item">
+      <span>📜</span> Términos
+    </a>
   </nav>
 
   <div class="sidebar-footer">
@@ -1262,6 +1269,16 @@ window.closeOffers = () => {
 
   window.withdraw = async (e) => {
     e.preventDefault();
+
+    // Verificación de cuenta robusta
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+    const userData = userSnap.data();
+
+    if (userData.status === 'suspended') {
+      return showToast("Tu cuenta está suspendida por actividad sospechosa ❌");
+    }
+
     const amount = parseFloat(document.getElementById("amount").value);
     const email = document.getElementById("email").value.trim();
 
