@@ -150,6 +150,43 @@
       background-color: var(--primary-hover);
     }
 
+    .btn-google {
+      width: 100%;
+      background-color: #fff;
+      color: #757575;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background-color 0.2s;
+    }
+
+    .btn-google:hover {
+      background-color: #f5f5f5;
+    }
+
+    .forgot-pass {
+      text-align: right;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+
+    .forgot-pass a {
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    .forgot-pass a:hover {
+      color: var(--primary-green);
+    }
+
     .switch-auth {
       text-align: center;
       margin-top: 20px;
@@ -255,9 +292,41 @@
       <div class="form-group">
         <input type="password" id="loginPassword" placeholder="Contraseña (mín. 6 caracteres)">
       </div>
+      <div class="forgot-pass">
+        <a href="#" onclick="toggleAuth(event, 'forgot')">¿Olvidaste tu contraseña?</a>
+      </div>
       <button class="btn-login" onclick="handleLogin()">Iniciar Sesión</button>
+      
+      <div style="display: flex; align-items: center; margin: 20px 0; gap: 10px;">
+        <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
+        <span style="font-size: 12px; color: var(--text-muted);">O continúa con</span>
+        <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
+      </div>
+
+      <button class="btn-google" onclick="handleGoogleAuth()">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" height="18">
+        Google
+      </button>
+
       <div class="switch-auth">
         ¿No tienes cuenta? <a href="#" onclick="toggleAuth(event, 'register')">Regístrate gratis</a>
+      </div>
+    </div>
+
+    <!-- Forgot Password View -->
+    <div id="forgotView" class="hidden">
+      <div class="card-title">
+        <span>🔑</span> Recuperar Cuenta
+      </div>
+      <p style="font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 20px;">
+        Ingresa tu correo y te enviaremos un enlace para restaurar tu contraseña.
+      </p>
+      <div class="form-group">
+        <input type="email" id="forgotEmail" placeholder="Correo electrónico">
+      </div>
+      <button class="btn-login" onclick="handleResetPassword()">Enviar Enlace</button>
+      <div class="switch-auth">
+        <a href="#" onclick="toggleAuth(event, 'login')">Volver al inicio de sesión</a>
       </div>
     </div>
 
@@ -273,6 +342,18 @@
         <input type="password" id="regPassword" placeholder="Contraseña (mín. 6 caracteres)">
       </div>
       <button class="btn-login" onclick="handleRegister()">Registrarse</button>
+
+      <div style="display: flex; align-items: center; margin: 20px 0; gap: 10px;">
+        <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
+        <span style="font-size: 12px; color: var(--text-muted);">O regístrate con</span>
+        <div style="flex: 1; height: 1px; background: var(--border-color);"></div>
+      </div>
+
+      <button class="btn-google" onclick="handleGoogleAuth()">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" height="18">
+        Google
+      </button>
+
       <div class="switch-auth">
         ¿Ya tienes cuenta? <a href="#" onclick="toggleAuth(event, 'login')">Inicia sesión</a>
       </div>
@@ -301,11 +382,23 @@
     💰 Monetiza tu web con Adsterra
   </a>
 
+  <footer style="margin-top: 40px; padding: 20px; text-align: center; border-top: 1px solid var(--border-color); width: 100%; max-width: 600px;">
+    <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+      <a href="terms.html" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">Términos y Condiciones</a>
+      <a href="privacy.html" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">Política de Privacidad</a>
+      <a href="support.html" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">Soporte</a>
+    </div>
+    <p style="color: var(--text-muted); font-size: 12px; margin-top: 15px;">© 2026 EarnPro. Todos los derechos reservados.</p>
+  </footer>
+
   <script type="module">
     import { auth } from './js/firebase.js';
     import { 
       signInWithEmailAndPassword, 
-      createUserWithEmailAndPassword 
+      createUserWithEmailAndPassword,
+      sendPasswordResetEmail,
+      GoogleAuthProvider,
+      signInWithPopup
     } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
     import { 
       doc, setDoc, getDoc, updateDoc, increment, addDoc, collection 
@@ -314,15 +407,16 @@
 
     window.toggleAuth = (e, mode) => {
       e.preventDefault();
-      const loginView = document.getElementById('loginView');
-      const registerView = document.getElementById('registerView');
-      if (mode === 'register') {
-        loginView.classList.add('hidden');
-        registerView.classList.remove('hidden');
-      } else {
-        loginView.classList.remove('hidden');
-        registerView.classList.add('hidden');
-      }
+      const views = {
+        login: document.getElementById('loginView'),
+        register: document.getElementById('registerView'),
+        forgot: document.getElementById('forgotView')
+      };
+      
+      Object.keys(views).forEach(v => {
+        if (v === mode) views[v].classList.remove('hidden');
+        else views[v].classList.add('hidden');
+      });
     };
 
     window.handleLogin = async () => {
@@ -338,12 +432,100 @@
       }
     };
 
+    window.handleResetPassword = async () => {
+      const email = document.getElementById('forgotEmail').value;
+      if (!email) return alert('Ingresa tu correo electrónico');
+      
+      try {
+        await sendPasswordResetEmail(auth, email);
+        alert('Enlace de recuperación enviado. Revisa tu bandeja de entrada.');
+        toggleAuth({preventDefault: () => {}}, 'login');
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    };
+
+    window.handleGoogleAuth = async () => {
+      const provider = new GoogleAuthProvider();
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        
+        // Verificar si el usuario ya existe en Firestore
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+        
+        if (!userSnap.exists()) {
+          // Crear perfil para nuevo usuario de Google
+          const ipCheck = await fetch('https://api.ipify.org?format=json').then(r => r.json()).catch(() => ({ip: 'unknown'}));
+          
+          let referrer = sessionStorage.getItem("referrer");
+          const urlParams = new URLSearchParams(window.location.search);
+          if (!referrer) referrer = urlParams.get("ref");
+
+          await setDoc(doc(db, "users", user.uid), {
+            uid: user.uid,
+            email: user.email,
+            balance: 0,
+            referrer: referrer || null,
+            referrals: 0,
+            referralEarnings: 0,
+            videosLeft: 6,
+            videoDate: new Date().toDateString(),
+            todayEarnings: 0,
+            todayDate: new Date().toDateString(),
+            lastDaily: 0,
+            createdAt: Date.now(),
+            lastIp: ipCheck.ip,
+            status: 'active',
+            isVerified: true // Google ya verifica el email
+          });
+
+          // Procesar referido si existe
+          if (referrer && referrer !== user.uid) {
+            try {
+              const refUser = doc(db, "users", referrer);
+              const refSnap = await getDoc(refUser);
+              if (refSnap.exists()) {
+                await updateDoc(refUser, {
+                  referrals: increment(1),
+                  referralEarnings: increment(1),
+                  balance: increment(1)
+                });
+                await addDoc(collection(db, "referrals"), {
+                  referrerId: referrer,
+                  referredId: user.uid,
+                  amount: 1,
+                  date: Date.now()
+                });
+              }
+            } catch (err) { console.error("Error ref:", err); }
+          }
+          sessionStorage.removeItem("referrer");
+        }
+        
+        window.location.href = 'dashboard.html';
+      } catch (e) {
+        alert('Error con Google: ' + e.message);
+      }
+    };
+
     window.handleRegister = async () => {
       const email = document.getElementById('regEmail').value;
       const pass = document.getElementById('regPassword').value;
       
       if (!email || pass.length < 6) {
         return alert('Correo inválido o contraseña muy corta (mín. 6)');
+      }
+
+      // --- Medidas Antifraude Básicas ---
+      const ipCheck = await fetch('https://api.ipify.org?format=json').then(r => r.json()).catch(() => ({ip: 'unknown'}));
+      
+      // Bloqueo simple de correos temporales (lista expandible)
+      const tempEmailDomains = ['yopmail.com', 'tempmail.com', 'guerrillamail.com', '10minutemail.com'];
+      const domain = email.split('@')[1];
+      if (tempEmailDomains.includes(domain)) {
+        return alert('No se permiten correos temporales para prevenir fraude.');
       }
 
       try {
@@ -366,7 +548,10 @@
           todayEarnings: 0,
           todayDate: new Date().toDateString(),
           lastDaily: 0,
-          createdAt: Date.now()
+          createdAt: Date.now(),
+          lastIp: ipCheck.ip,
+          status: 'active',
+          isVerified: false
         });
 
         if (referrer && referrer !== user.uid) {
