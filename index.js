@@ -68,6 +68,7 @@ app.all("/postback", async (req, res) => {
     const bonus = Math.random() < 0.1 ? 0.10 : 0.02; 
     const total = payout + bonus;
 
+    const userIp = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
     await db.collection("conversions").add({
       uid: subid,
       payout: payout,
@@ -75,7 +76,7 @@ app.all("/postback", async (req, res) => {
       total: total,
       offer: data.offer_id || "unknown",
       date: Date.now(),
-      ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress
+      ip: userIp
     });
 
     await userRef.update({
