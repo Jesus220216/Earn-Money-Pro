@@ -1103,87 +1103,149 @@
     setTimeout(() => t.remove(), 3000);
   }
 
-  // ============================================
-  // CPX RESEARCH
-  // ============================================
+ // ============================================
+// 🔥 CPX RESEARCH PRO (OPTIMIZADO)
+// ============================================
 
-  function initCPX() {
-    if (!user?.uid) return;
-    
-    window.config = {
-      general_config: {
-        app_id: 32499,
-        ext_user_id: user.uid,
-        email: user.email || "",
-        username: user.displayName || "",
-        secure_hash: "",
-        subid_1: "",
-        subid_2: "",
+let cpxLoaded = false;
+
+function initCPX() {
+  if (!user?.uid) return;
+
+  // limpiar contenedor antes de cargar
+  const container = document.getElementById("cpx-fullscreen");
+  if (container) container.innerHTML = "";
+
+  window.config = {
+    general_config: {
+      app_id: 32499,
+      ext_user_id: user.uid,
+      email: user.email || "",
+      username: user.displayName || "",
+    },
+
+    style_config: {
+      text_color: "#e5e7eb",
+      survey_box: {
+        topbar_background_color: "#10B981",
+        box_background_color: "#1f2937",
+        rounded_borders: true,
+        stars_filled: "#F59E0B",
       },
-      style_config: {
-        text_color: "#e5e7eb",
-        survey_box: {
-          topbar_background_color: "#10B981",
-          box_background_color: "#1f2937",
-          rounded_borders: true,
-          stars_filled: "#F59E0B",
-        },
+    },
+
+    script_config: [
+      {
+        div_id: "cpx-fullscreen",
+        theme_style: 1,
+        order_by: 2,
+        limit_surveys: 20 // 🔥 MÁS ENCUESTAS
       },
-      script_config: [
-        {
-          div_id: "cpx-fullscreen",
-          theme_style: 1,
-          order_by: 2,
-          limit_surveys: 20
-        }
-      ],
-      debug: false,
-      useIFrame: true,
-      iFramePosition: 1,
-      functions: {
-        no_surveys_available: () => {
-          console.log("CPX: No surveys available");
-          const container = document.getElementById("cpx-fullscreen");
-          if (container) container.innerHTML = "<p style='padding: 20px;'>No hay encuestas disponibles en este momento. Intenta más tarde.</p>";
-        },
-        count_new_surveys: (count) => {
-          console.log("CPX: New surveys count:", count);
-        },
-        get_all_surveys: (surveys) => {
-          console.log("CPX: All surveys:", surveys);
-        },
-        get_transaction: (transactions) => {
-          console.log("CPX: Transactions:", transactions);
-        }
+
+      // 🔥 NOTIFICACIONES (MUY IMPORTANTE)
+      {
+        div_id: "notification",
+        theme_style: 4,
+        position: 5
       }
-    };
+    ],
 
-    // Cargar el script de CPX Research v2.0
-    const script = document.createElement('script');
-   script.src = "https://cdn.cpx-research.com/assets/js/script_tag_v2.0.js";
-    script.async = true;
-    document.body.appendChild(script);
-    
-    console.log("📋 CPX Research inicializado para el usuario:", user.uid);
-  }
+    useIFrame: true,
+    iFramePosition: 1,
+    debug: false,
 
-  window.openCPXWall = () => {
-    if (!user?.uid) return showToast("Login requerido ❌");
-    
-    // Cambiar a la sección de CPX en el menú lateral
-    const cpxNavItem = document.querySelector('.nav-item[data-section="cpx"]');
-    if (cpxNavItem) {
-        cpxNavItem.click();
-    }
+    functions: {
+      no_surveys_available: () => {
+        const container = document.getElementById("cpx-fullscreen");
 
-    showToast("📋 Cargando encuestas CPX Research...");
-    
-    const container = document.getElementById("cpx-fullscreen");
-    if (container) {
-        container.scrollIntoView({ behavior: 'smooth' });
+        if (container) {
+          container.innerHTML = `
+            <div style="padding:20px;text-align:center;">
+              😕 No hay encuestas disponibles<br><br>
+              
+              <button onclick="openFullCPX()" style="
+                padding:12px;
+                background:#10B981;
+                border:none;
+                border-radius:8px;
+                font-weight:bold;
+                cursor:pointer;
+              ">
+                🔥 Ver TODAS las encuestas
+              </button>
+            </div>
+          `;
+        }
+      },
+
+      count_new_surveys: (count) => {
+        console.log("🆕 Encuestas nuevas:", count);
+      },
+
+      get_all_surveys: (surveys) => {
+        console.log("📊 Surveys:", surveys);
+      },
+
+      get_transaction: (transactions) => {
+        console.log("💰 Ganancias:", transactions);
+      }
     }
   };
-  
+
+  // evitar duplicar script
+  if (!document.querySelector("#cpx-script")) {
+    const script = document.createElement("script");
+    script.id = "cpx-script";
+    script.src = "https://cdn.cpx-research.com/assets/js/script_tag_v2.0.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }
+
+  console.log("✅ CPX cargado:", user.uid);
+}
+
+// ============================================
+// 🚀 ABRIR SECCIÓN CPX
+// ============================================
+
+window.openCPXWall = () => {
+  if (!user?.uid) return showToast("Login requerido ❌");
+
+  const cpxNavItem = document.querySelector('.nav-item[data-section="cpx"]');
+  if (cpxNavItem) cpxNavItem.click();
+
+  showToast("📋 Cargando encuestas...");
+
+  setTimeout(() => {
+    if (!cpxLoaded) {
+      initCPX();
+      cpxLoaded = true;
+    }
+  }, 400);
+};
+
+// ============================================
+// 🔥 ABRIR WALL COMPLETO (MUCHO MÁS DINERO)
+// ============================================
+
+window.openFullCPX = () => {
+  if (!user?.uid) return;
+
+  const url = `https://wall.cpx-research.com/index.php?app_id=32499&ext_user_id=${user.uid}`;
+  window.open(url, "_blank");
+};
+
+// ============================================
+// 🔄 AUTO-REFRESH (OPCIONAL PERO PRO)
+// ============================================
+
+setInterval(() => {
+  if (cpxLoaded) {
+    console.log("🔄 Refrescando encuestas...");
+    initCPX();
+  }
+}, 60000); // cada 60s
+ 
   // ============================================
   // WHATSAPP SHARE
   // ============================================
