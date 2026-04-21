@@ -1256,8 +1256,30 @@ setInterval(() => {
     window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank");
   };
 
-  // ============================================
-// ADGEM MODAL
+  /// ============================================
+// 🌍 DETECTAR PAÍS (UNA SOLA VEZ)
+// ============================================
+
+let userCountry = null;
+const ADGEM_APPROVED = false; // 🔥 CAMBIA A true CUANDO TE APRUEBEN
+
+async function detectCountry() {
+  if (userCountry) return userCountry;
+
+  try {
+    const res = await fetch("https://ipapi.co/json/");
+    const data = await res.json();
+    userCountry = data.country_code;
+  } catch (err) {
+    console.log("Error detectando país");
+    userCountry = "UNKNOWN";
+  }
+
+  return userCountry;
+}
+
+// ============================================
+// 🚀 OPEN OFFERS PRO
 // ============================================
 
 window.openOffers = async () => {
@@ -1265,41 +1287,30 @@ window.openOffers = async () => {
 
   showToast("🔍 Buscando mejores ofertas para ti...");
 
-  try {
-    // 🌍 Detectar país
-    const res = await fetch("https://ipapi.co/json/");
-    const data = await res.json();
-    const country = data.country_code;
+  const country = await detectCountry();
+  console.log("🌍 País detectado:", country);
 
-    console.log("País detectado:", country);
+  const premium = ["US", "GB", "CA", "AU"];
 
-    // 🔥 países premium
-    const premium = ["US", "GB", "CA", "AU"];
+  // 🥇 SOLO USA ADGEM SI ESTÁ APROBADO
+  if (ADGEM_APPROVED && premium.includes(country)) {
 
-    if (premium.includes(country)) {
-      // 🥇 ADGEM (cuando estés aprobado)
-      const modal = document.getElementById("adgemModal");
-      const frame = document.getElementById("adgemFrame");
+    showToast("🔥 Cargando ofertas premium...");
 
+    const modal = document.getElementById("adgemModal");
+    const frame = document.getElementById("adgemFrame");
+
+    if (modal && frame) {
       modal.style.display = "block";
       frame.src =
         "https://adunits.adgem.com/wall?appid=32365&playerid=" +
         encodeURIComponent(user.uid);
-
-    } else {
-      // 🥈 CPAGRIP (mejor para LATAM)
-      showToast("💰 Completa ofertas para ganar dinero");
-
-      window.open(
-        "https://www.cpagrip.com/show.php?l=0&u=2515689",
-        "_blank"
-      );
     }
 
-  } catch (err) {
-    console.log("Error país, usando fallback");
+  } else {
+    // 💰 CPAGRIP SIEMPRE COMO BASE
+    showToast("💸 Completa 2 ofertas para desbloquear retiro");
 
-    // 🆘 fallback si falla todo
     window.open(
       "https://www.cpagrip.com/show.php?l=0&u=2515689",
       "_blank"
