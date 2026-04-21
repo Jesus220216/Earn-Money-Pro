@@ -1055,7 +1055,7 @@
   let videosLeft = 6;
   let taskCooldown = false;
 
-  const CPA_LINK = "https://getafilenow.com/1890309";
+  const CPA_LINK = "https://www.cpagrip.com/show.php?l=0&u=2515689";
 
   // ============================================
   // UPDATE TIME
@@ -1139,7 +1139,7 @@ function initCPX() {
         div_id: "cpx-fullscreen",
         theme_style: 1,
         order_by: 2,
-        limit_surveys: 20 // 🔥 MÁS ENCUESTAS
+        limit_surveys: 50 // 🔥 MÁS ENCUESTAS
       },
 
       // 🔥 NOTIFICACIONES (MUY IMPORTANTE)
@@ -1260,21 +1260,51 @@ setInterval(() => {
 // ADGEM MODAL
 // ============================================
 
-window.openOffers = () => {
+window.openOffers = async () => {
   if (!user?.uid) return showToast("Login requerido ❌");
 
-  const modal = document.getElementById("adgemModal");
-  const frame = document.getElementById("adgemFrame");
+  showToast("🔍 Buscando mejores ofertas para ti...");
 
-  modal.style.display = "block";
+  try {
+    // 🌍 Detectar país
+    const res = await fetch("https://ipapi.co/json/");
+    const data = await res.json();
+    const country = data.country_code;
 
-  frame.src =
-    "https://adunits.adgem.com/wall?appid=32365&playerid=" +
-    encodeURIComponent(user.uid);
-};
+    console.log("País detectado:", country);
 
-window.closeOffers = () => {
-  document.getElementById("adgemModal").style.display = "none";
+    // 🔥 países premium
+    const premium = ["US", "GB", "CA", "AU"];
+
+    if (premium.includes(country)) {
+      // 🥇 ADGEM (cuando estés aprobado)
+      const modal = document.getElementById("adgemModal");
+      const frame = document.getElementById("adgemFrame");
+
+      modal.style.display = "block";
+      frame.src =
+        "https://adunits.adgem.com/wall?appid=32365&playerid=" +
+        encodeURIComponent(user.uid);
+
+    } else {
+      // 🥈 CPAGRIP (mejor para LATAM)
+      showToast("💰 Completa ofertas para ganar dinero");
+
+      window.open(
+        "https://www.cpagrip.com/show.php?l=0&u=2515689",
+        "_blank"
+      );
+    }
+
+  } catch (err) {
+    console.log("Error país, usando fallback");
+
+    // 🆘 fallback si falla todo
+    window.open(
+      "https://www.cpagrip.com/show.php?l=0&u=2515689",
+      "_blank"
+    );
+  }
 };
 
   // ============================================
