@@ -1170,8 +1170,12 @@
   window.openCPXWall = () => {
     if (!user?.uid) return showToast("Login requerido ❌");
     
-    // Si el script ya está cargado, CPX debería manejar el renderizado.
-    // Si no, podemos intentar forzar una recarga o simplemente mostrar el toast.
+    // Cambiar a la sección de CPX en el menú lateral
+    const cpxNavItem = document.querySelector('.nav-item[data-section="cpx"]');
+    if (cpxNavItem) {
+        cpxNavItem.click();
+    }
+
     showToast("📋 Cargando encuestas CPX Research...");
     
     const container = document.getElementById("cpx-fullscreen");
