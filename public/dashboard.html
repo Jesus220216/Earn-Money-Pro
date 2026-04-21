@@ -10,7 +10,7 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script type="text/javascript" src="https://cdn.cpx-research.com/assets/js/script_tag_v2.0.js"></script>
+  <!-- CPX Research Script se carga dinámicamente en initCPX() -->
   
   <style>
     * {
@@ -1107,10 +1107,10 @@
   // CPX RESEARCH
   // ============================================
 
-  window.openCPXWall = () => {
-    if (!user?.uid) return showToast("Login requerido ❌");
+  function initCPX() {
+    if (!user?.uid) return;
     
-    const config = {
+    window.config = {
       general_config: {
         app_id: 32499,
         ext_user_id: user.uid,
@@ -1144,7 +1144,7 @@
         no_surveys_available: () => {
           console.log("CPX: No surveys available");
           const container = document.getElementById("cpx-fullscreen");
-          if (container) container.innerHTML = "<p>No hay encuestas disponibles en este momento. Intenta más tarde.</p>";
+          if (container) container.innerHTML = "<p style='padding: 20px;'>No hay encuestas disponibles en este momento. Intenta más tarde.</p>";
         },
         count_new_surveys: (count) => {
           console.log("CPX: New surveys count:", count);
@@ -1158,16 +1158,25 @@
       }
     };
 
-    window.config = config;
+    // Cargar el script de CPX Research v2.0
+    const script = document.createElement('script');
+    script.src = "https://sdk.cpx-research.com/index.js";
+    script.async = true;
+    document.body.appendChild(script);
     
-    // Si ya existe el script de CPX, lo reiniciamos si es necesario o simplemente dejamos que actúe
-    // El script de CPX Research v2.0 se inicializa automáticamente con window.config
+    console.log("📋 CPX Research inicializado para el usuario:", user.uid);
+  }
+
+  window.openCPXWall = () => {
+    if (!user?.uid) return showToast("Login requerido ❌");
+    
+    // Si el script ya está cargado, CPX debería manejar el renderizado.
+    // Si no, podemos intentar forzar una recarga o simplemente mostrar el toast.
     showToast("📋 Cargando encuestas CPX Research...");
     
-    // Forzar renderizado si el contenedor está vacío
     const container = document.getElementById("cpx-fullscreen");
-    if (container && container.innerHTML.includes("aparecerán aquí")) {
-        container.innerHTML = "";
+    if (container) {
+        container.scrollIntoView({ behavior: 'smooth' });
     }
   };
   
@@ -1355,6 +1364,7 @@ auth.onAuthStateChanged((u) => {
   if (u) {
     user = u;
     setupRealtime();
+    initCPX();
 
     const frame = document.getElementById("adgemFrame");
     if (frame) {
