@@ -1256,12 +1256,12 @@ setInterval(() => {
     window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank");
   };
 
-  /// ============================================
-// 🌍 DETECTAR PAÍS (UNA SOLA VEZ)
+ // ============================================
+// 🌍 DETECTAR PAÍS
 // ============================================
 
 let userCountry = null;
-const ADGEM_APPROVED = false; // 🔥 CAMBIA A true CUANDO TE APRUEBEN
+const ADGEM_APPROVED = false; // 🔥 cambia a true cuando te aprueben
 
 async function detectCountry() {
   if (userCountry) return userCountry;
@@ -1270,8 +1270,7 @@ async function detectCountry() {
     const res = await fetch("https://ipapi.co/json/");
     const data = await res.json();
     userCountry = data.country_code;
-  } catch (err) {
-    console.log("Error detectando país");
+  } catch {
     userCountry = "UNKNOWN";
   }
 
@@ -1279,37 +1278,57 @@ async function detectCountry() {
 }
 
 // ============================================
-// 🚀 OPEN OFFERS PRO
+// 🔥 OPTILINK
+// ============================================
+
+function openOptilink() {
+  try {
+    if (typeof _lock !== "undefined") {
+      _lock();
+    } else {
+      window.open("https://optilinklock.com/?id=1889113", "_blank");
+    }
+  } catch {
+    window.open("https://optilinklock.com/?id=1889113", "_blank");
+  }
+}
+
+// ============================================
+// 🚀 BOTÓN PRINCIPAL (TODO EN UNO)
 // ============================================
 
 window.openOffers = async () => {
   if (!user?.uid) return showToast("Login requerido ❌");
 
-  showToast("🔍 Buscando mejores ofertas para ti...");
+  showToast("🔍 Preparando ofertas para ti...");
 
   const country = await detectCountry();
-  console.log("🌍 País detectado:", country);
-
   const premium = ["US", "GB", "CA", "AU"];
 
-  // 🥇 SOLO USA ADGEM SI ESTÁ APROBADO
-  if (ADGEM_APPROVED && premium.includes(country)) {
+  const rand = Math.random();
 
-    showToast("🔥 Cargando ofertas premium...");
+  // 🥇 ADGEM (solo si aprobado)
+  if (ADGEM_APPROVED && premium.includes(country) && rand < 0.4) {
+    showToast("🔥 Ofertas premium");
 
     const modal = document.getElementById("adgemModal");
     const frame = document.getElementById("adgemFrame");
 
-    if (modal && frame) {
-      modal.style.display = "block";
-      frame.src =
-        "https://adunits.adgem.com/wall?appid=32365&playerid=" +
-        encodeURIComponent(user.uid);
-    }
+    modal.style.display = "block";
+    frame.src =
+      "https://adunits.adgem.com/wall?appid=32365&playerid=" +
+      encodeURIComponent(user.uid);
+  }
 
-  } else {
-    // 💰 CPAGRIP SIEMPRE COMO BASE
-    showToast("💸 Completa 2 ofertas para desbloquear retiro");
+  // 🥈 OPTILINK
+  else if (rand < 0.7) {
+    showToast("🔓 Desbloquea contenido para ganar dinero");
+    openOptilink();
+  }
+
+  // 🥉 CPAGRIP (seguro 💰)
+  else {
+    showToast("💸 Completa ofertas para retirar dinero");
 
     window.open(
       "https://www.cpagrip.com/show.php?l=0&u=2515689",
