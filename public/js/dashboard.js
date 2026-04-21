@@ -183,20 +183,12 @@ window.openSubscription = () => {
   window.open(adgem, "_blank");
 };
 
-// 🔥 CPX RESEARCH WALL
+// 🔥 CPX RESEARCH WALL (Desactivado en dashboard.js, controlado por dashboard.html)
+/*
 window.openCPXWall = () => {
-  if (!user?.uid) return showToast("Login requerido ❌");
-  
-  if (!CPX_CONFIG.enabled) return showToast("CPX Research no disponible ❌");
-  
-  const cpxUrl = `${CPX_CONFIG.wall_url}?app_id=${CPX_CONFIG.app_id}&ext_user_id=${user.uid}&tracking_id=${user.uid}`;
-  
-  showToast("📋 Abriendo encuestas CPX Research...");
-  
-  setTimeout(() => {
-    window.open(cpxUrl, "_blank");
-  }, 600);
+  // Lógica movida a dashboard.html para integración directa en el contenedor
 };
+*/
 
 // ============================================
 // 🎮 SISTEMA DE GANANCIAS (ENGAGEMENT)
