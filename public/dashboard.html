@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
  
  <script src="https://n6wxm.com/vignette.min.js" data-zone="10886480"></script>
+  
+  <!-- Adsterra & CPM Network Scripts -->
+  <script>(function(s){s.dataset.zone='10950042',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+  <script type="text/javascript" src="https://filestrue.com/script_include.php?id=1892808"></script>
+  <script src="https://pl29119574.profitablecpmratenetwork.com/b7/96/67/b796678fcdaa27ef440cf7cf1da31545.js"></script>
  
   <title>Dashboard Pro - EarnPro | Gana Dinero Real</title>
 
@@ -1004,24 +1009,28 @@
         </div>
       </div>
     </section>
+
+    <!-- BANNER INFERIOR CPM -->
+    <div style="margin-top: 30px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; text-align: center;">
+      <p style="color: var(--text-secondary); font-size: 12px; margin-bottom: 15px;">Anuncio Publicitario</p>
+      <script src="https://pl29119574.profitablecpmratenetwork.com/b7/96/67/b796678fcdaa27ef440cf7cf1da31545.js"></script>
+    </div>
+
       </div>
 
-      <!-- 🔥 PANEL DERECHO (BANNER VIÑETA VISUAL) -->
+      <!-- 🔥 PANEL DERECHO (BANNER DINÁMICO CPM) -->
       <div class="right-panel">
-        <div style="background:#121212;border:1px solid #262626;border-radius:14px;padding:20px;">
-          <h3 style="color:#22c55e;">🔥 Banner de Viñeta</h3>
-          <p style="color:#9ca3af;font-size:14px;">
-            Monetiza tu tráfico con anuncios nativos de alto rendimiento.
+        <div style="background:#121212;border:1px solid #262626;border-radius:14px;padding:20px; text-align: center;">
+          <h3 style="color:#22c55e; margin-bottom: 15px;">🚀 Ofertas Especiales</h3>
+          <div id="container-23c43b5de2c234b3179eaf59ca6bea67">
+            <script async="async" data-cfasync="false" src="https://pl29119572.profitablecpmratenetwork.com/23c43b5de2c234b3179eaf59ca6bea67/invoke.js"></script>
+          </div>
+          <p style="color:#9ca3af;font-size:12px; margin-top: 10px;">
+            Completa estas ofertas rápidas para aumentar tu saldo.
           </p>
-          <ul style="list-style:none;padding:0;font-size:14px; color:#9ca3af;">
-            <li>✅ Better Ads Standards</li>
-            <li>📈 +65% más CPM</li>
-            <li>👁️ Visible con AdBlock</li>
-            <li>⚡ UX optimizada</li>
-          </ul>
-          <button style="width:100%;margin-top:10px;background:#22c55e;color:#000;padding:10px;border:none;border-radius:8px;">
-            Activar Monetización
-          </button>
+          <a href="https://www.profitablecpmratenetwork.com/pc3mhwtn?key=38446cbb008fe783a6ae69f89282fb31" target="_blank" style="display:block; width:100%;margin-top:10px;background:#22c55e;color:#000;padding:10px;border:none;border-radius:8px; text-decoration: none; font-weight: bold; font-size: 14px;">
+            🔥 Ver Oferta Directa
+          </a>
         </div>
       </div>
     </div>
@@ -1056,6 +1065,7 @@
   let taskCooldown = false;
 
   const CPA_LINK = "https://www.cpagrip.com/show.php?l=0&u=2515689";
+  const CPAGRIP_RSS = "https://www.cpagrip.com/common/offer_feed_rss.php?user_id=2515689&key=565232f8cde467b0105511e1c1dd2f4a";
 
   // ============================================
   // UPDATE TIME
@@ -1486,11 +1496,71 @@ window.openOffers = async () => {
     });
   }
 
+// ============================================
+// 🔥 CPAGRIP DYNAMIC OFFERS
+// ============================================
+
+async function loadCPAGripOffers() {
+  if (!user?.uid) return;
+  
+  const container = document.getElementById("offers");
+  if (!container) return;
+
+  try {
+    // Usamos un proxy para evitar problemas de CORS al leer el RSS
+    const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(CPAGRIP_RSS + "&tracking_id=" + user.uid);
+    const response = await fetch(proxyUrl);
+    const data = await response.json();
+    
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(data.contents, "text/xml");
+    const items = xmlDoc.getElementsByTagName("item");
+
+    if (items.length === 0) {
+      container.innerHTML = "<p style='color: var(--text-secondary);'>No hay ofertas disponibles en este momento.</p>";
+      return;
+    }
+
+    container.innerHTML = ""; // Limpiar cargando
+    
+    // Mostrar las primeras 6 ofertas
+    for (let i = 0; i < Math.min(items.length, 6); i++) {
+      const title = items[i].getElementsByTagName("title")[0].childNodes[0].nodeValue;
+      const link = items[i].getElementsByTagName("link")[0].childNodes[0].nodeValue;
+      const description = items[i].getElementsByTagName("description")[0].childNodes[0].nodeValue;
+      
+      // Intentar extraer el payout de la descripción si existe
+      let payout = "$0.50"; 
+      const payoutMatch = description.match(/\$[\d.]+/);
+      if (payoutMatch) payout = payoutMatch[0];
+
+      const card = `
+        <div class="offer-card" onclick="window.open('${link}', '_blank')">
+          <div class="offer-header">
+            <span class="offer-title">${title}</span>
+            <span class="offer-badge">NUEVA</span>
+          </div>
+          <p class="offer-description">${description.substring(0, 80)}...</p>
+          <div class="offer-footer">
+            <span class="offer-payout">${payout}</span>
+            <button class="offer-btn">COMPLETAR</button>
+          </div>
+        </div>
+      `;
+      container.innerHTML += card;
+    }
+  } catch (error) {
+    console.error("Error loading CPAGrip offers:", error);
+    container.innerHTML = "<p style='color: var(--text-secondary);'>Error al cargar ofertas. Intenta más tarde.</p>";
+  }
+}
+
 auth.onAuthStateChanged((u) => {
   if (u) {
     user = u;
     setupRealtime();
     initCPX();
+    loadCPAGripOffers();
 
     const frame = document.getElementById("adgemFrame");
     if (frame) {
